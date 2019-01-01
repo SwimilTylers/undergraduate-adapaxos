@@ -35,14 +35,53 @@ Macros := {
 
 当前[*Micros*]为**paxos实现**，完成的工作为[*Echo Agenda*]，完成不分先后。
 当前工作进展有
+
 ```pseudocode
 Def Echo :=
- *  scmodel: "server-client model of io-channels"
+ *  scmodel: "simple network establishment"
     javadoc: "sufficient comments with javadoc"
-    thread: "concurrency of io-channel"
-    agents: "proposer, acceptor & learner"
+ *  rsm: "replicate state machine"
+ *  agents: "proposer, acceptor & learner"
     poly: "polymorphic-lize"
 .
 ```
 
 希望通过细致的划分任务能够快速的实现本项目！
+
+## 实现模型
+
+### Proposer
+
+1. Proposer借助ProposerNetService完成通讯
+2. Proposer在整个系统中存在多个，如果发生冲突，就随机指数后退
+3. Proposer时钟是全局时钟，假设不存在时间差
+4. Proposer自动选择proposal number
+5. Proposer每次只发出一个提案，在提案结束之前，不会进行下一次提案
+6. Proposer每次的提案只有三种结束的方式
+   1. 本Proposer率先达成共识：结束，准备全新提案
+   2. 本次提案超时：结束，抛出ProposalTimeoutException，Learner决定
+      - 
+7. Proposer每次（重新）提交提案的条件是：
+   1. 全新提案：立即
+   2. Learner超时：随即指数后退
+
+### Acceptor
+
+1. Acceptor借助AcceptorNetService完成通讯
+2. Acceptor在整个系统中存在多个，是共识产生的地方
+3. Acceptor时钟是全局时钟，假设不存在时间差
+4. Acceptor有存储的组件，但是存储的是当前的proposal
+5. Acceptor每次accept一个proposal，发送通知给Learner
+
+### Learner
+
+1. Learner借助LearnerNetService完成通讯
+2. Learner在整个系统中存在多个，每一个server只有一个
+3. Learner时钟是全局时钟，假设不存在时间差
+4. Learner有存储的组件，但是存储的是所有达成的共识
+5. Learner决定达成共识的提案在执行序列中位置
+6. Learner每次的提案有两种结束方式
+   1. 超时
+   2. 完成提案，达成共识
+
+*？learner间的心跳包 *？
