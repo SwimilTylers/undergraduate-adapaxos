@@ -6,12 +6,36 @@ import com.sun.istack.internal.NotNull;
  * @author : Swimiltylers
  * @version : 2018/12/30 19:45
  */
-public interface PaxosMessage {
+public abstract class PaxosMessage<T> {
+    protected String senderName;
+    protected byte[] rawInfo;
 
-    public void fromBytes(@NotNull byte[] msg, int offset, int length);
+    public void setSenderName(@NotNull String senderName) {
+        this.senderName = senderName;
+    }
 
-    public byte[] toBytes();
+    public void setRawInfo(@NotNull byte[] rawInfo) {
+        this.rawInfo = rawInfo;
+    }
 
-    public int getLength();
+    public int getMessageLength() {
+        if (rawInfo != null)
+            return rawInfo.length;
+        else
+            return 0;
+    }
 
+    public String getSenderName() {
+        return senderName;
+    }
+
+    public byte[] getRawInfo() {
+        return rawInfo;
+    }
+
+    abstract protected byte[] toRawInfo(T info);
+    abstract protected T fromRawInfo(byte[] raw);
+
+    abstract public T getInfo();
+    abstract public void SetInfo(T msg);
 }
