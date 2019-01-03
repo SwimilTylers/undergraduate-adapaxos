@@ -24,7 +24,7 @@ import java.util.concurrent.*;
 public class Proposer<Proposal> {
     private static Logger logger = Logger.getLogger(Proposer.class);
 
-    private String name;
+    private String pname;
     private DatagramSocket pcom;
 
     public static final int PCOM_BUFFER_SIZE = 1024;
@@ -34,12 +34,9 @@ public class Proposer<Proposal> {
     private Set<Pair<InetAddress, Integer>> acceptors;
     public static final long INVALID_PROPOSAL_NUM = 0L;
 
-    private boolean ifStart = false;
-    private int consensus;
-
 
     Proposer(int localComPort, String name) throws SocketException {
-        this.name = name;
+        this.pname = name;
         pcom = new DatagramSocket(localComPort);
         pcomBuffer = new byte[PCOM_BUFFER_SIZE];
     }
@@ -61,7 +58,7 @@ public class Proposer<Proposal> {
                 Set<String> acceptorName = new HashSet<>();
                 List<Pair<InetAddress, Integer>> acceptorAddr = new ArrayList<>();
 
-                while (acceptorNum < acceptorAddr.size()){
+                while (acceptorNum > acceptorAddr.size()){
                     rcom.receive(rpack);
                     RegPaxosMessage msg = (RegPaxosMessage)PaxosMessageFactory.readFromPacket(rpack);
 
@@ -88,7 +85,7 @@ public class Proposer<Proposal> {
         return System.currentTimeMillis();
     }
 
-    public void broadcasting(byte[] rawMessage){
+    protected void broadcasting(byte[] rawMessage){
         acceptors.forEach(k-> {
             try {
                 pcom.send(new DatagramPacket(rawMessage, rawMessage.length, k.getKey(), k.getValue()));
@@ -101,7 +98,7 @@ public class Proposer<Proposal> {
     public Pair<Long, Proposal> fetchLatestChosenProposal(final long currentProposalNum, final int expireMillis)
             throws InterruptedException, ExecutionException, TimeoutException {
         // TODO: paxos 报文格式存在问题
-        final byte[] message = PaxosMessageFactory.writeToBytes(name, new ComPaxosMessage());
+        final byte[] message = PaxosMessageFactory.writeToBytes(pname, new ComPaxosMessage());
 
         broadcasting(message);
 
@@ -147,7 +144,7 @@ public class Proposer<Proposal> {
         ComPaxosMessage<Proposal> acceptMessage = new ComPaxosMessage<>();
         acceptMessage.setType(ComPaxosMessage.ComPaxosMessageType.ACCEPT);
         acceptMessage.setProposal(thisProposal);
-        final byte[] message = PaxosMessageFactory.writeToBytes(name, acceptMessage);
+        final byte[] message = PaxosMessageFactory.writeToBytes(pname, acceptMessage);
 
         broadcasting(message);
     }
