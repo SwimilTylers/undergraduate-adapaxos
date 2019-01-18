@@ -1,15 +1,12 @@
-package network;
-
 import javafx.util.Pair;
+import network.message.protocols.PaxosProposalProtocol;
+import network.message.protocols.PaxosTimestampedProposalProtocol;
 import org.apache.log4j.Logger;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 // TODO: logger is not complete
 
@@ -65,7 +62,7 @@ public class demo {
                 acceptors.add(new Pair<>(packet.getAddress(), packet.getPort()));
             }
 
-            // stage 1: prepare<n>
+            // stage 1: makePrepare<n>
             for (Pair<InetAddress, Integer> acc:acceptors
                  ) {
                 try {
@@ -228,6 +225,7 @@ public class demo {
     private static Logger logger = Logger.getLogger(demo.class);
 
     public static void main(String[] args) throws SocketException, UnknownHostException, FileNotFoundException {
+        /*
         System.out.println("[Global] start");
         ExecutorService exec = Executors.newCachedThreadPool();
 
@@ -241,5 +239,6 @@ public class demo {
 
         exec.shutdown();
         System.out.println("[Global] emitted");
+        */
     }
 }

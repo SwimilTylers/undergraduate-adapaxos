@@ -1,20 +1,15 @@
 package agent;
 
+import com.sun.istack.internal.NotNull;
 import javafx.util.Pair;
-import network.message.ComPaxosMessage;
-import network.message.PaxosMessageFactory;
-import network.message.RegPaxosMessage;
+import network.message.protocols.PaxosProposalProtocol;
+import network.message.protocols.PaxosTimestampedProposalProtocol;
+import network.service.NetService;
+import network.service.ObjectUdpNetService;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.*;
 
 /**
@@ -23,129 +18,92 @@ import java.util.concurrent.*;
  */
 public class Proposer<Proposal> {
     private static Logger logger = Logger.getLogger(Proposer.class);
+    public static final int DEFAULT_PROPOSER_REG_PORT = 290118;
+    public static final int DEFAULT_PROPOSER_COM_PORT = 108345;
 
-    private String pname;
-    private DatagramSocket pcom;
+    private String m_agentName;
+    private int m_acceptorSize;
+    private NetService<PaxosTimestampedProposalProtocol> m_netService;
 
-    public static final int PCOM_BUFFER_SIZE = 1024;
-    public static final int PREG_BUFFER_SIZE = PCOM_BUFFER_SIZE;
-    private final byte[] pcomBuffer;
+    private int m_localRegPort = DEFAULT_PROPOSER_REG_PORT;
+    private int m_localComPort = DEFAULT_PROPOSER_COM_PORT;
 
-    private Set<Pair<InetAddress, Integer>> acceptors;
-    public static final long INVALID_PROPOSAL_NUM = 0L;
+    public void initNetService(@NotNull String netId, int acceptorNum, int expireMillis)
+            throws IOException, InterruptedException, ExecutionException, TimeoutException {
+        m_agentName = netId;
+        m_acceptorSize = acceptorNum;
 
+        ObjectUdpNetService.Server<PaxosTimestampedProposalProtocol> netService =
+                new ObjectUdpNetService.Server<PaxosTimestampedProposalProtocol>(netId, m_localRegPort, m_localComPort);
+        netService.initFixedNetPool(acceptorNum, expireMillis);
 
-    Proposer(int localComPort, String name) throws SocketException {
-        this.pname = name;
-        pcom = new DatagramSocket(localComPort);
-        pcomBuffer = new byte[PCOM_BUFFER_SIZE];
+        m_netService = netService;
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        pcom.close();
-        super.finalize();
-    }
-
-    public void initFixedNetPool(final int localRegPort, final int acceptorNum, final int expireMillis) throws SocketException, InterruptedException, ExecutionException, TimeoutException {
-        DatagramSocket rcom = new DatagramSocket(localRegPort);
-        DatagramPacket rpack = new DatagramPacket(new byte[PREG_BUFFER_SIZE], PREG_BUFFER_SIZE);
-
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        Future<Set<Pair<InetAddress, Integer>>> addr = executorService.submit(new Callable<Set<Pair<InetAddress, Integer>>>() {
-            @Override
-            public Set<Pair<InetAddress, Integer>> call() throws Exception {
-                Set<String> acceptorName = new HashSet<>();
-                List<Pair<InetAddress, Integer>> acceptorAddr = new ArrayList<>();
-
-                while (acceptorNum > acceptorAddr.size()){
-                    rcom.receive(rpack);
-                    RegPaxosMessage msg = (RegPaxosMessage)PaxosMessageFactory.readFromPacket(rpack);
-
-                    if (!acceptorName.contains(msg.getSenderName())){
-                        acceptorName.add(msg.getSenderName());
-                        acceptorAddr.add(msg.getInfo());
-                        // TODO: 改用pcom信道，但是传输的信息格式不正确
-                        pcom.send(new DatagramPacket("ack".getBytes(), 3));
-                    }
-                }
-
-                return new HashSet<>(acceptorAddr);
-            }
-        });
-
-        try {
-            acceptors = addr.get(expireMillis, TimeUnit.MILLISECONDS);
-        } finally {
-            executorService.shutdown();
-        }
-    }
-
-    public long generateProposalNum(){
+    public long newProposalNum(){
         return System.currentTimeMillis();
     }
 
-    protected void broadcasting(byte[] rawMessage){
-        acceptors.forEach(k-> {
-            try {
-                pcom.send(new DatagramPacket(rawMessage, rawMessage.length, k.getKey(), k.getValue()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+    public boolean ifSufficient(Set<String> recv_acceptors){
+        return recv_acceptors.size() > m_acceptorSize/2;
     }
 
-    public Pair<Long, Proposal> fetchLatestChosenProposal(final long currentProposalNum, final int expireMillis)
-            throws InterruptedException, ExecutionException, TimeoutException {
-        // TODO: paxos 报文格式存在问题
-        final byte[] message = PaxosMessageFactory.writeToBytes(pname, new ComPaxosMessage());
+    public Pair<Long, Proposal> fetchLatestChosenProposal(final long pNum, final long iNum, final int expireMillis)
+            throws InterruptedException, ExecutionException, TimeoutException, IOException {
 
-        broadcasting(message);
+        /* sending PREPARE<pNum> */
 
-        DatagramPacket cpack = new DatagramPacket(pcomBuffer, pcomBuffer.length);
+        m_netService.putBroadcastObject(PaxosTimestampedProposalProtocol.makePrepare(m_agentName, pNum, iNum));
+
+        /* receiving ACK<pNum, vPNum, v>
+        *  waiting for responses from the majority of acceptors
+        * */
+
         ExecutorService executorService = Executors.newSingleThreadExecutor();
-        Future<Pair<Long, Proposal>> ret = executorService.submit(new Callable<Pair<Long, Proposal>>() {
-            @Override
-            public Pair<Long, Proposal> call() throws Exception {
-                long currentMaxPNum = INVALID_PROPOSAL_NUM;
-                Proposal currentMaxPNumProposal = null;
+        Future<List<Pair<Long, Proposal>>> ret = executorService.submit(() -> {
+            List<Pair<Long, Proposal>> acks = new ArrayList<>();
+            Set<String> acceptors = new HashSet<>();
 
-                int currentAck = 0;
+            while (!ifSufficient(acceptors)){
+                PaxosTimestampedProposalProtocol ack = m_netService.getArrivalObject().getKey();
 
-                while (currentAck < acceptors.size()/2){
-                    pcom.receive(cpack);
-                    // TODO: paxos 报文读取方式有问题
-                    ComPaxosMessage<Proposal> response = (ComPaxosMessage<Proposal>)PaxosMessageFactory.readFromPacket(cpack);
-                    if (response.getProposalNum() == currentProposalNum){
-                        if (response.getMaxChosenProposalNum() >= currentMaxPNum){
-                            currentMaxPNum = response.getMaxChosenProposalNum();
-                            currentMaxPNumProposal = response.getProposal();
-                        }
-                        ++currentAck;
+                if (ack.getIssueNum() == iNum){
+                    if (ack.getPNum() > pNum){
+                        acks.clear();
+                        break;
+                    }
+                    else if(ack.getPNum() == pNum
+                            && ack.getProposalType() == PaxosProposalProtocol.PROPOSAL_TYPE.PROPOSAL_ACK
+                            && !acceptors.contains(ack.getSenderName())){
+                        acceptors.add(ack.getSenderName());
+                        Pair<Long, Proposal> info = PaxosTimestampedProposalProtocol.resoluteAck(ack);
+                        acks.add(info);
                     }
                 }
-
-                return new Pair<>(currentMaxPNum, currentMaxPNumProposal);
+                else{
+                    // TODO: iNum 不同的情况下的处理方式
+                    assert ack.getIssueNum() == iNum;
+                }
             }
+
+            return acks;
         });
 
-        Pair<Long, Proposal> latestChosenProposal = null;
+        List<Pair<Long, Proposal>> acks = null;
         try {
-            latestChosenProposal = ret.get(expireMillis, TimeUnit.MILLISECONDS);
+             acks = ret.get(expireMillis, TimeUnit.MILLISECONDS);
         } finally {
             executorService.shutdown();
         }
 
-        return latestChosenProposal;
+
+        /* find the latest chosen proposal */
+
+        return Collections.max(acks, (a,b)->b.getKey().compareTo(a.getKey()));
     }
 
-    public void decideCertainProposal(final long currentProposalNum, Proposal thisProposal){
-        // TODO: paxos 报文格式存在问题
-        ComPaxosMessage<Proposal> acceptMessage = new ComPaxosMessage<>();
-        acceptMessage.setType(ComPaxosMessage.ComPaxosMessageType.ACCEPT);
-        acceptMessage.setProposal(thisProposal);
-        final byte[] message = PaxosMessageFactory.writeToBytes(pname, acceptMessage);
-
-        broadcasting(message);
+    public void decideCertainProposal(final long pNum, final long iNum, Proposal decision) throws IOException {
+        PaxosTimestampedProposalProtocol msg = PaxosTimestampedProposalProtocol.makeAccept(m_agentName, pNum, iNum, decision);
+        m_netService.putBroadcastObject(msg);
     }
 }

@@ -59,8 +59,7 @@ Def Echo :=
 5. Proposer每次只发出一个提案，在提案结束之前，不会进行下一次提案
 6. Proposer每次的提案只有三种结束的方式
    1. 本Proposer率先达成共识：结束，准备全新提案
-   2. 本次提案超时：结束，抛出ProposalTimeoutException，Learner决定
-      - 
+   2. 本次提案超时：结束，抛出ProposalTimeoutException，Learner决定:TODO
 7. Proposer每次（重新）提交提案的条件是：
    1. 全新提案：立即
    2. Learner超时：随即指数后退
