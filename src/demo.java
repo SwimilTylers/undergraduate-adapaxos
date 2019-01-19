@@ -1,12 +1,16 @@
+import agent.Acceptor;
+import agent.Proposer;
 import javafx.util.Pair;
-import network.message.protocols.PaxosProposalProtocol;
-import network.message.protocols.PaxosTimestampedProposalProtocol;
-import org.apache.log4j.Logger;
+import network.service.ObjectUdpNetService;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.*;
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeoutException;
 
 // TODO: logger is not complete
 
@@ -17,228 +21,149 @@ import java.util.ArrayList;
  * Time: 23:45
  */
 public class demo {
-    static class Proposer implements Runnable {
-        private static Logger logger = Logger.getLogger(demo.Proposer.class);
+    public static class netServiceTest{
+        final static int[][] serverPorts = {{55432, 23091}, {55511, 46001}};
+        final static int[][] clientPorts = {{32213, 42232}, {60991, 56771}};
 
-        private DatagramSocket serverSocket;
-        private byte[] data = new byte[1024];
+        final static String[] serverId = {"server0", "server1"};
+        final static String[] clientIds = {"client0", "client1"};
 
-        private int totalAccNum;
-        private ArrayList<Pair<InetAddress, Integer>> acceptors = new ArrayList<>();
-
-        private int currentPNum;
-        private boolean ifStart = false;
-        private int consensus;
-
-
-        Proposer(int startPNum, int port, int totalAccNum) throws SocketException, FileNotFoundException {
-            this.totalAccNum = totalAccNum;
-            this.currentPNum = startPNum;
-
-            serverSocket = new DatagramSocket(port);
-        }
-
-        @Override
-        protected void finalize() throws Throwable {
-            serverSocket.close();
-            super.finalize();
-        }
-
-        @Override
-        public void run() {
-            DatagramPacket packet = new DatagramPacket(data, data.length);
-
-            // register acceptors
-            while (totalAccNum > acceptors.size()){
-                try {
-                    serverSocket.receive(packet);
-                } catch (IOException e) {
-                    logger.error(e);
-                    e.printStackTrace();
-                }
-                String info = new String(data, 0, packet.getLength());
-                logger.error("[Proposer] REGISTER "+info);
-
-                acceptors.add(new Pair<>(packet.getAddress(), packet.getPort()));
-            }
-
-            // stage 1: makePrepare<n>
-            for (Pair<InetAddress, Integer> acc:acceptors
-                 ) {
-                try {
-                    byte[] reply = ("PREPARE <"+currentPNum+">").getBytes();
-                    serverSocket.send(new DatagramPacket(reply, reply.length, acc.getKey(), acc.getValue()));
-                } catch (IOException e) {
-                    logger.error(e);
-                    e.printStackTrace();
-                }
-            }
-
-            // stage 1.5: wait for the majority response
-            boolean ifDecide = false;
-            int receAccNum = 0;
-            ifStart = false;
-            int maxRecePNum = 0;
-            while (!ifDecide){
-                try {
-                    serverSocket.receive(packet);
-                } catch (IOException e) {
-                    logger.error(e);
-                    e.printStackTrace();
-                }
-                String[] ack = new String(data, 0, packet.getLength()).split(" ");
-                if (ack[0].equals("ACK")){
-                    if (receAccNum < totalAccNum/2){
-
-                        String[] triple = ack[1].substring(1, ack[1].length()-1).split(",");
-
-                        int chosen = Integer.valueOf(triple[1]);
-                        int chosenPNum = Integer.valueOf(triple[2]);
-
-                        if (!ifStart || chosenPNum > maxRecePNum){
-                            consensus = chosen;
-                            maxRecePNum = chosenPNum;
-                            ifStart = true;
-                        }
-
-
-                        ++receAccNum;
-                    }
-                    else
-                        ifDecide = true;
-                }
-            }
-
-            // stage 2: decide
-            for (Pair<InetAddress, Integer> acc:acceptors
-            ) {
-                try {
-                    byte[] reply = ("ACCEPT <"+currentPNum+","+consensus+">").getBytes();
-                    serverSocket.send(new DatagramPacket(reply, reply.length, acc.getKey(), acc.getValue()));
-                } catch (IOException e) {
-                    logger.error(e);
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-
-    static class Acceptor implements Runnable {
-        private static Logger logger = Logger.getLogger(demo.Acceptor.class);
-
-        private DatagramSocket clientSocket;
-        private Pair<InetAddress, Integer> proposer;
-        private String name;
-
-        private byte[] data = new byte[1024];
-
-        int input;
-        boolean ifStart = false;
-        int maxPNum;
-        int decision, decPNum;
-
-        Acceptor(String name, int input, String toIp, int toPort) throws UnknownHostException, SocketException, FileNotFoundException {
-            InetAddress inet = InetAddress.getByName(toIp);
-            clientSocket = new DatagramSocket();
-            this.name = name;
-            proposer = new Pair<>(inet, toPort);
-            this.input = input;
-            decision = input;
-
-            logger.error("["+name+"] INPUT "+input);
-        }
-
-        @Override
-        protected void finalize() throws Throwable {
-            clientSocket.close();
-            super.finalize();
-        }
-
-        @Override
-        public void run() {
+        static Set<Pair<InetAddress, Integer>> serverRegIP = null;
+        static {
             try {
-                DatagramPacket init = new DatagramPacket(name.getBytes(), name.length(), proposer.getKey(), proposer.getValue());
-                clientSocket.send(init);
-            } catch (IOException e) {
-                logger.error(e);
+                serverRegIP = new HashSet<>();
+                serverRegIP.add(new Pair<InetAddress, Integer>(InetAddress.getByName("localhost"), serverPorts[0][0]));
+                serverRegIP.add(new Pair<InetAddress, Integer>(InetAddress.getByName("localhost"), serverPorts[1][0]));
+            } catch (UnknownHostException e) {
                 e.printStackTrace();
             }
+        }
 
-            DatagramPacket packet = new DatagramPacket(data, data.length);
-            boolean ifDecide = false;
-            while (!ifDecide){
+        public static void test0() throws IOException {
+            ObjectUdpNetService.Server<Integer> server0 = new ObjectUdpNetService.Server<>(serverId[0], serverPorts[0][0], serverPorts[0][1]);
+            ObjectUdpNetService.Server<Integer> server1 = new ObjectUdpNetService.Server<>(serverId[1], serverPorts[1][0], serverPorts[1][1]);
+            ObjectUdpNetService.Client<Integer> client0 = new ObjectUdpNetService.Client<>(clientIds[0], clientPorts[0][0], clientPorts[0][1]);
+            ObjectUdpNetService.Client<Integer> client1 = new ObjectUdpNetService.Client<>(clientIds[1], clientPorts[1][0], clientPorts[1][1]);
+
+            client0.setRegNetPool(serverRegIP);
+            client1.setRegNetPool(serverRegIP);
+
+            ExecutorService executorService = Executors.newCachedThreadPool();
+            executorService.execute(() -> {
                 try {
-                    clientSocket.receive(packet);
-                } catch (IOException e) {
-                    logger.error(e);
+                    server0.initFixedNetPool(clientIds.length, 1000);
+                } catch (InterruptedException | ExecutionException | TimeoutException e) {
                     e.printStackTrace();
                 }
-
-                int msglen = packet.getLength();
-                String msg = new String(packet.getData(), 0, msglen);
-                logger.error("["+name+"] get "+ msg);
-
-                String[] analysis = msg.split(" ");
-                if (analysis[0].equals("PREPARE")){
-                    int pNum = Integer.valueOf(analysis[1].substring(1, analysis[1].length()-1));
-                    if (!ifStart || pNum >= maxPNum){
-                        ifStart = true;
-                        maxPNum = pNum;
-
-                        byte[] ack = ("ACK <"+pNum+","+decision+","+decPNum+">").getBytes();
-                        DatagramPacket ackpack = new DatagramPacket(ack, ack.length, proposer.getKey(), proposer.getValue());
-                        try {
-                            clientSocket.send(ackpack);
-                        } catch (IOException e) {
-                            logger.error(e);
-                            e.printStackTrace();
-                        }
+            });
+            executorService.execute(() -> {
+                try {
+                    server1.initFixedNetPool(clientIds.length, 1000);
+                } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                    e.printStackTrace();
+                }
+            });
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        client0.initSelfExistence(1000);
+                    } catch (InterruptedException | TimeoutException | ExecutionException | IOException e) {
+                        e.printStackTrace();
                     }
                 }
-                else if (analysis[0].equals("ACCEPT")){
-                    String[] toNum = analysis[1].substring(1, analysis[1].length()-1).split(",");
-                    int pNum = Integer.valueOf(toNum[0]);
-                    int consensus = Integer.valueOf(toNum[1]);
-                    if (pNum >= maxPNum){
-                        decision = consensus;
-                        decPNum = pNum;
-
-                        byte[] ack = ("ACCEPTED <"+pNum+","+decision+">").getBytes();
-                        DatagramPacket ackpack = new DatagramPacket(ack, ack.length, proposer.getKey(), proposer.getValue());
-                        try {
-                            clientSocket.send(ackpack);
-                        } catch (IOException e) {
-                            logger.error(e);
-                            e.printStackTrace();
-                        }
-
-                        ifDecide = true;
+            });
+            executorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        client1.initSelfExistence(1000);
+                    } catch (InterruptedException | TimeoutException | ExecutionException | IOException e) {
+                        e.printStackTrace();
                     }
                 }
-            }
+            });
         }
     }
 
-    private static final int accCount = 5;
-    private static final String proposerIP = "localhost";
-    private static final int proposerPort = 10010;
-    private static Logger logger = Logger.getLogger(demo.class);
+    public static class paxosPhaseTest{
+        static Proposer<Integer> proposer0 = getProposer(netServiceTest.serverPorts[0][0], netServiceTest.serverPorts[0][1]);
+        static Proposer<Integer> proposer1 = getProposer(netServiceTest.serverPorts[1][0], netServiceTest.serverPorts[1][1]);
+        static Acceptor<Integer> acceptor0 = getAcceptor(4, netServiceTest.clientPorts[0][0], netServiceTest.clientPorts[0][1]);
+        static Acceptor<Integer> acceptor1 = getAcceptor(5, netServiceTest.clientPorts[1][0], netServiceTest.clientPorts[1][1]);
 
-    public static void main(String[] args) throws SocketException, UnknownHostException, FileNotFoundException {
-        /*
-        System.out.println("[Global] start");
-        ExecutorService exec = Executors.newCachedThreadPool();
+        static Runnable paxos0 = () -> {
+            ExecutorService exe = Executors.newCachedThreadPool();
+            exe.execute(() -> {
+                try {
+                    proposer0.initNetService(netServiceTest.serverId[0], netServiceTest.clientIds.length, 1000);
+                    long pNum = proposer0.newProposalNum();
+                    Pair<Long, Integer> stat = proposer0.fetchLatestChosenProposal(pNum, 0, 1000);
+                    proposer0.decideCertainProposal(pNum, 0, stat.getValue());
+                } catch (IOException | InterruptedException | ExecutionException | TimeoutException e) {
+                    e.printStackTrace();
+                }
+            });
+            exe.execute(() -> {
+                try {
+                    acceptor0.initNetService2Proposer(netServiceTest.clientIds[0], netServiceTest.serverRegIP, 1000);
+                    acceptor0.workingOnCertainIssue(0);
+                } catch (IOException | InterruptedException | ExecutionException | TimeoutException e) {
+                    e.printStackTrace();
+                }
+            });
+            exe.shutdown();
+        };
 
-        Proposer proposer = new Proposer(0, proposerPort, accCount);
-        exec.execute(proposer);
+        static Runnable paxos1 = () -> {
+            ExecutorService exe = Executors.newCachedThreadPool();
+            exe.execute(() -> {
+                try {
+                    proposer1.initNetService(netServiceTest.serverId[1], netServiceTest.clientIds.length, 1000);
+                } catch (IOException | InterruptedException | ExecutionException | TimeoutException e) {
+                    e.printStackTrace();
+                }
+            });
+            exe.execute(() -> {
+                try {
+                    acceptor1.initNetService2Proposer(netServiceTest.clientIds[1], netServiceTest.serverRegIP, 1000);
+                    acceptor1.workingOnCertainIssue(0);
+                } catch (IOException | InterruptedException | ExecutionException | TimeoutException e) {
+                    e.printStackTrace();
+                }
+            });
+            exe.shutdown();
+        };
 
-        for (int i = 0; i < accCount; i++) {
-            Acceptor acceptor = new Acceptor("ACC-"+i, new Random().nextInt(64), proposerIP, proposerPort);
-            exec.execute(acceptor);
+        public static Proposer<Integer> getProposer(int localRegPort, int localComPort){
+            Proposer<Integer> p = new Proposer<>();
+            p.setLocalRegPort(localRegPort);
+            p.setLocalComPort(localComPort);
+
+            return p;
         }
 
-        exec.shutdown();
-        System.out.println("[Global] emitted");
-        */
+        public static Acceptor<Integer> getAcceptor(Integer init, int localRegPort, int localComPort){
+            Acceptor<Integer> a = new Acceptor<>();
+            a.setInitDecision(init);
+            a.setLocalRegPort(localRegPort);
+            a.setLocalComPort(localComPort);
+
+            return a;
+        }
+
+        public static void test0(){
+            ExecutorService executorService = Executors.newCachedThreadPool();
+            executorService.execute(paxos0);
+            executorService.execute(paxos1);
+            executorService.shutdown();
+        }
+    }
+
+
+
+
+    public static void main(String[] args) {
+        paxosPhaseTest.test0();
     }
 }

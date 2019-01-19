@@ -19,17 +19,17 @@ public class RegistrationProtocol implements Serializable {
         return m_senderName;
     }
 
-    public Pair<InetAddress, Integer> getAnotherChannel() {
+    public Pair<String, Integer> getAnotherChannel() {
         return m_anotherChannel;
     }
 
     protected String m_senderName;
-    protected Pair<InetAddress, Integer> m_anotherChannel;
+    protected Pair<String, Integer> m_anotherChannel;
 
     RegistrationProtocol(){}
 
     public RegistrationProtocol(@NotNull String senderName,
-                                @NotNull Pair<InetAddress, Integer> anotherChannel){
+                                @NotNull Pair<String, Integer> anotherChannel){
         this.m_senderName = senderName;
         this.m_anotherChannel = anotherChannel;
     }
@@ -37,13 +37,18 @@ public class RegistrationProtocol implements Serializable {
     public RegistrationProtocol(@NotNull String senderName,
                                 InetAddress anotherChannel_inet, int anotherChannel_port){
         this.m_senderName = senderName;
-        this.m_anotherChannel = new Pair<>(anotherChannel_inet, anotherChannel_port);
+        this.m_anotherChannel = new Pair<>(anotherChannel_inet.getHostAddress(), anotherChannel_port);
     }
 
     public RegistrationProtocol(@NotNull String senderName,
                                 String anotherChannel_inet, int anotherChannel_port)
             throws UnknownHostException {
         this.m_senderName = senderName;
-        this.m_anotherChannel = new Pair<>(InetAddress.getByName(anotherChannel_inet), anotherChannel_port);
+        this.m_anotherChannel = new Pair<>(anotherChannel_inet, anotherChannel_port);
+    }
+
+    @Override
+    public String toString() {
+        return m_senderName + ": " + m_anotherChannel;
     }
 }

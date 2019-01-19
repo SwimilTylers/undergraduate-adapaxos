@@ -20,8 +20,8 @@ import java.util.concurrent.*;
  */
 public class Acceptor<Proposal> {
     private static Logger logger = Logger.getLogger(Proposer.class);
-    public static final int DEFAULT_ACCEPTOR_REG_PORT = 290119;
-    public static final int DEFAULT_ACCEPTOR_COM_PORT = 108346;
+    public static final int DEFAULT_ACCEPTOR_REG_PORT = 7501;
+    public static final int DEFAULT_ACCEPTOR_COM_PORT = 5578;
 
     public static final int DEFAULT_ACCEPTOR_INFOREG_PORT = 40010;
     public static final int DEFAULT_ACCEPTOR_INFOCOM_PORT = 40020;
@@ -40,7 +40,13 @@ public class Acceptor<Proposal> {
 
     private PriorityQueue<Pair<Long, Proposal>> proposalHistory = new PriorityQueue<>((a,b)->b.getKey().compareTo(a.getKey()));
 
-    private Proposal initDecision;
+    private Proposal m_initDecision;
+
+    public Acceptor(){}
+
+    public Acceptor(Proposal initDecision){
+        m_initDecision = initDecision;
+    }
 
     private NetService<PaxosTimestampedProposalProtocol> initNetServiceInternal(
             @NotNull String netId, @NotNull Set<Pair<InetAddress, Integer>> regNetPool,
@@ -69,50 +75,47 @@ public class Acceptor<Proposal> {
     public void workingOnCertainIssue(long iNum){
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         try {
-            executorService.execute(new Runnable() {
-                @Override
-                public void run() {
-                    while (!Thread.interrupted()) {
-                        try {
-                            Pair<PaxosTimestampedProposalProtocol, Pair<InetAddress, Integer>> info = m_netService2Proposer.getArrivalObject();
-                            PaxosTimestampedProposalProtocol msg = info.getKey();
+            executorService.execute(() -> {
+                while (!Thread.interrupted()) {
+                    try {
+                        Pair<PaxosTimestampedProposalProtocol, Pair<InetAddress, Integer>> info = m_netService2Proposer.getArrivalObject();
+                        PaxosTimestampedProposalProtocol msg = info.getKey();
 
-                            if (msg.getIssueNum() == iNum) {
-                                if (proposalHistory.isEmpty() || msg.getPNum() >= proposalHistory.peek().getKey()) {
-                                    if (msg.getProposalType() == PaxosProposalProtocol.PROPOSAL_TYPE.PROPOSAL_PREPARE) {
-                                        Pair<Long, Proposal> ack = proposalHistory.isEmpty()
-                                                ? new Pair<>(PaxosTimestampedProposalProtocol.PNUM_NO_SUCH_HISTORY, initDecision)
-                                                : proposalHistory.peek();
-                                        PaxosTimestampedProposalProtocol reply = PaxosTimestampedProposalProtocol.makeAck(
+                        if (msg.getIssueNum() == iNum) {
+                            if (proposalHistory.isEmpty() || msg.getPNum() >= proposalHistory.peek().getKey()) {
+                                if (msg.getProposalType() == PaxosProposalProtocol.PROPOSAL_TYPE.PROPOSAL_PREPARE) {
+                                    Pair<Long, Proposal> ack = proposalHistory.isEmpty()
+                                            ? new Pair<>(PaxosTimestampedProposalProtocol.PNUM_NO_SUCH_HISTORY, m_initDecision)
+                                            : proposalHistory.peek();
+                                    PaxosTimestampedProposalProtocol reply = PaxosTimestampedProposalProtocol.makeAck(
+                                            m_agentName,
+                                            msg.getPNum(),
+                                            iNum,
+                                            ack.getKey(),
+                                            ack.getValue()
+                                    );
+                                    m_netService2Proposer.putDepartureObject(reply, info.getValue().getKey(), info.getValue().getValue());
+                                }
+                                else if (msg.getProposalType() == PaxosProposalProtocol.PROPOSAL_TYPE.PROPOSAL_ACCEPT) {
+                                    Proposal chosenOne = PaxosTimestampedProposalProtocol.resoluteAccept(msg);
+                                    proposalHistory.add(new Pair<>(msg.getPNum(), chosenOne));
+                                    if (m_netService2Learner != null){
+                                        PaxosTimestampedProposalProtocol accepted = PaxosTimestampedProposalProtocol.makeAccepted(
                                                 m_agentName,
                                                 msg.getPNum(),
                                                 iNum,
-                                                ack.getKey(),
-                                                ack.getValue()
+                                                chosenOne
                                         );
-                                        m_netService2Proposer.putDepartureObject(reply, info.getValue().getKey(), info.getValue().getValue());
-                                    }
-                                    else if (msg.getProposalType() == PaxosProposalProtocol.PROPOSAL_TYPE.PROPOSAL_ACCEPT) {
-                                        Proposal chosenOne = PaxosTimestampedProposalProtocol.resoluteAccept(msg);
-                                        proposalHistory.add(new Pair<>(msg.getPNum(), chosenOne));
-                                        if (m_netService2Learner != null){
-                                            PaxosTimestampedProposalProtocol accepted = PaxosTimestampedProposalProtocol.makeAccepted(
-                                                    m_agentName,
-                                                    msg.getPNum(),
-                                                    iNum,
-                                                    chosenOne
-                                            );
-                                            m_netService2Learner.putBroadcastObject(accepted);
-                                        }
+                                        m_netService2Learner.putBroadcastObject(accepted);
                                     }
                                 }
-                            } else {
-                                // TODO: iNum不同未处理
-                                assert msg.getIssueNum() == iNum;
                             }
-                        } catch (IOException | ClassNotFoundException e) {
-                            e.printStackTrace();
+                        } else {
+                            // TODO: iNum不同未处理
+                            assert msg.getIssueNum() == iNum;
                         }
+                    } catch (IOException | ClassNotFoundException e) {
+                        e.printStackTrace();
                     }
                 }
             });
@@ -122,10 +125,42 @@ public class Acceptor<Proposal> {
     }
 
     public void setInitDecision(Proposal initDecision) {
-        this.initDecision = initDecision;
+        this.m_initDecision = initDecision;
     }
 
     public Proposal getInitDecision() {
-        return initDecision;
+        return m_initDecision;
+    }
+
+    public int getLocalRegPort() {
+        return m_localRegPort;
+    }
+
+    public int getLocalComPort() {
+        return m_localComPort;
+    }
+
+    public int getLocalInfoRegPort() {
+        return m_localInfoRegPort;
+    }
+
+    public int getLocalInfoComPort() {
+        return m_localInfoComPort;
+    }
+
+    public void setLocalRegPort(int localRegPort) {
+        this.m_localRegPort = localRegPort;
+    }
+
+    public void setLocalComPort(int localComPort) {
+        this.m_localComPort = localComPort;
+    }
+
+    public void setLocalInfoRegPort(int localInfoRegPort) {
+        this.m_localInfoRegPort = localInfoRegPort;
+    }
+
+    public void setLocalInfoComPort(int localInfoComPort) {
+        this.m_localInfoComPort = localInfoComPort;
     }
 }

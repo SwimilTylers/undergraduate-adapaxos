@@ -18,8 +18,8 @@ import java.util.concurrent.*;
  */
 public class Proposer<Proposal> {
     private static Logger logger = Logger.getLogger(Proposer.class);
-    public static final int DEFAULT_PROPOSER_REG_PORT = 290118;
-    public static final int DEFAULT_PROPOSER_COM_PORT = 108345;
+    public static final int DEFAULT_PROPOSER_REG_PORT = 7500;
+    public static final int DEFAULT_PROPOSER_COM_PORT = 5586;
 
     private String m_agentName;
     private int m_acceptorSize;
@@ -98,12 +98,30 @@ public class Proposer<Proposal> {
 
 
         /* find the latest chosen proposal */
-
-        return Collections.max(acks, (a,b)->b.getKey().compareTo(a.getKey()));
+        if (acks.isEmpty())
+            return null;
+        else
+            return Collections.max(acks, (a,b)->b.getKey().compareTo(a.getKey()));
     }
 
     public void decideCertainProposal(final long pNum, final long iNum, Proposal decision) throws IOException {
         PaxosTimestampedProposalProtocol msg = PaxosTimestampedProposalProtocol.makeAccept(m_agentName, pNum, iNum, decision);
         m_netService.putBroadcastObject(msg);
+    }
+
+    public int getLocalRegPort() {
+        return m_localRegPort;
+    }
+
+    public void setLocalRegPort(int localRegPort) {
+        this.m_localRegPort = localRegPort;
+    }
+
+    public int getLocalComPort() {
+        return m_localComPort;
+    }
+
+    public void setLocalComPort(int localComPort) {
+        this.m_localComPort = localComPort;
     }
 }

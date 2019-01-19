@@ -8,6 +8,7 @@ import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.*;
@@ -24,98 +25,144 @@ abstract public class ObjectUdpNetService<ComMessage_t> implements NetService<Co
 
     protected Set<Pair<InetAddress, Integer>> regNetPool;
     protected DatagramSocket regSocket;
+    protected int regPort;
 
-    protected ObjectInputStream regIn;
     protected ByteArrayInputStream regInBuffer;
     protected DatagramPacket regInPack;
 
     protected ObjectOutputStream regOut;
     protected ByteArrayOutputStream regOutBuffer;
+    protected final byte[] regOutBufferPrefix;
 
 
     protected Set<Pair<InetAddress, Integer>> comNetPool;
     protected DatagramSocket comSocket;
+    protected int comPort;
 
-    protected ObjectInputStream comIn;
     protected ByteArrayInputStream comInBuffer;
     protected DatagramPacket comInPack;
 
     protected ObjectOutputStream comOut;
     protected ByteArrayOutputStream comOutBuffer;
+    protected final byte[] comOutBufferPrefix;
 
     public ObjectUdpNetService(@NotNull String netId, final int localRegPort, final int localComPort) throws IOException {
-        regSocket = new DatagramSocket(localRegPort);
         netServiceName = netId;
+
+        regSocket = new DatagramSocket(localRegPort);
+        regPort = localRegPort;
 
         byte[] inBuffer = new byte[REG_BUFFER_SIZE];
         regInBuffer = new ByteArrayInputStream(inBuffer);
-        regIn = new ObjectInputStream(regInBuffer);
         regInPack = new DatagramPacket(inBuffer, inBuffer.length);
 
         regOutBuffer = new ByteArrayOutputStream(REG_BUFFER_SIZE);
         regOut = new ObjectOutputStream(regOutBuffer);
+        regOutBufferPrefix = regOutBuffer.toByteArray();
 
         comSocket = new DatagramSocket(localComPort);
+        comPort = localComPort;
 
-        inBuffer = new byte[COM_BUFFER_SIZE];
-        comInBuffer = new ByteArrayInputStream(inBuffer);
-        comIn = new ObjectInputStream(comInBuffer);
-        comInPack = new DatagramPacket(inBuffer, inBuffer.length);
+        byte[] c_inBuffer = new byte[COM_BUFFER_SIZE];
+        comInBuffer = new ByteArrayInputStream(c_inBuffer);
+        comInPack = new DatagramPacket(c_inBuffer, c_inBuffer.length);
 
         comOutBuffer = new ByteArrayOutputStream(COM_BUFFER_SIZE);
         comOut = new ObjectOutputStream(comOutBuffer);
+        comOutBufferPrefix = comOutBuffer.toByteArray();
     }
 
     @Override
     protected void finalize() throws Throwable {
-        regIn.close();
         regOut.close();
+        comOut.close();
 
         regSocket.close();
+        comSocket.close();
         super.finalize();
     }
 
     public void send (boolean isReg, @NotNull Object message, @NotNull InetAddress addr, int port) throws IOException {
         if (isReg){
             regOut.writeObject(message);
-            regSocket.send(new DatagramPacket(regOutBuffer.toByteArray(), regOutBuffer.size(), addr, port));
+            regOut.flush();
+            byte[] sendBytes = regOutBuffer.toByteArray();
+            regSocket.send(new DatagramPacket(sendBytes, sendBytes.length, addr, port));
 
             regOut.reset();
+            regOutBuffer.reset();
+            regOutBuffer.write(regOutBufferPrefix); // BufferPrefix is necessary prefix for any OutputBuffer working for ObjectOutputBuffer
         }
         else{
             comOut.writeObject(message);
-            comSocket.send(new DatagramPacket(comOutBuffer.toByteArray(), comOutBuffer.size(), addr, port));
+            comOut.flush();
+            byte[] sendBytes = comOutBuffer.toByteArray();
+            comSocket.send(new DatagramPacket(sendBytes, sendBytes.length, addr, port));
 
             comOut.reset();
+            comOutBuffer.reset();
+            comOutBuffer.write(comOutBufferPrefix); // BufferPrefix is necessary prefix for any OutputBuffer working for ObjectOutputBuffer
         }
     }
 
     public void sendAll(boolean isReg, @NotNull Object message) throws IOException {
-        Set<Pair<InetAddress, Integer>> pool = isReg ? regNetPool : comNetPool;
-        regOut.writeObject(message);
-        byte[] sendBytes = regOutBuffer.toByteArray();
+        if (isReg){
+            regOut.writeObject(message);
+            regOut.flush();
+            byte[] sendBytes = regOutBuffer.toByteArray();
 
-        pool.forEach(a-> {
-            try {
-                regSocket.send(new DatagramPacket(sendBytes, sendBytes.length, a.getKey(), a.getValue()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
+            regNetPool.forEach(a -> {
+                try {
+                    regSocket.send(new DatagramPacket(sendBytes, sendBytes.length, a.getKey(), a.getValue()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            regOut.reset();
+            regOutBuffer.reset();
+            regOutBuffer.write(regOutBufferPrefix);
+        }
+        else{
+            comOut.writeObject(message);
+            comOut.flush();
+            byte[] sendBytes = comOutBuffer.toByteArray();
+
+            comNetPool.forEach(a -> {
+                try {
+                    comSocket.send(new DatagramPacket(sendBytes, sendBytes.length, a.getKey(), a.getValue()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            comOut.reset();
+            comOutBuffer.reset();
+            comOutBuffer.write(comOutBufferPrefix);
+        }
     }
 
     public Pair<Object, Pair<InetAddress, Integer>> fetch (boolean isReg) throws IOException, ClassNotFoundException {
         if (isReg){
-            regIn.reset();
+            regInBuffer.reset();
             regSocket.receive(regInPack);
 
-            return new Pair<>(regIn.readObject(), new Pair<>(regInPack.getAddress(), regInPack.getPort()));
+            Pair<Object, Pair<InetAddress, Integer>> t;
+            try (ObjectInputStream regIn = new ObjectInputStream(regInBuffer)) {
+                t = new Pair<>(regIn.readObject(), new Pair<>(regInPack.getAddress(), regInPack.getPort()));
+            }
+            return t;
+
         }
         else{
-            comIn.reset();
+            comInBuffer.reset();
             comSocket.receive(comInPack);
 
-            return new Pair<>(comIn.readObject(), new Pair<>(comInPack.getAddress(), comInPack.getPort()));
+            Pair<Object, Pair<InetAddress, Integer>> t;
+            try (ObjectInputStream comIn = new ObjectInputStream(comInBuffer)) {
+                t = new Pair<>(comIn.readObject(), new Pair<>(comInPack.getAddress(), comInPack.getPort()));
+            }
+            return t;
         }
     }
 
@@ -148,16 +195,21 @@ abstract public class ObjectUdpNetService<ComMessage_t> implements NetService<Co
                 Set<String> acceptorName = new HashSet<>();
                 Set<Pair<InetAddress, Integer>> l_regNetPool = new HashSet<>();
                 Set<Pair<InetAddress, Integer>> l_comNetPool = new HashSet<>();
-                RegistrationProtocol reply = new RegistrationProtocol(netServiceName, comSocket.getInetAddress(), comSocket.getPort());
+                // TODO: has it to be localhost ?
+                RegistrationProtocol reply = new RegistrationProtocol(netServiceName, InetAddress.getLocalHost().getHostAddress(), comPort);
 
                 while (acceptorNum > l_comNetPool.size()){
                     Pair<Object, Pair<InetAddress, Integer>> info = fetch(true);
                     RegistrationProtocol msg = (RegistrationProtocol) info.getKey();
+                    Pair<InetAddress, Integer> anotheraddr = new Pair<>(
+                            InetAddress.getByName(msg.getAnotherChannel().getKey()),
+                            msg.getAnotherChannel().getValue()
+                    );
 
                     if (!acceptorName.contains(msg.getSenderName())){
                         acceptorName.add(msg.getSenderName());
                         l_regNetPool.add(info.getValue());
-                        l_comNetPool.add(msg.getAnotherChannel());
+                        l_comNetPool.add(anotheraddr);
                         super.send(true, reply, info.getValue().getKey(), info.getValue().getValue());
                     }
                 }
@@ -178,7 +230,7 @@ abstract public class ObjectUdpNetService<ComMessage_t> implements NetService<Co
 
     public static class Client<T> extends ObjectUdpNetService<T>{
 
-        public static final int DEFAULT_CLIENT_WAIT_INTERVAL = 20;
+        public static final int DEFAULT_CLIENT_WAIT_INTERVAL = 200;
         public static final int DEFAULT_CLIENT_WAIT_EPOCH = 5;
 
         private int regWaitingIntervalMillis;
@@ -196,9 +248,9 @@ abstract public class ObjectUdpNetService<ComMessage_t> implements NetService<Co
 
         public void initSelfExistence(final int expireMillis)
                 throws InterruptedException, TimeoutException, ExecutionException, IOException {
-
+            // TODO: has it to be localhost ?
             RegistrationProtocol reg = new RegistrationProtocol(netServiceName,
-                    new Pair<>(comSocket.getInetAddress(), comSocket.getPort()));
+                    new Pair<>(InetAddress.getLocalHost().getHostAddress(), comPort));
 
             for (int i = 0; i < regWaitingEpoch; i++) {
                 super.sendAll(true, reg);
@@ -214,10 +266,14 @@ abstract public class ObjectUdpNetService<ComMessage_t> implements NetService<Co
 
                 while (expectedResponseNum > respAddr.size()){
                     RegistrationProtocol msg = (RegistrationProtocol) super.fetch(true).getKey();
+                    Pair<InetAddress, Integer> anotherAddr = new Pair<>(
+                            InetAddress.getByName(msg.getAnotherChannel().getKey()),
+                            msg.getAnotherChannel().getValue()
+                    );
 
                     if (!responderName.contains(msg.getSenderName())){
                         responderName.add(msg.getSenderName());
-                        respAddr.add(msg.getAnotherChannel());
+                        respAddr.add(anotherAddr);
                     }
                 }
 
