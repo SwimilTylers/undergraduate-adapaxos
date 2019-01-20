@@ -76,13 +76,15 @@ public class Acceptor<Proposal> {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         try {
             executorService.execute(() -> {
+                long maxPNum = proposalHistory.isEmpty() ? PaxosTimestampedProposalProtocol.PNUM_NO_SUCH_HISTORY : proposalHistory.peek().getKey();
                 while (!Thread.interrupted()) {
                     try {
                         Pair<PaxosTimestampedProposalProtocol, Pair<InetAddress, Integer>> info = m_netService2Proposer.getArrivalObject();
                         PaxosTimestampedProposalProtocol msg = info.getKey();
 
                         if (msg.getIssueNum() == iNum) {
-                            if (proposalHistory.isEmpty() || msg.getPNum() >= proposalHistory.peek().getKey()) {
+                            if (msg.getPNum() >= maxPNum) {
+                                maxPNum = msg.getPNum();
                                 if (msg.getProposalType() == PaxosProposalProtocol.PROPOSAL_TYPE.PROPOSAL_PREPARE) {
                                     Pair<Long, Proposal> ack = proposalHistory.isEmpty()
                                             ? new Pair<>(PaxosTimestampedProposalProtocol.PNUM_NO_SUCH_HISTORY, m_initDecision)
@@ -109,6 +111,15 @@ public class Acceptor<Proposal> {
                                         m_netService2Learner.putBroadcastObject(accepted);
                                     }
                                 }
+                            }
+                            /* upon receiving a deprecated proposal */
+                            else {
+                                PaxosTimestampedProposalProtocol warning = PaxosTimestampedProposalProtocol.makeKill(
+                                        m_agentName,
+                                        maxPNum,
+                                        iNum
+                                );
+                                m_netService2Proposer.putDepartureObject(warning, info.getValue().getKey(), info.getValue().getValue());
                             }
                         } else {
                             // TODO: iNum不同未处理

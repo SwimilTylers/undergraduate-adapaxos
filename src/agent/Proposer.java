@@ -34,7 +34,7 @@ public class Proposer<Proposal> {
         m_acceptorSize = acceptorNum;
 
         ObjectUdpNetService.Server<PaxosTimestampedProposalProtocol> netService =
-                new ObjectUdpNetService.Server<PaxosTimestampedProposalProtocol>(netId, m_localRegPort, m_localComPort);
+                new ObjectUdpNetService.Server<>(netId, m_localRegPort, m_localComPort);
         netService.initFixedNetPool(acceptorNum, expireMillis);
 
         m_netService = netService;
@@ -97,9 +97,10 @@ public class Proposer<Proposal> {
         }
 
 
-        /* find the latest chosen proposal */
+        /* this proposal is deprecated, due to receiving PROPOSAL_KILL message */
         if (acks.isEmpty())
             return null;
+        /* find the latest chosen proposal */
         else
             return Collections.max(acks, (a,b)->b.getKey().compareTo(a.getKey()));
     }

@@ -16,7 +16,7 @@ abstract public class PaxosProposalProtocol<pNum_t, pContent_t> implements Seria
     protected pContent_t m_proposalContent;
 
     public enum PROPOSAL_TYPE {
-        PROPOSAL_PREPARE, PROPOSAL_ACK, PROPOSAL_ACCEPT, PROPOSAL_ACCEPTED
+        PROPOSAL_PREPARE, PROPOSAL_ACK, PROPOSAL_ACCEPT, PROPOSAL_ACCEPTED, PROPOSAL_KILL
     }
 
     protected PROPOSAL_TYPE m_proposal;

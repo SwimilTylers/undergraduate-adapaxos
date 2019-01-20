@@ -38,10 +38,10 @@ Macros := {
 
 ```pseudocode
 Def Echo :=
- *  scmodel: "simple network establishment"
+ #  scmodel: "simple network establishment"
     javadoc: "sufficient comments with javadoc"
  *  rsm: "replicate state machine"
- *  agents: "proposer, acceptor & learner"
+ #  agents: "proposer, acceptor & learner"
     poly: "polymorphic-lize"
 .
 ```

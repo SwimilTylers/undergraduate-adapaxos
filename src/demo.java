@@ -161,8 +161,6 @@ public class demo {
     }
 
 
-
-
     public static void main(String[] args) {
         paxosPhaseTest.test0();
     }

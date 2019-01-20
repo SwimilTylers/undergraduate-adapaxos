@@ -97,6 +97,20 @@ public class PaxosTimestampedProposalProtocol extends PaxosProposalProtocol<Long
         );
     }
 
+    public static long resoluteKill(PaxosTimestampedProposalProtocol proposal){
+        return proposal.getPNum();
+    }
+
+    public static PaxosTimestampedProposalProtocol makeKill(String senderName, long pnum, long inum){
+        return new PaxosTimestampedProposalProtocol(
+                pnum,
+                senderName,
+                inum,
+                "warning: PNum is deprecated",
+                PROPOSAL_TYPE.PROPOSAL_KILL
+        );
+    }
+
     @Override
     public int compareTo(PaxosProposalProtocol<Long, ?> a) {
         return Long.compare(this.m_pNum, a.m_pNum);
