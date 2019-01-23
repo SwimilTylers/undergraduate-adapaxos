@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="Status: decouple network service and agent, leaving *untested* mechanics &#10;of transmission&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is working properly&#10;+ proposal number is increased sequentially&#10;+ integrated paxos agent &amp; i/o channel&#10;+ Paxos message construction needs utilization of constructors">
+    <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/network/pool/FixedPoolDescriptor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/network/service/ObjectTcpNetService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/rsm/SimpleRSM.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/agent/Acceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/Acceptor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/agent/Learner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/Learner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/agent/Proposer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/Proposer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/demo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/demo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/message/protocols/PaxosProposalProtocol.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/message/protocols/PaxosProposalProtocol.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/message/protocols/PaxosTimestampedProposalProtocol.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/message/protocols/PaxosTimestampedProposalProtocol.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -27,16 +26,13 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/demo.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="516">
-              <caret line="161" selection-start-line="161" selection-end-line="161" />
+            <state relative-caret-position="952">
+              <caret line="152" column="9" selection-start-line="152" selection-start-column="9" selection-end-line="152" selection-end-column="9" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="class#netServiceTest#0;class#demo#0" />
                 <element signature="method#test0#0;class#netServiceTest#0;class#demo#0" />
                 <element signature="e#4192#5297#0" />
-                <element signature="e#5333#6200#0" />
-                <element signature="e#7092#7093#0" expanded="true" />
-                <element signature="e#7130#7131#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -45,20 +41,10 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/agent/Acceptor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-378">
-              <caret line="25" column="65" selection-start-line="25" selection-start-column="60" selection-end-line="25" selection-end-column="65" />
+            <state relative-caret-position="364">
+              <caret line="38" column="29" selection-start-line="38" selection-start-column="29" selection-end-line="38" selection-end-column="29" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#7044#7045#0" expanded="true" />
-                <element signature="e#7122#7123#0" expanded="true" />
-                <element signature="e#7195#7196#0" expanded="true" />
-                <element signature="e#7268#7269#0" expanded="true" />
-                <element signature="e#7349#7350#0" expanded="true" />
-                <element signature="e#7430#7431#0" expanded="true" />
-                <element signature="e#7533#7534#0" expanded="true" />
-                <element signature="e#7636#7637#0" expanded="true" />
-                <element signature="e#7755#7756#0" expanded="true" />
-                <element signature="e#7874#7875#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -67,8 +53,32 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/agent/Proposer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-350">
-              <caret line="47" column="56" lean-forward="true" selection-start-line="47" selection-start-column="8" selection-end-line="47" selection-end-column="56" />
+            <state relative-caret-position="392">
+              <caret line="38" selection-start-line="38" selection-end-line="38" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/network/service/ObjectUdpNetService.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1806">
+              <caret line="48" column="100" lean-forward="true" selection-start-line="48" selection-start-column="31" selection-end-line="48" selection-end-column="100" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/agent/Learner.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1526">
+              <caret line="133" selection-start-line="133" selection-end-line="133" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -77,18 +87,28 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/agent/Learner.java">
+        <entry file="file://$PROJECT_DIR$/src/network/service/ObjectTcpNetService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="191">
-              <caret line="58" column="17" lean-forward="true" selection-start-line="58" selection-start-column="17" selection-end-line="58" selection-end-column="17" />
+            <state relative-caret-position="826">
+              <caret line="59" column="42" lean-forward="true" selection-start-line="59" selection-start-column="42" selection-end-line="59" selection-end-column="42" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#2216#2217#0" expanded="true" />
-                <element signature="e#2259#2260#0" expanded="true" />
-                <element signature="e#2420#2421#0" expanded="true" />
-                <element signature="e#2462#2463#0" expanded="true" />
-                <element signature="e#2517#2518#0" expanded="true" />
-                <element signature="e#2560#2561#0" expanded="true" />
+                <element signature="e#962#963#0" expanded="true" />
+                <element signature="e#996#997#0" expanded="true" />
+                <element signature="e#1554#1555#0" expanded="true" />
+                <element signature="e#1587#1588#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/network/pool/FixedPoolDescriptor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="294">
+              <caret line="38" column="29" selection-start-line="38" selection-start-column="29" selection-end-line="38" selection-end-column="29" />
+              <folding>
+                <element signature="imports" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -97,14 +117,10 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/network/message/protocols/PaxosTimestampedProposalProtocol.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="779">
+            <state relative-caret-position="1414">
               <caret line="109" column="43" selection-start-line="109" selection-start-column="43" selection-end-line="109" selection-end-column="43" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#3426#3427#0" expanded="true" />
-                <element signature="e#3456#3457#0" expanded="true" />
-                <element signature="e#3417#3418#0" expanded="true" />
-                <element signature="e#3475#3476#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -113,8 +129,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/network/message/protocols/PaxosProposalProtocol.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="560">
-              <caret line="48" column="5" lean-forward="true" selection-start-line="48" selection-start-column="5" selection-end-line="48" selection-end-column="5" />
+            <state relative-caret-position="532">
+              <caret line="48" column="5" selection-start-line="48" selection-start-column="5" selection-end-line="48" selection-end-column="5" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -127,8 +143,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -150,9 +166,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/Proposer.java" />
-        <option value="$PROJECT_DIR$/src/net/demo.java" />
-        <option value="$PROJECT_DIR$/src/net/ProposerNetService.java" />
         <option value="$PROJECT_DIR$/src/net/FixedSequentialProposerNetService.java" />
         <option value="$PROJECT_DIR$/src/net/SequentialProposerNetService.java" />
         <option value="$PROJECT_DIR$/src/net/BasicMessage.java" />
@@ -192,15 +205,18 @@
         <option value="$PROJECT_DIR$/src/network/demo.java" />
         <option value="$PROJECT_DIR$/src/network/service/NetService.java" />
         <option value="$PROJECT_DIR$/src/network/service/SequentialNetService.java" />
-        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/src/network/message/protocols/RegistrationProtocol.java" />
         <option value="$PROJECT_DIR$/src/network/service/ObjectUdpNetService.java" />
         <option value="$PROJECT_DIR$/src/demo.java" />
         <option value="$PROJECT_DIR$/src/network/message/protocols/PaxosProposalProtocol.java" />
         <option value="$PROJECT_DIR$/src/network/message/protocols/PaxosTimestampedProposalProtocol.java" />
-        <option value="$PROJECT_DIR$/src/agent/Acceptor.java" />
         <option value="$PROJECT_DIR$/src/agent/Proposer.java" />
+        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/src/agent/Learner.java" />
+        <option value="$PROJECT_DIR$/src/network/pool/FixedPoolDescriptor.java" />
+        <option value="$PROJECT_DIR$/src/agent/Acceptor.java" />
+        <option value="$PROJECT_DIR$/src/rsm/SimpleRSM.java" />
+        <option value="$PROJECT_DIR$/src/network/service/ObjectTcpNetService.java" />
       </list>
     </option>
   </component>
@@ -215,8 +231,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -229,10 +243,51 @@
               <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="agent" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="network" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="network" type="462c0819:PsiDirectoryNode" />
+              <item name="protocols" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="network" type="462c0819:PsiDirectoryNode" />
+              <item name="pool" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="network" type="462c0819:PsiDirectoryNode" />
+              <item name="service" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="rsm" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -242,7 +297,7 @@
     <property name="Repository.Attach.Sources" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1547971643634" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1548250466425" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/lib/apache-log4j-2.11.1-bin" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -307,7 +362,10 @@
       <workItem from="1547779574902" duration="254000" />
       <workItem from="1547779960634" duration="28583000" />
       <workItem from="1547866983151" duration="19607000" />
-      <workItem from="1547952445842" duration="8813000" />
+      <workItem from="1547952445842" duration="13646000" />
+      <workItem from="1548038070028" duration="2390000" />
+      <workItem from="1548066947617" duration="4082000" />
+      <workItem from="1548231656244" duration="4329000" />
     </task>
     <task id="LOCAL-00001" summary="modify README.md">
       <created>1545406849881</created>
@@ -358,11 +416,18 @@
       <option name="project" value="LOCAL" />
       <updated>1547821766072</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Status: finish Learner &amp; PROPOSAL_KILL&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;# Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is working properly&#10;+ timestamped proposal number&#10;+ decoupled paxos agent &amp; i/o channel&#10;+ requires integrate Paxos procedure">
+      <created>1547971802311</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1547971802311</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="167457000" />
+    <option name="totallyTimeSpent" value="183091000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -377,7 +442,7 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.29825738" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.31032172" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -496,7 +561,8 @@
     <MESSAGE value="Status: provide a solution of serialization and its counterpart&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is working properly&#10;+ proposal number is increased sequentially&#10;+ integrated paxos agent &amp; i/o channel&#10;+ Paxos message construction needs utilization of constructors" />
     <MESSAGE value="Status: decouple network service and agent, *untested* mechanics of transmission&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is working properly&#10;+ proposal number is increased sequentially&#10;+ integrated paxos agent &amp; i/o channel&#10;+ Paxos message construction needs utilization of constructors" />
     <MESSAGE value="Status: decouple network service and agent, leaving *untested* mechanics &#10;of transmission&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is working properly&#10;+ proposal number is increased sequentially&#10;+ integrated paxos agent &amp; i/o channel&#10;+ Paxos message construction needs utilization of constructors" />
-    <option name="LAST_COMMIT_MESSAGE" value="Status: decouple network service and agent, leaving *untested* mechanics &#10;of transmission&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is working properly&#10;+ proposal number is increased sequentially&#10;+ integrated paxos agent &amp; i/o channel&#10;+ Paxos message construction needs utilization of constructors" />
+    <MESSAGE value="Status: finish Learner &amp; PROPOSAL_KILL&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;# Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is working properly&#10;+ timestamped proposal number&#10;+ decoupled paxos agent &amp; i/o channel&#10;+ requires integrate Paxos procedure" />
+    <option name="LAST_COMMIT_MESSAGE" value="Status: finish Learner &amp; PROPOSAL_KILL&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;# Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is working properly&#10;+ timestamped proposal number&#10;+ decoupled paxos agent &amp; i/o channel&#10;+ requires integrate Paxos procedure" />
   </component>
   <component name="editorHistoryManager">
     <entry file="jar://C:/Program Files/Java/jdk1.8.0_144/javafx-src.zip!/javafx/util/Pair.java">
@@ -617,22 +683,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/ObjectUdpNetService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="243">
-          <caret line="286" column="13" selection-start-line="286" selection-start-column="13" selection-end-line="286" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/network/demo.java" />
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="336">
-            <caret line="25" column="1" lean-forward="true" selection-start-line="25" selection-start-column="1" selection-end-line="25" selection-end-column="1" />
+          <first_editor relative-caret-position="462">
+            <caret line="43" column="2" selection-start-line="43" selection-start-column="2" selection-end-line="43" selection-end-column="2" />
           </first_editor>
           <second_editor />
         </state>
@@ -640,68 +696,31 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/demo.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="516">
-          <caret line="161" selection-start-line="161" selection-end-line="161" />
+        <state relative-caret-position="952">
+          <caret line="152" column="9" selection-start-line="152" selection-start-column="9" selection-end-line="152" selection-end-column="9" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="class#netServiceTest#0;class#demo#0" />
             <element signature="method#test0#0;class#netServiceTest#0;class#demo#0" />
             <element signature="e#4192#5297#0" />
-            <element signature="e#5333#6200#0" />
-            <element signature="e#7092#7093#0" expanded="true" />
-            <element signature="e#7130#7131#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/message/protocols/PaxosProposalProtocol.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="560">
-          <caret line="48" column="5" lean-forward="true" selection-start-line="48" selection-start-column="5" selection-end-line="48" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/agent/Acceptor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-378">
-          <caret line="25" column="65" selection-start-line="25" selection-start-column="60" selection-end-line="25" selection-end-column="65" />
+        <state relative-caret-position="364">
+          <caret line="38" column="29" selection-start-line="38" selection-start-column="29" selection-end-line="38" selection-end-column="29" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#7044#7045#0" expanded="true" />
-            <element signature="e#7122#7123#0" expanded="true" />
-            <element signature="e#7195#7196#0" expanded="true" />
-            <element signature="e#7268#7269#0" expanded="true" />
-            <element signature="e#7349#7350#0" expanded="true" />
-            <element signature="e#7430#7431#0" expanded="true" />
-            <element signature="e#7533#7534#0" expanded="true" />
-            <element signature="e#7636#7637#0" expanded="true" />
-            <element signature="e#7755#7756#0" expanded="true" />
-            <element signature="e#7874#7875#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/message/protocols/PaxosTimestampedProposalProtocol.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="779">
-          <caret line="109" column="43" selection-start-line="109" selection-start-column="43" selection-end-line="109" selection-end-column="43" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#3426#3427#0" expanded="true" />
-            <element signature="e#3456#3457#0" expanded="true" />
-            <element signature="e#3417#3418#0" expanded="true" />
-            <element signature="e#3475#3476#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/agent/Proposer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-350">
-          <caret line="47" column="56" lean-forward="true" selection-start-line="47" selection-start-column="8" selection-end-line="47" selection-end-column="56" />
+        <state relative-caret-position="392">
+          <caret line="38" selection-start-line="38" selection-end-line="38" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -710,16 +729,74 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/agent/Learner.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="58" column="17" lean-forward="true" selection-start-line="58" selection-start-column="17" selection-end-line="58" selection-end-column="17" />
+        <state relative-caret-position="1526">
+          <caret line="133" selection-start-line="133" selection-end-line="133" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#2216#2217#0" expanded="true" />
-            <element signature="e#2259#2260#0" expanded="true" />
-            <element signature="e#2420#2421#0" expanded="true" />
-            <element signature="e#2462#2463#0" expanded="true" />
-            <element signature="e#2517#2518#0" expanded="true" />
-            <element signature="e#2560#2561#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/pool/FixedPoolDescriptor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="294">
+          <caret line="38" column="29" selection-start-line="38" selection-start-column="29" selection-end-line="38" selection-end-column="29" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/message/protocols/PaxosTimestampedProposalProtocol.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1414">
+          <caret line="109" column="43" selection-start-line="109" selection-start-column="43" selection-end-line="109" selection-end-column="43" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/message/protocols/PaxosProposalProtocol.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="532">
+          <caret line="48" column="5" selection-start-line="48" selection-start-column="5" selection-end-line="48" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/rsm/SimpleRSM.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="626">
+          <caret line="117" column="15" selection-start-line="117" selection-start-column="15" selection-end-line="117" selection-end-column="15" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/ObjectUdpNetService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1806">
+          <caret line="48" column="100" lean-forward="true" selection-start-line="48" selection-start-column="31" selection-end-line="48" selection-end-column="100" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/ObjectTcpNetService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="826">
+          <caret line="59" column="42" lean-forward="true" selection-start-line="59" selection-start-column="42" selection-end-line="59" selection-end-column="42" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#962#963#0" expanded="true" />
+            <element signature="e#996#997#0" expanded="true" />
+            <element signature="e#1554#1555#0" expanded="true" />
+            <element signature="e#1587#1588#0" expanded="true" />
           </folding>
         </state>
       </provider>

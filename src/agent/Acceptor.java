@@ -26,7 +26,7 @@ public class Acceptor<Proposal> {
     public static final int DEFAULT_ACCEPTOR_INFOREG_PORT = 40010;
     public static final int DEFAULT_ACCEPTOR_INFOCOM_PORT = 40020;
 
-    private String m_agentName;
+    private volatile String m_agentName;
     private NetService<PaxosTimestampedProposalProtocol> m_netService2Proposer;
     private NetService<PaxosTimestampedProposalProtocol> m_netService2Learner;
 
@@ -52,6 +52,7 @@ public class Acceptor<Proposal> {
             @NotNull String netId, @NotNull Set<Pair<InetAddress, Integer>> regNetPool,
             int regPort, int comPort, int expireMillis)
             throws InterruptedException, ExecutionException, TimeoutException, IOException {
+        // TODO: 多线程不安全！
         m_agentName = netId;
 
         ObjectUdpNetService.Client<PaxosTimestampedProposalProtocol> netService =

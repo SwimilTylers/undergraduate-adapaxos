@@ -114,4 +114,20 @@ public class Learner<Proposal> {
 
         return new Pair<>(knowledge.getKey(), knowledge.getValue().getLastProposal());
     }
+
+    public int getLocalInfoRegPort() {
+        return m_localInfoRegPort;
+    }
+
+    public void setLocalInfoRegPort(int m_localInfoRegPort) {
+        this.m_localInfoRegPort = m_localInfoRegPort;
+    }
+
+    public int getLocalInfoComPort() {
+        return m_localInfoComPort;
+    }
+
+    public void setLocalInfoComPort(int m_localInfoComPort) {
+        this.m_localInfoComPort = m_localInfoComPort;
+    }
 }
