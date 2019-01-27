@@ -1,7 +1,11 @@
 import agent.Acceptor;
 import agent.Proposer;
 import javafx.util.Pair;
+import network.service.GenericNetService;
 import network.service.ObjectUdpNetService;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import java.io.IOException;
 import java.net.*;
@@ -160,8 +164,36 @@ public class demo {
         }
     }
 
+    public static Logger logger;
+    static {
+        logger = Logger.getLogger(demo.class);
+        BasicConfigurator.configure();
+    }
+
+    static class NetServiceTesting{
+        static String[] addr = {"localhost", "localhost", "localhost", "localhost", "localhost"};
+        static int[] port = {14231, 14251, 14271, 15231, 15251};
+
+        static void test0(){
+            ExecutorService service = Executors.newCachedThreadPool();
+
+            for (int i = 0; i < addr.length; i++) {
+                int id = i;
+                service.execute(() -> {
+                    GenericNetService netService = new GenericNetService(id);
+                    try {
+                        netService.connect(addr, port);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+
+            service.shutdown();
+        }
+    }
 
     public static void main(String[] args) {
-        paxosPhaseTest.test0();
+        NetServiceTesting.test0();
     }
 }
