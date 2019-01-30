@@ -2,26 +2,24 @@ package network.service;
 
 import com.sun.istack.internal.NotNull;
 import javafx.util.Pair;
-import network.message.protocols.Beacon;
+import network.message.protocols.GenericBeacon;
 import network.message.protocols.Distinguishable;
+import network.message.protocols.GenericClientMessage;
+import network.message.protocols.GenericPaxosMessage;
+import network.service.handler.GenericBeaconHandler;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 /**
  * @author : Swimiltylers
  * @version : 2019/1/27 11:35
  */
 public class GenericNetService {
-    public static final int MAX_MESSAGE_TYPE = 16;
-
     private int netServiceId;
     private int peerSize;
     private String[] peerAddrList;
@@ -30,17 +28,21 @@ public class GenericNetService {
     private Socket[] peers;
     private BufferedInputStream[] peerReaderBuffer;
     private BufferedOutputStream[] peerWriteBuffer;
-    private boolean[] Alive;
+    private GenericBeaconHandler beaconHandler;
 
     private ExecutorService listenService;
 
-    private List<Pair<Distinguishable, BlockingDeque>> channels;
+    private BlockingQueue clientChan;
+    private BlockingQueue<GenericPaxosMessage> paxosChan;
+    private List<Pair<Distinguishable, BlockingQueue>> channels;
     private boolean onRunning;
 
-    public GenericNetService(int thisId){
+    public GenericNetService(int thisId, @NotNull BlockingQueue clientChan, @NotNull BlockingQueue<GenericPaxosMessage> paxosChan){
         netServiceId = thisId;
         onRunning = false;
         channels = new ArrayList<>();
+        this.clientChan = clientChan;
+        this.paxosChan = paxosChan;
     }
 
     @Override
@@ -49,6 +51,11 @@ public class GenericNetService {
             listenService.shutdown();
         onRunning = false;
         super.finalize();
+    }
+
+    public void addNewChannel(@NotNull Distinguishable condition, @NotNull BlockingQueue channel){
+        if (!onRunning)
+            channels.add(new Pair<>(condition, channel));
     }
 
     public void connect(@NotNull String[] addr, @NotNull int[] port) throws InterruptedException {
@@ -61,7 +68,7 @@ public class GenericNetService {
         peers = new Socket[peerSize];
         peerReaderBuffer = new BufferedInputStream[peerSize];
         peerWriteBuffer = new BufferedOutputStream[peerSize];
-        Alive = new boolean[peerSize];
+        beaconHandler = new GenericBeaconHandler(peerSize);
 
         CountDownLatch latch = new CountDownLatch(2);
 
@@ -83,7 +90,7 @@ public class GenericNetService {
         }
     }
 
-    private void connectToPeers(CountDownLatch latch){
+    private void connectToPeers(@NotNull CountDownLatch latch){
         try {
             for (int i = 0; i < netServiceId; i++) {
                 Socket socket = null;
@@ -122,14 +129,14 @@ public class GenericNetService {
                     System.out.println("Connection Failed (INPUT): "+e.getMessage());
                     continue;
                 }
-                Alive[i] = true;
+                beaconHandler.alive(i);
             }
         } finally {
             latch.countDown();
         }
     }
 
-    private void waitingForPeers(CountDownLatch latch){
+    private void waitingForPeers(@NotNull CountDownLatch latch){
         try {
             ServerSocket listener = new ServerSocket(peerPortList[netServiceId]);
             for (int i = netServiceId + 1; i < peerSize; i++) {
@@ -167,7 +174,7 @@ public class GenericNetService {
                     System.out.println("Connection Failed (OUTPUT): "+e.getMessage());
                     continue;
                 }
-                Alive[remoteId] = true;
+                beaconHandler.alive(remoteId);
                 System.out.println("Successfully Connected: from "+remoteId+" to "+netServiceId);
             }
         } catch (IOException e) {
@@ -177,7 +184,8 @@ public class GenericNetService {
         }
     }
 
-    private void listen(BufferedInputStream chan){
+    @SuppressWarnings("unchecked")
+    private void listen(@NotNull BufferedInputStream chan){
         onRunning = true;
 
         while (onRunning){
@@ -188,18 +196,59 @@ public class GenericNetService {
                 continue;
             }
 
-            if (msg instanceof Beacon){
-                System.out.println("beacon");
+            if (msg instanceof GenericBeacon){
+                System.out.println("Receive beacon");
+                GenericBeacon cast = (GenericBeacon) msg;
+                sendPeerMessage(cast.fromId, beaconHandler.handle(cast));
+            }
+            else if (msg instanceof GenericPaxosMessage){
+                GenericPaxosMessage cast = (GenericPaxosMessage) msg;
+                try {
+                    paxosChan.put(cast);
+                } catch (InterruptedException e) {
+                    System.out.println("Generic Paxos Message Interrupted");
+                }
+            }
+            else if (msg instanceof GenericClientMessage){
+                GenericClientMessage cast = (GenericClientMessage) msg;
+                try {
+                    clientChan.put(cast);
+                } catch (InterruptedException e) {
+                    System.out.println("Generic Client Message Interrupted");
+                }
             }
             else{
-                for (Pair<Distinguishable, BlockingDeque> t:channels) {
+                for (Pair<Distinguishable, BlockingQueue> t:channels) {
                     if (t.getKey().meet(msg)){
                         try {
                             t.getValue().put(msg);
                             break;
-                        } catch (InterruptedException ignored) {}
+                        } catch (InterruptedException e) {
+                            System.out.println("Costumed Message Interrupted");
+                        }
                     }
                 }
+            }
+        }
+    }
+
+    public void sendPeerMessage(int toId, @NotNull Object msg){
+        if (toId < peerSize && beaconHandler.check(toId)){
+            try {
+                ObjectOutputStream ostream = new ObjectOutputStream(peerWriteBuffer[toId]);
+                ostream.writeObject(msg);
+                ostream.flush();
+                ostream.reset();
+            } catch (IOException e) {
+                System.out.println("Paxos Message send faliure: "+e.getMessage());
+            }
+        }
+    }
+
+    public void broadcastPeerMessage(@NotNull Object msg){
+        for (int i = 0; i < peerSize; i++) {
+            if (i != netServiceId){
+                sendPeerMessage(i, msg);
             }
         }
     }

@@ -11,10 +11,7 @@ import java.io.IOException;
 import java.net.*;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 // TODO: logger is not complete
 
@@ -180,7 +177,7 @@ public class demo {
             for (int i = 0; i < addr.length; i++) {
                 int id = i;
                 service.execute(() -> {
-                    GenericNetService netService = new GenericNetService(id);
+                    GenericNetService netService = new GenericNetService(id, new ArrayBlockingQueue(10), new ArrayBlockingQueue<>(10));
                     try {
                         netService.connect(addr, port);
                     } catch (InterruptedException e) {
