@@ -1,6 +1,7 @@
 package network.service;
 
 import com.sun.istack.internal.NotNull;
+import instance.ClientRequest;
 import javafx.util.Pair;
 import network.message.protocols.GenericBeacon;
 import network.message.protocols.Distinguishable;
@@ -32,12 +33,12 @@ public class GenericNetService {
 
     private ExecutorService listenService;
 
-    private BlockingQueue clientChan;
+    private BlockingQueue<ClientRequest> clientChan;
     private BlockingQueue<GenericPaxosMessage> paxosChan;
     private List<Pair<Distinguishable, BlockingQueue>> channels;
     private boolean onRunning;
 
-    public GenericNetService(int thisId, @NotNull BlockingQueue clientChan, @NotNull BlockingQueue<GenericPaxosMessage> paxosChan){
+    public GenericNetService(int thisId, @NotNull BlockingQueue<ClientRequest> clientChan, @NotNull BlockingQueue<GenericPaxosMessage> paxosChan){
         netServiceId = thisId;
         onRunning = false;
         channels = new ArrayList<>();
@@ -85,7 +86,7 @@ public class GenericNetService {
         for (int i = 0; i < peerSize; i++) {
             if (i != netServiceId){
                 BufferedInputStream istream = peerReaderBuffer[i];
-                listenService.execute(() -> listen(istream));
+                listenService.execute(() -> listenTOPeers(istream));
             }
         }
     }
@@ -185,7 +186,7 @@ public class GenericNetService {
     }
 
     @SuppressWarnings("unchecked")
-    private void listen(@NotNull BufferedInputStream chan){
+    private void listenTOPeers(@NotNull BufferedInputStream chan){
         onRunning = true;
 
         while (onRunning){
@@ -209,14 +210,6 @@ public class GenericNetService {
                     System.out.println("Generic Paxos Message Interrupted");
                 }
             }
-            else if (msg instanceof GenericClientMessage){
-                GenericClientMessage cast = (GenericClientMessage) msg;
-                try {
-                    clientChan.put(cast);
-                } catch (InterruptedException e) {
-                    System.out.println("Generic Client Message Interrupted");
-                }
-            }
             else{
                 for (Pair<Distinguishable, BlockingQueue> t:channels) {
                     if (t.getKey().meet(msg)){
@@ -227,6 +220,28 @@ public class GenericNetService {
                             System.out.println("Costumed Message Interrupted");
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private void listenToClient(@NotNull BufferedInputStream istream, @NotNull BufferedOutputStream ostream){
+        onRunning = true;
+
+        while (onRunning){
+            Object msg;
+            try {
+                msg = (new ObjectInputStream(istream)).readObject();
+            } catch (IOException|ClassNotFoundException e) {
+                continue;
+            }
+
+            if (msg instanceof GenericClientMessage.Propose){
+                GenericClientMessage.Propose cast = (GenericClientMessage.Propose) msg;
+                try {
+                    clientChan.put(new ClientRequest(cast, ostream));
+                } catch (InterruptedException e) {
+                    System.out.println("Generic Client Message Interrupted");
                 }
             }
         }

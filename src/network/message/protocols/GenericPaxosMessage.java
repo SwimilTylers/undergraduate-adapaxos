@@ -97,10 +97,12 @@ public class GenericPaxosMessage implements Serializable {
 
     public static class Restore extends GenericPaxosMessage{
         private static final long serialVersionUID = -6283205199126333110L;
-        public final GenericClientMessage.Propose[] proposals;
+        public final int inst_no;
+        public final GenericPaxosSMR.PaxosInstance load;
 
-        public Restore(GenericClientMessage.Propose[] proposals) {
-            this.proposals = proposals;
+        public Restore(int inst_no, GenericPaxosSMR.PaxosInstance load) {
+            this.inst_no = inst_no;
+            this.load = load;
         }
     }
 }
