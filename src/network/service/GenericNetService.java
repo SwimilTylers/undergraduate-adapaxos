@@ -26,6 +26,9 @@ public class GenericNetService {
     private String[] peerAddrList;
     private int[] peerPortList;
 
+    public static final int DEFAULT_TO_CLIENT_PORT = 41020;
+    private int toClientPort;
+
     private Socket[] peers;
     private BufferedInputStream[] peerReaderBuffer;
     private BufferedOutputStream[] peerWriteBuffer;
@@ -38,8 +41,9 @@ public class GenericNetService {
     private List<Pair<Distinguishable, BlockingQueue>> channels;
     private boolean onRunning;
 
-    public GenericNetService(int thisId, @NotNull BlockingQueue<ClientRequest> clientChan, @NotNull BlockingQueue<GenericPaxosMessage> paxosChan){
+    public GenericNetService(int thisId, int toClientPort, @NotNull BlockingQueue<ClientRequest> clientChan, @NotNull BlockingQueue<GenericPaxosMessage> paxosChan){
         netServiceId = thisId;
+        this.toClientPort = toClientPort;
         onRunning = false;
         channels = new ArrayList<>();
         this.clientChan = clientChan;
@@ -225,9 +229,39 @@ public class GenericNetService {
         }
     }
 
-    private void listenToClient(@NotNull BufferedInputStream istream, @NotNull BufferedOutputStream ostream){
-        onRunning = true;
+    public void watch(){
+        if (onRunning){
+            ServerSocket server = null;
+            try {
+                server = new ServerSocket(toClientPort);
+            } catch (IOException e) {
+                System.out.println("server cannot establish");
+                return;
+            }
 
+            while (onRunning){
+                Socket client = null;
+                try {
+                    client = server.accept();
+                } catch (IOException e) {
+                    System.out.println("client connection failed");
+                    continue;
+                }
+                BufferedInputStream inputStream;
+                BufferedOutputStream outputStream;
+                try {
+                    inputStream = new BufferedInputStream(client.getInputStream());
+                    outputStream = new BufferedOutputStream(client.getOutputStream());
+                } catch (IOException e) {
+                    System.out.println("client stream failure");
+                    continue;
+                }
+                listenService.execute(() -> listenToClient(inputStream, outputStream));
+            }
+        }
+    }
+
+    private void listenToClient(@NotNull BufferedInputStream istream, @NotNull BufferedOutputStream ostream){
         while (onRunning){
             Object msg;
             try {

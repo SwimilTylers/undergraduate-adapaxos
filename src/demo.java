@@ -5,12 +5,9 @@ import network.service.GenericNetService;
 import network.service.ObjectUdpNetService;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import rsm.GenericPaxosSMR;
 
 import java.io.IOException;
 import java.net.*;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.*;
@@ -179,7 +176,7 @@ public class demo {
             for (int i = 0; i < addr.length; i++) {
                 int id = i;
                 service.execute(() -> {
-                    GenericNetService netService = new GenericNetService(id, new ArrayBlockingQueue(10), new ArrayBlockingQueue<>(10));
+                    GenericNetService netService = new GenericNetService(id, GenericNetService.DEFAULT_TO_CLIENT_PORT, new ArrayBlockingQueue(10), new ArrayBlockingQueue<>(10));
                     try {
                         netService.connect(addr, port);
                     } catch (InterruptedException e) {
