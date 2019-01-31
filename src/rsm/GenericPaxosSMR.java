@@ -152,6 +152,16 @@ public class GenericPaxosSMR implements Runnable{
         return serverId == 0;
     }
 
+    private boolean fitRestoreCase(PaxosInstance inst){
+        if (inst.status == InstanceStatus.PREPARING || inst.status == InstanceStatus.PREPARED)
+            return inst.leaderMaintenanceUnit != null;      // former leader
+        else return inst.status == InstanceStatus.ACCEPTED;
+    }
+
+    private boolean fitRecoveryCase(PaxosInstance inst){
+        return inst.status == InstanceStatus.COMMITTED;
+    }
+
     @Override
     public void run() {
         try {
@@ -291,7 +301,7 @@ public class GenericPaxosSMR implements Runnable{
         }
         else if (instanceSpace[prepare.inst_no].crtLeaderId < prepare.leaderId){
             PaxosInstance inst = instanceSpace[prepare.inst_no];
-            if (inst.status == InstanceStatus.PREPARING || inst.status == InstanceStatus.PREPARED){      // restore-early case
+            if (fitRestoreCase(inst)){      // restore-early case
                 GenericPaxosMessage.ackPrepare reply = new GenericPaxosMessage.ackPrepare(
                         prepare.inst_no,
                         GenericPaxosMessage.ackMessageType.RESTORE,
@@ -308,7 +318,7 @@ public class GenericPaxosSMR implements Runnable{
 
                 net.sendPeerMessage(prepare.leaderId, reply);
             }
-            else if (inst.status == InstanceStatus.ACCEPTED || inst.status == InstanceStatus.COMMITTED){   // recovery case
+            else if (fitRecoveryCase(inst)){   // recovery case
                 GenericPaxosMessage.ackPrepare reply = new GenericPaxosMessage.ackPrepare(
                         prepare.inst_no,
                         GenericPaxosMessage.ackMessageType.RECOVER,
@@ -319,16 +329,34 @@ public class GenericPaxosSMR implements Runnable{
 
                 inst.crtLeaderId = prepare.leaderId;
                 inst.crtInstBallot = prepare.inst_ballot;
-                inst.status = InstanceStatus.ACCEPTED;
+                inst.status = InstanceStatus.COMMITTED;
                 inst.leaderMaintenanceUnit = null;
 
                 net.sendPeerMessage(prepare.leaderId, reply);
+            }
+            else{   // overwrite case
+                inst.crtLeaderId = prepare.leaderId;
+                inst.crtInstBallot = prepare.inst_ballot;
+                inst.status = InstanceStatus.PREPARING;
+
+                inst.leaderMaintenanceUnit = null;
+                inst.cmds = null;
+
+                net.sendPeerMessage(
+                        prepare.leaderId,
+                        new GenericPaxosMessage.ackPrepare(
+                                prepare.inst_no,
+                                GenericPaxosMessage.ackMessageType.PROCEEDING,
+                                prepare.leaderId,
+                                prepare.inst_ballot, null
+                        )
+                );
             }
         }
         else if (instanceSpace[prepare.inst_no].crtLeaderId == prepare.leaderId){
             PaxosInstance inst = instanceSpace[prepare.inst_no];
             if (inst.crtInstBallot < prepare.inst_ballot){
-                if (inst.status == InstanceStatus.PREPARING || inst.status == InstanceStatus.PREPARED){  // back-online case: catch up with current situation
+                if (fitRestoreCase(inst)){  // restore-back-online case: catch up with current situation
                     inst.crtLeaderId = prepare.leaderId;
                     inst.crtInstBallot = prepare.inst_ballot;
                     inst.status = InstanceStatus.PREPARING;
@@ -344,7 +372,7 @@ public class GenericPaxosSMR implements Runnable{
                             )
                     );
                 }
-                else if (inst.status == InstanceStatus.ACCEPTED || inst.status == InstanceStatus.COMMITTED){     // recovery case
+                else if (fitRecoveryCase(inst)){     // recovery case
                     GenericPaxosMessage.ackPrepare reply = new GenericPaxosMessage.ackPrepare(
                             prepare.inst_no,
                             GenericPaxosMessage.ackMessageType.RECOVER,
@@ -354,10 +382,27 @@ public class GenericPaxosSMR implements Runnable{
                     );
 
                     inst.crtInstBallot = prepare.inst_ballot;
-                    inst.status = InstanceStatus.ACCEPTED;
+                    inst.status = InstanceStatus.COMMITTED;
                     inst.leaderMaintenanceUnit = null;
 
                     net.sendPeerMessage(prepare.leaderId, reply);
+                }
+                else{   // overwrite case
+                    inst.cmds = null;
+                    inst.crtInstBallot = prepare.inst_ballot;
+                    inst.status = InstanceStatus.PREPARING;
+
+                    inst.leaderMaintenanceUnit = null;
+
+                    net.sendPeerMessage(
+                            prepare.leaderId,
+                            new GenericPaxosMessage.ackPrepare(
+                                    prepare.inst_no,
+                                    GenericPaxosMessage.ackMessageType.PROCEEDING,
+                                    prepare.leaderId,
+                                    prepare.inst_ballot, null
+                            )
+                    );
                 }
             }
 
@@ -424,13 +469,13 @@ public class GenericPaxosSMR implements Runnable{
                 }
             }
             else if (ackPrepare.type == GenericPaxosMessage.ackMessageType.RECOVER){
-                if (inst.status == InstanceStatus.PREPARING){   // recovery case: check status to avoid broadcasting duplicated ACCEPT
+                if (inst.status == InstanceStatus.PREPARING){   // recovery case: check status to avoid broadcasting duplicated COMMIT
                     restoredRequestList.addAll(Arrays.asList(inst.cmds));
 
                     inst.cmds = ackPrepare.load.cmds;
-                    inst.status = InstanceStatus.PREPARED;
+                    inst.status = InstanceStatus.COMMITTED;
 
-                    net.broadcastPeerMessage(new GenericPaxosMessage.Accept(ackPrepare.inst_no, serverId, inst.crtInstBallot, inst.cmds));
+                    net.broadcastPeerMessage(new GenericPaxosMessage.Commit(ackPrepare.inst_no, serverId, inst.crtInstBallot, inst.cmds));
                 }
             }
             else if (ackPrepare.type == GenericPaxosMessage.ackMessageType.ABORT){  // abort case
@@ -503,7 +548,7 @@ public class GenericPaxosSMR implements Runnable{
         }
         else if (instanceSpace[accept.inst_no].crtLeaderId < accept.leaderId){
             PaxosInstance inst = instanceSpace[accept.inst_no];
-            if (inst.status == InstanceStatus.PREPARING || inst.status == InstanceStatus.PREPARED){ // restore-late case
+            if (fitRestoreCase(inst)){ // restore-late case
                 GenericPaxosMessage.ackAccept reply = new GenericPaxosMessage.ackAccept(
                         accept.inst_no,
                         GenericPaxosMessage.ackMessageType.RESTORE,
@@ -521,7 +566,7 @@ public class GenericPaxosSMR implements Runnable{
 
                 net.sendPeerMessage(accept.leaderId, reply);
             }
-            else if (inst.status == InstanceStatus.ACCEPTED || inst.status == InstanceStatus.COMMITTED){  // recovery case
+            else if (fitRecoveryCase(inst)){  // recovery case
 
                 /* feedback is not necessary.
                 * COMMITTED means there are more than n/2 of [ACCEPTED/COMMITTED],
@@ -529,9 +574,28 @@ public class GenericPaxosSMR implements Runnable{
 
                 inst.crtLeaderId = accept.leaderId;
                 inst.crtInstBallot = accept.inst_ballot;
-                inst.status = InstanceStatus.ACCEPTED;
+                inst.status = InstanceStatus.COMMITTED;
                 inst.cmds = accept.cmds;
                 inst.leaderMaintenanceUnit = null;
+            }
+            else{   // overwrite case
+                inst.crtLeaderId = accept.leaderId;
+                inst.crtInstBallot = accept.inst_ballot;
+                inst.status = InstanceStatus.PREPARING;
+
+                inst.leaderMaintenanceUnit = null;
+                inst.cmds = accept.cmds;
+
+                net.sendPeerMessage(
+                        accept.leaderId,
+                        new GenericPaxosMessage.ackAccept(
+                                accept.inst_no,
+                                GenericPaxosMessage.ackMessageType.PROCEEDING,
+                                accept.leaderId,
+                                accept.inst_ballot, null,
+                                inst.cmds
+                        )
+                );
             }
         }
         else {  // abort case

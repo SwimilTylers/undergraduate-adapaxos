@@ -5,10 +5,12 @@ import network.service.GenericNetService;
 import network.service.ObjectUdpNetService;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+import rsm.GenericPaxosSMR;
 
 import java.io.IOException;
 import java.net.*;
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.*;
 
@@ -170,26 +172,54 @@ public class demo {
         static String[] addr = {"localhost", "localhost", "localhost", "localhost", "localhost"};
         static int[] port = {14231, 14251, 14271, 15231, 15251};
 
+        static void emit(ExecutorService service, int id){
+            service.execute(() -> {
+                GenericNetService netService = new GenericNetService(id, GenericNetService.DEFAULT_TO_CLIENT_PORT, new ArrayBlockingQueue<>(10), new ArrayBlockingQueue<>(10));
+                try {
+                    netService.connect(addr, port);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+
         static void test0(){
             ExecutorService service = Executors.newCachedThreadPool();
+            for (int i = 0; i < addr.length; i++)
+                emit(service, i);
 
+            service.shutdown();
+        }
+
+        static void test1(){
+            ExecutorService service = Executors.newCachedThreadPool();
+            Random random = new Random();
             for (int i = 0; i < addr.length; i++) {
-                int id = i;
-                service.execute(() -> {
-                    GenericNetService netService = new GenericNetService(id, GenericNetService.DEFAULT_TO_CLIENT_PORT, new ArrayBlockingQueue(10), new ArrayBlockingQueue<>(10));
-                    try {
-                        netService.connect(addr, port);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                });
+                emit(service, i);
+                try {
+                    Thread.sleep(random.nextInt(50000)+10000);
+                } catch (InterruptedException ignored) {}
             }
 
             service.shutdown();
         }
     }
 
+    static class GenericPaxosSMRTesting{
+        static void emit(ExecutorService service, int id){
+            GenericPaxosSMR rsm = new GenericPaxosSMR(id, NetServiceTesting.addr, NetServiceTesting.port);
+            service.execute(rsm);
+        }
+
+        static void test0(){
+            ExecutorService service = Executors.newCachedThreadPool();
+            for (int i = 0; i < NetServiceTesting.addr.length; i++) {
+                emit(service, i);
+            }
+        }
+    }
+
     public static void main(String[] args) {
-        NetServiceTesting.test0();
+        NetServiceTesting.test1();
     }
 }
