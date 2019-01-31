@@ -54,6 +54,7 @@ public class GenericPaxosSMR implements Runnable{
     public static class HistoryMaintenance{
         int maxRecvLeaderId;
         int maxRecvInstBallot;
+        boolean HOST_RESTORE;
         ClientRequest[] reservedCmds;
         Set<Pair<Integer, Integer>> received;
 
@@ -62,18 +63,22 @@ public class GenericPaxosSMR implements Runnable{
             maxRecvInstBallot = initInstBallot;
             reservedCmds = initCmds;
 
+            HOST_RESTORE = true;
+
             received = new HashSet<>();
             received.add(new Pair<>(initLeaderId, initInstBallot));
         }
 
         /* this initiator is designed for restore-late case */
         HistoryMaintenance(List<ClientRequest> restoredProposals, int initLeaderId, int initInstBallot, ClientRequest[] initCmds){
-            maxRecvLeaderId = initLeaderId;
-            maxRecvInstBallot = initInstBallot;
-            reservedCmds = initCmds;
+            maxRecvLeaderId = -1;
+            maxRecvInstBallot = -1;
+            reservedCmds = null;
 
             if (initCmds != null)
-                restoredProposals.addAll(Arrays.asList(reservedCmds));
+                restoredProposals.addAll(Arrays.asList(initCmds));
+
+            HOST_RESTORE = false;
 
             received = new HashSet<>();
             received.add(new Pair<>(initLeaderId, initInstBallot));
@@ -82,6 +87,8 @@ public class GenericPaxosSMR implements Runnable{
         void record(List<ClientRequest> restoredProposals, int leaderId, int instBallot, ClientRequest[] cmds){
             if (!received.contains(new Pair<>(leaderId, instBallot))){
                 received.add(new Pair<>(leaderId, instBallot));
+
+                HOST_RESTORE = true;
 
                 if (leaderId > maxRecvLeaderId
                         || (leaderId == maxRecvLeaderId && instBallot > maxRecvInstBallot)){
@@ -93,10 +100,19 @@ public class GenericPaxosSMR implements Runnable{
                     reservedCmds = cmds;
 
                 }
-                else if (cmds != null && !received.contains(new Pair<>(leaderId, instBallot)))
+                else if (cmds != null)
                     restoredProposals.addAll(Arrays.asList(cmds));
             }
 
+        }
+
+        void restore(List<ClientRequest> restoredProposals, int leaderId, int instBallot, ClientRequest[] cmds){
+            if (!received.contains(new Pair<>(leaderId, instBallot))){
+                received.add(new Pair<>(leaderId, instBallot));
+
+                if (cmds != null)
+                    restoredProposals.addAll(Arrays.asList(cmds));
+            }
         }
     }
 
@@ -217,26 +233,56 @@ public class GenericPaxosSMR implements Runnable{
                 net.sendPeerMessage(prepare.leaderId, reply);
             }
             else{   // recovery case
+                GenericPaxosMessage.ackPrepare reply = new GenericPaxosMessage.ackPrepare(
+                        prepare.inst_no,
+                        GenericPaxosMessage.ackMessageType.RECOVER,
+                        prepare.leaderId,
+                        prepare.inst_ballot,
+                        inst.copyOf()
+                );
 
+                inst.crtLeaderId = prepare.leaderId;
+                inst.crtInstBallot = prepare.inst_ballot;
+                inst.status = InstanceStatus.ACCEPTED;
+                inst.leaderMaintenanceUnit = null;
+
+                net.sendPeerMessage(prepare.leaderId, reply);
             }
         }
         else if (instanceSpace[prepare.inst_no].crtLeaderId == prepare.leaderId){
             PaxosInstance inst = instanceSpace[prepare.inst_no];
-            if (inst.crtInstBallot < prepare.inst_ballot){  // back-online case: catch up with current situation
-                inst.crtLeaderId = prepare.leaderId;
-                inst.crtInstBallot = prepare.inst_ballot;
-                inst.status = InstanceStatus.PREPARING;
-                inst.cmds = null;
+            if (inst.crtInstBallot < prepare.inst_ballot){
+                if (inst.status != InstanceStatus.COMMITTED){  // back-online case: catch up with current situation
+                    inst.crtLeaderId = prepare.leaderId;
+                    inst.crtInstBallot = prepare.inst_ballot;
+                    inst.status = InstanceStatus.PREPARING;
+                    inst.cmds = null;
 
-                net.sendPeerMessage(
-                        prepare.leaderId,
-                        new GenericPaxosMessage.ackPrepare(
-                                prepare.inst_no,
-                                GenericPaxosMessage.ackMessageType.PROCEEDING,
-                                prepare.leaderId,
-                                prepare.inst_ballot, null
-                        )
-                );
+                    net.sendPeerMessage(
+                            prepare.leaderId,
+                            new GenericPaxosMessage.ackPrepare(
+                                    prepare.inst_no,
+                                    GenericPaxosMessage.ackMessageType.PROCEEDING,
+                                    prepare.leaderId,
+                                    prepare.inst_ballot, null
+                            )
+                    );
+                }
+                else{     // recovery case
+                    GenericPaxosMessage.ackPrepare reply = new GenericPaxosMessage.ackPrepare(
+                            prepare.inst_no,
+                            GenericPaxosMessage.ackMessageType.RECOVER,
+                            prepare.leaderId,
+                            prepare.inst_ballot,
+                            inst.copyOf()
+                    );
+
+                    inst.crtInstBallot = prepare.inst_ballot;
+                    inst.status = InstanceStatus.ACCEPTED;
+                    inst.leaderMaintenanceUnit = null;
+
+                    net.sendPeerMessage(prepare.leaderId, reply);
+                }
             }
 
             /* otherwise, drop the message, which is expired */
@@ -252,47 +298,62 @@ public class GenericPaxosSMR implements Runnable{
 
             PaxosInstance inst = instanceSpace[ackPrepare.inst_no];
 
-            if (ackPrepare.type == GenericPaxosMessage.ackMessageType.PROCEEDING
-                    && ackPrepare.ack_leaderId == serverId
-                    && ackPrepare.inst_ballot == inst.crtInstBallot){  // normal case
+            if (ackPrepare.type == GenericPaxosMessage.ackMessageType.PROCEEDING || ackPrepare.type == GenericPaxosMessage.ackMessageType.RESTORE){
+                if (ackPrepare.type == GenericPaxosMessage.ackMessageType.PROCEEDING
+                        && ackPrepare.ack_leaderId == serverId
+                        && ackPrepare.inst_ballot == inst.crtInstBallot){  // normal case
 
-                ++inst.leaderMaintenanceUnit.prepareResponse;
-            }
-            else if (ackPrepare.type == GenericPaxosMessage.ackMessageType.RESTORE
-                    && ackPrepare.ack_leaderId == serverId
-                    && ackPrepare.inst_ballot == inst.crtInstBallot){  // restore-early case
+                    ++inst.leaderMaintenanceUnit.prepareResponse;
+                }
+                else if (ackPrepare.type == GenericPaxosMessage.ackMessageType.RESTORE
+                        && ackPrepare.ack_leaderId == serverId
+                        && ackPrepare.inst_ballot == inst.crtInstBallot){  // restore-early case
 
-                ++inst.leaderMaintenanceUnit.prepareResponse;
+                    ++inst.leaderMaintenanceUnit.prepareResponse;
 
-                if (ackPrepare.load != null){     // a meaningful restoration request
-                    if (inst.leaderMaintenanceUnit.historyMaintenanceUnit == null)
-                        inst.leaderMaintenanceUnit.historyMaintenanceUnit = new HistoryMaintenance(
-                                ackPrepare.load.crtLeaderId,
-                                ackPrepare.load.crtInstBallot,
-                                ackPrepare.load.cmds
-                        );
-                    else
-                        inst.leaderMaintenanceUnit.historyMaintenanceUnit.record(
-                                restoredRequestList,
-                                ackPrepare.load.crtLeaderId,
-                                ackPrepare.load.crtInstBallot,
-                                ackPrepare.load.cmds
-                        );
+                    if (ackPrepare.load != null){     // a meaningful restoration request
+                        if (inst.leaderMaintenanceUnit.historyMaintenanceUnit == null)
+                            /* watch out for the constructor
+                             * it is a restore-early-style one */
+                            inst.leaderMaintenanceUnit.historyMaintenanceUnit = new HistoryMaintenance(
+                                    ackPrepare.load.crtLeaderId,
+                                    ackPrepare.load.crtInstBallot,
+                                    ackPrepare.load.cmds
+                            );
+                        else
+                            inst.leaderMaintenanceUnit.historyMaintenanceUnit.record(
+                                    restoredRequestList,
+                                    ackPrepare.load.crtLeaderId,
+                                    ackPrepare.load.crtInstBallot,
+                                    ackPrepare.load.cmds
+                            );
+                    }
+                }
+
+                /* accumulating until reach Paxos threshold
+                 * BROADCASTING_ACCEPT activated only once in each Paxos period (only in PREPARING status) */
+
+                if (inst.status == InstanceStatus.PREPARING     // check status to avoid broadcasting duplicated ACCEPT
+                        && inst.leaderMaintenanceUnit.prepareResponse > peerSize/2){
+                    if (inst.leaderMaintenanceUnit.historyMaintenanceUnit != null
+                            && inst.leaderMaintenanceUnit.historyMaintenanceUnit.HOST_RESTORE){ // restore-early case: exists formal paxos conversation
+                        restoredRequestList.addAll(Arrays.asList(inst.cmds));   // restore local cmds
+
+                        inst.cmds = inst.leaderMaintenanceUnit.historyMaintenanceUnit.reservedCmds;
+                    }
+                    inst.status = InstanceStatus.PREPARED;
+                    net.broadcastPeerMessage(new GenericPaxosMessage.Accept(ackPrepare.inst_no, serverId, inst.crtInstBallot, inst.cmds));
                 }
             }
+            else if (ackPrepare.type == GenericPaxosMessage.ackMessageType.RECOVER){
+                if (inst.status == InstanceStatus.PREPARING){   // recovery case: check status to avoid broadcasting duplicated COMMIT
+                    restoredRequestList.addAll(Arrays.asList(inst.cmds));
 
-            /* accumulating until reach Paxos threshold
-             * BROADCASTING_ACCEPT activated only once in each Paxos period (only in PREPARING status) */
+                    inst.cmds = ackPrepare.load.cmds;
+                    inst.status = InstanceStatus.PREPARED;
 
-            if (inst.status == InstanceStatus.PREPARING
-                    && inst.leaderMaintenanceUnit.prepareResponse > peerSize/2){
-                if (inst.leaderMaintenanceUnit.historyMaintenanceUnit != null){ // restore-early case: exists formal paxos conversation
-                    restoredRequestList.addAll(Arrays.asList(inst.cmds));   // restore local cmds
-
-                    inst.cmds = inst.leaderMaintenanceUnit.historyMaintenanceUnit.reservedCmds;
+                    net.broadcastPeerMessage(new GenericPaxosMessage.Accept(ackPrepare.inst_no, serverId, inst.crtInstBallot, inst.cmds));
                 }
-                inst.status = InstanceStatus.PREPARED;
-                net.broadcastPeerMessage(new GenericPaxosMessage.Accept(ackPrepare.inst_no, serverId, inst.crtInstBallot, inst.cmds));
             }
         }
     }
@@ -375,6 +436,9 @@ public class GenericPaxosSMR implements Runnable{
             }
             else {  // recovery case
 
+                /* not necessarily,
+                * COMMITTED means there are more than n/2 of [ACCEPTED/COMMITTED],
+                * which must be detected in the first run */
             }
         }
         else {  // abort case
@@ -402,6 +466,8 @@ public class GenericPaxosSMR implements Runnable{
 
                 if (ackAccept.load != null){     // a meaningful restoration request
                     if (inst.leaderMaintenanceUnit.historyMaintenanceUnit == null)
+                        /* watch out for the constructor
+                         * it is a restore-late-style one */
                         inst.leaderMaintenanceUnit.historyMaintenanceUnit = new HistoryMaintenance(
                                 restoredRequestList,
                                 ackAccept.load.crtLeaderId,
@@ -409,7 +475,7 @@ public class GenericPaxosSMR implements Runnable{
                                 ackAccept.load.cmds
                         );
                     else
-                        inst.leaderMaintenanceUnit.historyMaintenanceUnit.record(
+                        inst.leaderMaintenanceUnit.historyMaintenanceUnit.restore(
                                 restoredRequestList,
                                 ackAccept.load.crtLeaderId,
                                 ackAccept.load.crtInstBallot,
@@ -471,8 +537,10 @@ public class GenericPaxosSMR implements Runnable{
 
     private void handleRestore(GenericPaxosMessage.Restore restore){
         PaxosInstance inst = instanceSpace[restore.inst_no];
-        if (inst.leaderMaintenanceUnit != null && restore.load != null){
+        if (inst.status != InstanceStatus.COMMITTED && inst.leaderMaintenanceUnit != null && restore.load != null){ // a meaningful restoration request
             if (inst.leaderMaintenanceUnit.historyMaintenanceUnit == null)
+                /* watch out for the constructor
+                * it is a restore-late-style one */
                 inst.leaderMaintenanceUnit.historyMaintenanceUnit = new HistoryMaintenance(
                         restoredRequestList,
                         restore.load.crtLeaderId,
@@ -480,7 +548,7 @@ public class GenericPaxosSMR implements Runnable{
                         restore.load.cmds
                 );
             else
-                inst.leaderMaintenanceUnit.historyMaintenanceUnit.record(
+                inst.leaderMaintenanceUnit.historyMaintenanceUnit.restore(
                         restoredRequestList,
                         restore.load.crtLeaderId,
                         restore.load.crtInstBallot,
