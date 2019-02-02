@@ -1,6 +1,6 @@
 package network.message.protocols;
 
-import instance.ClientRequest;
+import client.ClientRequest;
 import rsm.GenericPaxosSMR;
 
 import java.io.Serializable;

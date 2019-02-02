@@ -169,7 +169,7 @@ Log4j 2.0 ERROR "Could not search jar" with JBoss EAP 6.2. Thanks to Shehata, Pa
 * [LOG4J2-2328](https://issues.apache.org/jira/browse/LOG4J2-2328):
 Update JAnsi from 1.17 to 1.17.1.
 * [LOG4J2-2351](https://issues.apache.org/jira/browse/LOG4J2-2351):
-Added AbstractLogEvent.getMutableInstant to allow the MutableInstant instance to be modified by classes extending AbstractLogEvent.
+Added AbstractLogEvent.getMutableInstant to allow the MutableInstant client to be modified by classes extending AbstractLogEvent.
 * [LOG4J2-2357](https://issues.apache.org/jira/browse/LOG4J2-2357):
 Update Jackson from 2.9.5 to 2.9.6.
 * [LOG4J2-2358](https://issues.apache.org/jira/browse/LOG4J2-2358):

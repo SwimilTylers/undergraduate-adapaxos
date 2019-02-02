@@ -1,7 +1,7 @@
 package network.service;
 
 import com.sun.istack.internal.NotNull;
-import instance.ClientRequest;
+import client.ClientRequest;
 import javafx.util.Pair;
 import network.message.protocols.GenericBeacon;
 import network.message.protocols.Distinguishable;
@@ -30,8 +30,6 @@ public class GenericNetService {
     private int toClientPort;
 
     private Socket[] peers;
-    private BufferedInputStream[] peerReaderBuffer;
-    private BufferedOutputStream[] peerWriteBuffer;
     private GenericBeaconHandler beaconHandler;
 
     private ExecutorService listenService;
@@ -71,8 +69,6 @@ public class GenericNetService {
         peerPortList = port;
 
         peers = new Socket[peerSize];
-        peerReaderBuffer = new BufferedInputStream[peerSize];
-        peerWriteBuffer = new BufferedOutputStream[peerSize];
         beaconHandler = new GenericBeaconHandler(peerSize);
 
         CountDownLatch latch = new CountDownLatch(2);
@@ -89,8 +85,8 @@ public class GenericNetService {
 
         for (int i = 0; i < peerSize; i++) {
             if (i != netServiceId){
-                BufferedInputStream istream = peerReaderBuffer[i];
-                listenService.execute(() -> listenTOPeers(istream));
+                Socket socket = peers[i];
+                listenService.execute(() -> listenTOPeers(socket));
             }
         }
     }
@@ -126,14 +122,6 @@ public class GenericNetService {
                     continue;
                 }
                 peers[i] = socket;
-                peerWriteBuffer[i] = buffer;
-
-                try {
-                    peerReaderBuffer[i] = new BufferedInputStream(socket.getInputStream());
-                } catch (IOException e) {
-                    System.out.println("Connection Failed (INPUT): "+e.getMessage());
-                    continue;
-                }
                 beaconHandler.alive(i);
             }
         } finally {
@@ -172,13 +160,6 @@ public class GenericNetService {
                 }
 
                 peers[remoteId] = conn;
-                peerReaderBuffer[remoteId] = buffer;
-                try {
-                    peerWriteBuffer[remoteId] = new BufferedOutputStream(conn.getOutputStream());
-                } catch (IOException e) {
-                    System.out.println("Connection Failed (OUTPUT): "+e.getMessage());
-                    continue;
-                }
                 beaconHandler.alive(remoteId);
                 System.out.println("Successfully Connected: from "+remoteId+" to "+netServiceId);
             }
@@ -190,14 +171,15 @@ public class GenericNetService {
     }
 
     @SuppressWarnings("unchecked")
-    private void listenTOPeers(@NotNull BufferedInputStream chan){
+    private void listenTOPeers(@NotNull Socket chan){
         onRunning = true;
 
         while (onRunning){
             Object msg;
             try {
-                msg = (new ObjectInputStream(chan)).readObject();
+                msg = (new ObjectInputStream(chan.getInputStream())).readObject();
             } catch (IOException|ClassNotFoundException e) {
+                System.out.println("ERROR [server "+netServiceId+"]: " + e.getMessage());
                 continue;
             }
 
@@ -240,32 +222,23 @@ public class GenericNetService {
             }
 
             while (onRunning){
-                Socket client = null;
+                Socket client;
                 try {
                     client = server.accept();
                 } catch (IOException e) {
                     System.out.println("client connection failed");
                     continue;
                 }
-                BufferedInputStream inputStream;
-                BufferedOutputStream outputStream;
-                try {
-                    inputStream = new BufferedInputStream(client.getInputStream());
-                    outputStream = new BufferedOutputStream(client.getOutputStream());
-                } catch (IOException e) {
-                    System.out.println("client stream failure");
-                    continue;
-                }
-                listenService.execute(() -> listenToClient(inputStream, outputStream));
+                listenService.execute(() -> listenToClient(client));
             }
         }
     }
 
-    private void listenToClient(@NotNull BufferedInputStream istream, @NotNull BufferedOutputStream ostream){
+    private void listenToClient(@NotNull Socket socket){
         while (onRunning){
             Object msg;
             try {
-                msg = (new ObjectInputStream(istream)).readObject();
+                msg = (new ObjectInputStream(socket.getInputStream())).readObject();
             } catch (IOException|ClassNotFoundException e) {
                 continue;
             }
@@ -273,7 +246,7 @@ public class GenericNetService {
             if (msg instanceof GenericClientMessage.Propose){
                 GenericClientMessage.Propose cast = (GenericClientMessage.Propose) msg;
                 try {
-                    clientChan.put(new ClientRequest(cast, ostream));
+                    clientChan.put(new ClientRequest(cast, socket));
                 } catch (InterruptedException e) {
                     System.out.println("Generic Client Message Interrupted");
                 }
@@ -284,10 +257,12 @@ public class GenericNetService {
     public void sendPeerMessage(int toId, @NotNull Object msg){
         if (toId < peerSize && beaconHandler.check(toId)){
             try {
-                ObjectOutputStream ostream = new ObjectOutputStream(peerWriteBuffer[toId]);
+                System.out.println(netServiceId+"->"+toId);
+                OutputStream socketStream = peers[toId].getOutputStream();
+                ObjectOutputStream ostream = new ObjectOutputStream(socketStream);
                 ostream.writeObject(msg);
                 ostream.flush();
-                ostream.reset();
+                socketStream.flush();
             } catch (IOException e) {
                 System.out.println("Paxos Message send faliure: "+e.getMessage());
             }

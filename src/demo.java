@@ -1,5 +1,6 @@
 import agent.Acceptor;
 import agent.Proposer;
+import client.FileIteratorClient;
 import javafx.util.Pair;
 import network.service.GenericNetService;
 import network.service.ObjectUdpNetService;
@@ -203,6 +204,29 @@ public class demo {
 
             service.shutdown();
         }
+
+        static void test2(){
+            ExecutorService service = Executors.newCachedThreadPool();
+
+            for (int i = 0; i < addr.length; i++) {
+                int id = i;
+                service.execute(() -> {
+                    GenericNetService netService = new GenericNetService(id, GenericNetService.DEFAULT_TO_CLIENT_PORT, new ArrayBlockingQueue<>(10), new ArrayBlockingQueue<>(10));
+                    try {
+                        netService.connect(addr, port);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if (id == 0){
+                        netService.broadcastPeerMessage("world");
+                        netService.broadcastPeerMessage("peer");
+                    }
+                    else {
+                        netService.sendPeerMessage(0, "hello");
+                    }
+                });
+            }
+        }
     }
 
     static class GenericPaxosSMRTesting{
@@ -216,10 +240,18 @@ public class demo {
             for (int i = 0; i < NetServiceTesting.addr.length; i++) {
                 emit(service, i);
             }
+            FileIteratorClient client = new FileIteratorClient("kepas");
+            try {
+                client.connect("localhost", GenericNetService.DEFAULT_TO_CLIENT_PORT);
+            } catch (IOException e) {
+                return;
+            }
+            service.execute(client);
         }
     }
 
     public static void main(String[] args) {
-        NetServiceTesting.test1();
+        //NetServiceTesting.test2();
+        GenericPaxosSMRTesting.test0();
     }
 }

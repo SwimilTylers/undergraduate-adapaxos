@@ -1,7 +1,7 @@
 package rsm;
 
 import com.sun.istack.internal.NotNull;
-import instance.ClientRequest;
+import client.ClientRequest;
 import javafx.util.Pair;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.GenericNetService;
@@ -173,11 +173,16 @@ public class GenericPaxosSMR implements Runnable{
 
         ExecutorService service = Executors.newCachedThreadPool();
 
-        service.execute(() -> net.watch());
+        System.out.println("Watching");
+        if (isLeader(0))
+            service.execute(() -> net.watch());
 
         ReentrantLock lock = new ReentrantLock();
 
+        System.out.println("Compacting");
         service.execute(() -> compactRequests(lock));
+
+        System.out.println("Consensus-making");
         service.execute(() -> makeConsensus(lock));
 
         service.shutdown();
@@ -224,7 +229,7 @@ public class GenericPaxosSMR implements Runnable{
                 net.broadcastPeerMessage(new GenericPaxosMessage.Prepare(crtInstance, inst.crtLeaderId, inst.crtInstBallot));
 
                 ++crtInstance;
-            }finally {
+            } finally {
                 lock.unlock();
             }
 
@@ -241,9 +246,13 @@ public class GenericPaxosSMR implements Runnable{
         while (true){
             lock.lock();
             try {
-                System.out.println("making consensus...");
                 GenericPaxosMessage msg;
                 try {
+                    if (pMessage.isEmpty()){
+                        Thread.sleep(5000);
+                        continue;
+                    }
+
                     msg = pMessage.take();
                 } catch (InterruptedException e) {
                     System.out.println("Unsuccessfully message taking");
@@ -417,7 +426,7 @@ public class GenericPaxosSMR implements Runnable{
 
     private void handleAckPrepare(GenericPaxosMessage.ackPrepare ackPrepare){
         if (instanceSpace[ackPrepare.inst_no] != null
-                && instanceSpace[ackPrepare.inst_no].crtLeaderId == serverId){   // on this instance, local server works as a leader
+                && instanceSpace[ackPrepare.inst_no].crtLeaderId == serverId){   // on this client, local server works as a leader
 
             PaxosInstance inst = instanceSpace[ackPrepare.inst_no];
 
@@ -483,7 +492,7 @@ public class GenericPaxosSMR implements Runnable{
 
                 instanceSpace[ackPrepare.inst_no] = ackPrepare.load;
 
-                /* after this point, this server will no longer play the role of leader in this instance.
+                /* after this point, this server will no longer play the role of leader in this client.
                  * ABORT msg will only react once, since control flow will not reach here again.
                  * There must be only ONE leader in the network ! */
             }
@@ -607,7 +616,7 @@ public class GenericPaxosSMR implements Runnable{
 
     private void handleAckAccept(GenericPaxosMessage.ackAccept ackAccept){
         if (instanceSpace[ackAccept.inst_no] != null
-                && instanceSpace[ackAccept.inst_no].crtLeaderId == serverId){         // on this instance, local server works as a leader
+                && instanceSpace[ackAccept.inst_no].crtLeaderId == serverId){         // on this client, local server works as a leader
 
             PaxosInstance inst = instanceSpace[ackAccept.inst_no];
 
@@ -658,7 +667,7 @@ public class GenericPaxosSMR implements Runnable{
 
                 instanceSpace[ackAccept.inst_no] = ackAccept.load;
 
-                /* after this point, this server will no longer play the role of leader in this instance.
+                /* after this point, this server will no longer play the role of leader in this client.
                  * ABORT msg will only react once, since control flow will not reach here again.
                  * There must be only ONE leader in the network ! */
             }

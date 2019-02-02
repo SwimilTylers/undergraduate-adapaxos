@@ -1,9 +1,10 @@
-package instance;
+package client;
 
 import com.sun.istack.internal.NotNull;
 import network.message.protocols.GenericClientMessage;
 
 import java.io.BufferedOutputStream;
+import java.net.Socket;
 
 /**
  * @author : Swimiltylers
@@ -11,10 +12,10 @@ import java.io.BufferedOutputStream;
  */
 public class ClientRequest {
     public final String exec;
-    public final BufferedOutputStream to;
+    public final Socket to;
 
-    public ClientRequest(@NotNull GenericClientMessage.Propose proposal, @NotNull BufferedOutputStream ostream){
+    public ClientRequest(@NotNull GenericClientMessage.Propose proposal, @NotNull Socket socket){
         exec = proposal.exec;
-        to = ostream;
+        to = socket;
     }
 }
