@@ -39,6 +39,8 @@ public class GenericNetService {
     private List<Pair<Distinguishable, BlockingQueue>> channels;
     private boolean onRunning;
 
+    private boolean debugPrintSwitch = true;
+
     public GenericNetService(int thisId, int toClientPort, @NotNull BlockingQueue<ClientRequest> clientChan, @NotNull BlockingQueue<GenericPaxosMessage> paxosChan){
         netServiceId = thisId;
         this.toClientPort = toClientPort;
@@ -245,8 +247,10 @@ public class GenericNetService {
 
             if (msg instanceof GenericClientMessage.Propose){
                 GenericClientMessage.Propose cast = (GenericClientMessage.Propose) msg;
+                System.out.println("PROPOSE "+cast.exec);
                 try {
                     clientChan.put(new ClientRequest(cast, socket));
+                    System.out.println(System.currentTimeMillis()+" client chan size " + clientChan.size());
                 } catch (InterruptedException e) {
                     System.out.println("Generic Client Message Interrupted");
                 }
@@ -254,7 +258,7 @@ public class GenericNetService {
         }
     }
 
-    public void sendPeerMessage(int toId, @NotNull Object msg){
+    synchronized public void sendPeerMessage(int toId, @NotNull Object msg){
         if (toId < peerSize && beaconHandler.check(toId)){
             try {
                 System.out.println(netServiceId+"->"+toId);
@@ -264,12 +268,16 @@ public class GenericNetService {
                 ostream.flush();
                 socketStream.flush();
             } catch (IOException e) {
-                System.out.println("Paxos Message send faliure: "+e.getMessage());
+                if (debugPrintSwitch) {
+                    System.out.println(msg);
+                    debugPrintSwitch = false;
+                }
+                //System.out.println("Paxos Message send faliure: "+e.getMessage());
             }
         }
     }
 
-    public void broadcastPeerMessage(@NotNull Object msg){
+    synchronized public void broadcastPeerMessage(@NotNull Object msg){
         for (int i = 0; i < peerSize; i++) {
             if (i != netServiceId){
                 sendPeerMessage(i, msg);

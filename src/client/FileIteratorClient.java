@@ -1,9 +1,8 @@
 package client;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import network.message.protocols.GenericClientMessage;
+
+import java.io.*;
 import java.net.Socket;
 
 /**
@@ -15,8 +14,6 @@ public class FileIteratorClient implements Runnable{
     private String exec;
 
     private Socket net;
-    private BufferedInputStream inputStream;
-    private BufferedOutputStream outputStream;
 
     public FileIteratorClient(String id){
         clientId = id;
@@ -25,10 +22,6 @@ public class FileIteratorClient implements Runnable{
 
     @Override
     protected void finalize() throws Throwable {
-        if (inputStream != null)
-            inputStream.close();
-        if (outputStream != null)
-            outputStream.close();
         if (net != null)
             net.close();
 
@@ -37,16 +30,17 @@ public class FileIteratorClient implements Runnable{
 
     public void connect(String serverAddr, int serverPort) throws IOException {
         net = new Socket(serverAddr, serverPort);
-        inputStream = new BufferedInputStream(net.getInputStream());
-        outputStream = new BufferedOutputStream(net.getOutputStream());
     }
 
 
     @Override
     public void run() {
         try {
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-            objectOutputStream.writeObject("FROM ["+clientId+"] "+exec);
+            OutputStream socketStream = net.getOutputStream();
+            ObjectOutputStream outputStream = new ObjectOutputStream(socketStream);
+            outputStream.writeObject(new GenericClientMessage.Propose("FROM ["+clientId+"] "+exec));
+            outputStream.flush();
+            socketStream.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -3,15 +3,14 @@ package rsm;
 import com.sun.istack.internal.NotNull;
 import client.ClientRequest;
 import javafx.util.Pair;
+import logger.NaiveLogger;
+import logger.PaxosLogger;
+import network.message.protocols.GenericClientMessage;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.GenericNetService;
 
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.*;
 
 /**
  * @author : Swimiltylers
@@ -21,10 +20,20 @@ public class GenericPaxosSMR implements Runnable{
     public static final int DEFAULT_INSTANCE_SIZE = 1024;
     public static final int DEFAULT_MESSAGE_SIZE = 32;
     public static final int DEFAULT_REQUEST_COMPACTING_SIZE = 48;
+    public static final int DEFAULT_COMPACT_INTERVAL = 5000;
+    public static final int DEFAULT_CLIENT_COM_WAITING = 50;
+    public static final int DEFAULT_PEER_COM_WAITING = 50;
 
     private GenericNetService net;
     private String[] peerAddr;
     private int[] peerPort;
+
+    private BlockingQueue<ClientRequest[]> compactChan;
+    private int compactInterval;
+
+    private int clientComWaiting;
+    private int peerComWaiting;
+
     private BlockingQueue<ClientRequest> cMessages;
     private BlockingQueue<GenericPaxosMessage> pMessage;
 
@@ -34,6 +43,8 @@ public class GenericPaxosSMR implements Runnable{
     private int crtInstance = 0;
     private int excInstance = 0;
     private int crtBallot = 0;
+
+    private PaxosLogger logger;
 
     private List<ClientRequest> restoredRequestList;
 
@@ -45,12 +56,19 @@ public class GenericPaxosSMR implements Runnable{
         peerSize = addr.length;
         serverId = id;
 
+        compactChan = new ArrayBlockingQueue<>(1);
+
+        compactInterval = DEFAULT_COMPACT_INTERVAL;
+        clientComWaiting = DEFAULT_CLIENT_COM_WAITING;
+        peerComWaiting = DEFAULT_PEER_COM_WAITING;
+
         cMessages = new ArrayBlockingQueue<>(DEFAULT_MESSAGE_SIZE);
         pMessage = new ArrayBlockingQueue<>(DEFAULT_MESSAGE_SIZE);
 
         net = new GenericNetService(id, GenericNetService.DEFAULT_TO_CLIENT_PORT, cMessages, pMessage);
 
         restoredRequestList = new ArrayList<>();
+        logger = new NaiveLogger(id);
     }
 
     public enum InstanceStatus{
@@ -173,120 +191,123 @@ public class GenericPaxosSMR implements Runnable{
 
         ExecutorService service = Executors.newCachedThreadPool();
 
-        System.out.println("Watching");
-        if (isLeader(0))
+        if (isLeader(0)) {
+            System.out.println("Server-"+serverId+" is watching");
             service.execute(() -> net.watch());
+        }
 
-        ReentrantLock lock = new ReentrantLock();
-
-        System.out.println("Compacting");
-        service.execute(() -> compactRequests(lock));
-
-        System.out.println("Consensus-making");
-        service.execute(() -> makeConsensus(lock));
+        service.execute(this::compact);
+        service.execute(this::paxosRoutine);
 
         service.shutdown();
     }
 
-    private void compactRequests(ReentrantLock lock){
-        if (!isLeader(crtInstance))
-            return;
-
+    private void compact(){
         while (true){
-            lock.lock();
-            try {
-                System.out.println("compacting requests...");
-                int cMessageSize = cMessages.size();
-                for (int i = 0; i < cMessageSize; i++) {
-                    try {
-                        restoredRequestList.add(cMessages.take());
-                    } catch (InterruptedException ignored) {}
-                }
+            System.out.println("compacting requests...");
+            int cMessageSize = cMessages.size();
+            System.out.println(System.currentTimeMillis() + " csize: " + cMessageSize);
 
+            for (int i = 0; i < cMessageSize; i++) {
+                try {
+                    restoredRequestList.add(cMessages.take());
+                } catch (InterruptedException ignored) {
+                }
+            }
+
+            if (!restoredRequestList.isEmpty()) {
                 Collections.shuffle(restoredRequestList);
                 int compactSize = restoredRequestList.size() < DEFAULT_REQUEST_COMPACTING_SIZE
                         ? restoredRequestList.size()
                         : DEFAULT_INSTANCE_SIZE;
 
-                ClientRequest[] cmds = restoredRequestList.subList(0, compactSize).toArray(new ClientRequest[compactSize]);
+                ClientRequest[] requests = restoredRequestList.subList(0, compactSize).toArray(new ClientRequest[compactSize]);
 
                 if (restoredRequestList.size() == compactSize)
                     restoredRequestList.clear();
                 else
                     restoredRequestList = restoredRequestList.subList(compactSize, restoredRequestList.size());
 
-                PaxosInstance inst = new PaxosInstance();
+                try {
+                    compactChan.put(requests); // slow down if congestion happens
 
-                inst.crtLeaderId = serverId;
-                inst.crtInstBallot = ++crtBallot;
-                inst.cmds = cmds;
-                inst.status = InstanceStatus.PREPARING;
-                inst.leaderMaintenanceUnit = new LeaderMaintenance();
-
-                instanceSpace[crtInstance] = inst;
-
-                System.out.println("preparing...");
-                net.broadcastPeerMessage(new GenericPaxosMessage.Prepare(crtInstance, inst.crtLeaderId, inst.crtInstBallot));
-
-                ++crtInstance;
-            } finally {
-                lock.unlock();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
 
             try {
-                Thread.sleep(1000);
+                Thread.sleep(compactInterval); // drop the refreshing frequency of 'compact'
             } catch (InterruptedException e) {
-                break;
+                e.printStackTrace();
             }
         }
-
     }
 
-    private void makeConsensus(ReentrantLock lock){
-        while (true){
-            lock.lock();
-            try {
-                GenericPaxosMessage msg;
-                try {
-                    if (pMessage.isEmpty()){
-                        Thread.sleep(5000);
-                        continue;
-                    }
+    private void peerConversation(){
+        GenericPaxosMessage msg;
+        try {
+            msg = pMessage.poll(peerComWaiting, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            System.out.println("Unsuccessfully message taking");
+            return;
+        }
 
-                    msg = pMessage.take();
-                } catch (InterruptedException e) {
-                    System.out.println("Unsuccessfully message taking");
-                    break;
-                }
-
-                if (msg instanceof GenericPaxosMessage.Prepare){
-                    System.out.println("Receive a Prepare");
-                    handlePrepare((GenericPaxosMessage.Prepare) msg);
-                }
-                else if (msg instanceof GenericPaxosMessage.ackPrepare){
-                    System.out.println("Receive a ackPrepare");
-                    handleAckPrepare((GenericPaxosMessage.ackPrepare) msg);
-                }
-                else if (msg instanceof GenericPaxosMessage.Accept){
-                    System.out.println("Receive a Accept");
-                    handleAccept((GenericPaxosMessage.Accept) msg);
-                }
-                else if (msg instanceof GenericPaxosMessage.ackAccept){
-                    System.out.println("Receive a ackAccept");
-                    handleAckAccept((GenericPaxosMessage.ackAccept) msg);
-                }
-                else if (msg instanceof GenericPaxosMessage.Commit){
-                    System.out.println("Receive a Commit");
-                    handleCommit((GenericPaxosMessage.Commit) msg);
-                }
-                else if (msg instanceof GenericPaxosMessage.Restore){
-                    System.out.println("Receive a Restore");
-                    handleRestore((GenericPaxosMessage.Restore) msg);
-                }
-            } finally {
-                lock.unlock();
+        if (msg != null) {
+            if (msg instanceof GenericPaxosMessage.Prepare) {
+                System.out.println("Receive a Prepare");
+                handlePrepare((GenericPaxosMessage.Prepare) msg);
+            } else if (msg instanceof GenericPaxosMessage.ackPrepare) {
+                System.out.println("Receive a ackPrepare");
+                handleAckPrepare((GenericPaxosMessage.ackPrepare) msg);
+            } else if (msg instanceof GenericPaxosMessage.Accept) {
+                System.out.println("Receive a Accept");
+                handleAccept((GenericPaxosMessage.Accept) msg);
+            } else if (msg instanceof GenericPaxosMessage.ackAccept) {
+                System.out.println("Receive a ackAccept");
+                handleAckAccept((GenericPaxosMessage.ackAccept) msg);
+            } else if (msg instanceof GenericPaxosMessage.Commit) {
+                System.out.println("Receive a Commit");
+                handleCommit((GenericPaxosMessage.Commit) msg);
+            } else if (msg instanceof GenericPaxosMessage.Restore) {
+                System.out.println("Receive a Restore");
+                handleRestore((GenericPaxosMessage.Restore) msg);
             }
         }
+    }
+
+    private void paxosRoutine(){
+        while (true) {
+            try {
+                peerConversation();
+            } catch (Exception ignored){}
+
+            ClientRequest[] compact = null;
+            try {
+                compact = compactChan.poll(clientComWaiting, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (compact != null)
+                handleRequests(compact);
+        }
+    }
+
+    private void handleRequests(@NotNull ClientRequest[] requests){
+        PaxosInstance inst = new PaxosInstance();
+
+        inst.crtLeaderId = serverId;
+        inst.crtInstBallot = ++crtBallot;
+        inst.cmds = requests;
+        inst.status = InstanceStatus.PREPARING;
+        inst.leaderMaintenanceUnit = new LeaderMaintenance();
+
+        instanceSpace[crtInstance] = inst;
+
+        System.out.println("ignite： cmd_length=" + requests.length);
+        net.broadcastPeerMessage(new GenericPaxosMessage.Prepare(crtInstance, inst.crtLeaderId, inst.crtInstBallot));
+
+        ++crtInstance;
     }
 
     private void handlePrepare(GenericPaxosMessage.Prepare prepare){
@@ -685,6 +706,7 @@ public class GenericPaxosSMR implements Runnable{
 
             instanceSpace[commit.inst_no] = inst;
             System.out.println("successfully committed");
+            logger.commit(commit.inst_no, inst.cmds);
         }
         else{
             PaxosInstance inst = instanceSpace[commit.inst_no];
@@ -695,6 +717,7 @@ public class GenericPaxosSMR implements Runnable{
                     inst.status = InstanceStatus.COMMITTED;
 
                     System.out.println("successfully committed");
+                    logger.commit(commit.inst_no, inst.cmds);
                 }
 
                 /* otherwise, drop the message, which is expired */
@@ -710,6 +733,7 @@ public class GenericPaxosSMR implements Runnable{
 
                 net.sendPeerMessage(commit.leaderId, reply);
                 System.out.println("successfully committed");
+                logger.commit(commit.inst_no, inst.cmds);
             }
 
             /* otherwise, drop the message, which is expired */

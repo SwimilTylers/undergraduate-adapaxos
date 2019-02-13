@@ -59,6 +59,11 @@ public class GenericPaxosMessage implements Serializable {
             this.inst_ballot = inst_ballot;
             this.cmds = cmds;
         }
+
+        @Override
+        public String toString() {
+            return "["+inst_no+","+leaderId+","+inst_ballot+",cmd_length="+cmds.length+"["+cmds[0].exec+"...]]";
+        }
     }
 
     public static class ackAccept extends GenericPaxosMessage{

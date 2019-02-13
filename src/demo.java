@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import rsm.GenericPaxosSMR;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.*;
 import java.util.HashSet;
 import java.util.Random;
