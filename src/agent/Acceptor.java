@@ -18,6 +18,7 @@ import java.util.concurrent.*;
  * @author : Swimiltylers
  * @version : 2019/1/3 10:16
  */
+@Deprecated
 public class Acceptor<Proposal> {
     private static Logger logger = Logger.getLogger(Proposer.class);
     public static final int DEFAULT_ACCEPTOR_REG_PORT = 7501;

@@ -16,6 +16,7 @@ import java.util.Set;
  * @author : Swimiltylers
  * @version : 2019/1/23 16:48
  */
+@Deprecated
 public class ObjectTcpNetService<ComMessage_t> implements NetService<ComMessage_t>{
 
     protected String netServiceName;

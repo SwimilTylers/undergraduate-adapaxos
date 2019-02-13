@@ -16,6 +16,7 @@ import java.util.concurrent.*;
  * @author : Swimiltylers
  * @version : 2019/1/3 10:16
  */
+@Deprecated
 public class Proposer<Proposal> {
     private static Logger logger = Logger.getLogger(Proposer.class);
     public static final int DEFAULT_PROPOSER_REG_PORT = 7500;

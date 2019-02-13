@@ -17,6 +17,7 @@ import java.util.concurrent.*;
  * @author : Swimiltylers
  * @version : 2019/1/18 10:47
  */
+@Deprecated
 abstract public class ObjectUdpNetService<ComMessage_t> implements NetService<ComMessage_t>{
     public static final int COM_BUFFER_SIZE = 4096;
     public static final int REG_BUFFER_SIZE = COM_BUFFER_SIZE;

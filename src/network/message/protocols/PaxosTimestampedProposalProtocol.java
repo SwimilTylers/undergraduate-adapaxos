@@ -8,6 +8,7 @@ import java.io.Serializable;
  * @author : Swimiltylers
  * @version : 2019/1/4 0:23
  */
+@Deprecated
 public class PaxosTimestampedProposalProtocol extends PaxosProposalProtocol<Long, Object> implements Serializable {
     private static final long serialVersionUID = 9216770728138537120L;
 

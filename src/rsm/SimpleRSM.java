@@ -13,6 +13,8 @@ import java.util.concurrent.*;
  * @author : Swimiltylers
  * @version : 2019/1/20 16:17
  */
+
+@Deprecated
 public class SimpleRSM<Consensus> {
     private Proposer<Consensus> m_proposer;
     private Acceptor<Consensus> m_acceptor;

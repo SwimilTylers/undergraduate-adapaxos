@@ -12,6 +12,7 @@ import java.util.Arrays;
  * @author : Swimiltylers
  * @version : 2019/1/4 0:05
  */
+@Deprecated
 public class RegistrationProtocol implements Serializable {
     private static final long serialVersionUID = 4505516181213774144L;
 

@@ -50,7 +50,14 @@ Def Echo :=
 
 ## 实现模型
 
+目前实现的SMR/RSM版本是 GenericPaxosSMR，其实现参考epaxos-master中关于basic-paxos
+的实现，并在该基础上进行一些简化和修改，控制流、通讯时序等实现过程描述在
+[Notes on implementation](Notes%20on%20implementation.md) 中。
+
+下面描述的部分已经弃置。
+
 ### Proposer
+> ! out-of-date
 
 1. Proposer借助ProposerNetService完成通讯
 2. Proposer在整个系统中存在多个，如果发生冲突，就随机指数后退
@@ -65,6 +72,7 @@ Def Echo :=
    2. Learner超时：随即指数后退
 
 ### Acceptor
+> ! out-of-date
 
 1. Acceptor借助AcceptorNetService完成通讯
 2. Acceptor在整个系统中存在多个，是共识产生的地方
@@ -73,6 +81,7 @@ Def Echo :=
 5. Acceptor每次accept一个proposal，发送通知给Learner
 
 ### Learner
+> ! out-of-date
 
 1. Learner借助LearnerNetService完成通讯
 2. Learner在整个系统中存在多个，每一个server只有一个
