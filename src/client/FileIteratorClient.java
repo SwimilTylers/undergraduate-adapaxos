@@ -1,5 +1,6 @@
 package client;
 
+import com.sun.istack.internal.NotNull;
 import network.message.protocols.GenericClientMessage;
 
 import java.io.*;
@@ -11,19 +12,36 @@ import java.net.Socket;
  */
 public class FileIteratorClient implements Runnable{
     private String clientId;
-    private String exec;
+    private BufferedReader reader;
 
     private Socket net;
 
+    public FileIteratorClient(String id, File file){
+        clientId = id;
+        try {
+            reader = new BufferedReader(new FileReader(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            reader = null;
+        }
+    }
+
     public FileIteratorClient(String id){
         clientId = id;
-        exec = "hello world !";
+        try {
+            reader = new BufferedReader(new FileReader("client.txt"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            reader = null;
+        }
     }
 
     @Override
     protected void finalize() throws Throwable {
         if (net != null)
             net.close();
+        if (reader != null)
+            reader.close();
 
         super.finalize();
     }
@@ -35,10 +53,22 @@ public class FileIteratorClient implements Runnable{
 
     @Override
     public void run() {
+        String str = "";
+        try{
+            while ((str = reader.readLine()) != null){
+                System.out.println("client: "+str);
+                sendServerMessage(net, new GenericClientMessage.Propose(str));
+                Thread.sleep(2400);
+            }
+        } catch (Exception e){e.printStackTrace();}
+    }
+
+    synchronized public void sendServerMessage(@NotNull Socket server, @NotNull GenericClientMessage msg){
         try {
-            OutputStream socketStream = net.getOutputStream();
+            OutputStream socketStream = server.getOutputStream();
             ObjectOutputStream outputStream = new ObjectOutputStream(socketStream);
-            outputStream.writeObject(new GenericClientMessage.Propose("FROM ["+clientId+"] "+exec));
+            outputStream.writeObject(msg);
+
             outputStream.flush();
             socketStream.flush();
         } catch (IOException e) {

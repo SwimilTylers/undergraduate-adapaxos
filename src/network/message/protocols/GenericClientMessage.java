@@ -19,7 +19,21 @@ public class GenericClientMessage implements Serializable {
         }
     }
 
-    public static class Reply extends GenericClientMessage{
+    public static class ackPropose extends GenericClientMessage{
+        private static final long serialVersionUID = 1361465008679327734L;
+        public final long pTimestamp;
 
+        public ackPropose(Propose propose){
+            pTimestamp = 0;
+        }
+    }
+
+    public static class Updated extends GenericClientMessage{
+        private static final long serialVersionUID = 2472143475442675021L;
+        public final String exec;
+
+        public Updated(Propose propose){
+            exec = propose.exec;
+        }
     }
 }

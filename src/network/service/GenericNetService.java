@@ -39,8 +39,6 @@ public class GenericNetService {
     private List<Pair<Distinguishable, BlockingQueue>> channels;
     private boolean onRunning;
 
-    private boolean debugPrintSwitch = true;
-
     public GenericNetService(int thisId, int toClientPort, @NotNull BlockingQueue<ClientRequest> clientChan, @NotNull BlockingQueue<GenericPaxosMessage> paxosChan){
         netServiceId = thisId;
         this.toClientPort = toClientPort;
@@ -247,6 +245,8 @@ public class GenericNetService {
 
             if (msg instanceof GenericClientMessage.Propose){
                 GenericClientMessage.Propose cast = (GenericClientMessage.Propose) msg;
+
+                sendClientMessage(socket, new GenericClientMessage.ackPropose(cast));   // ack to client
                 System.out.println("PROPOSE "+cast.exec);
                 try {
                     clientChan.put(new ClientRequest(cast, socket));
@@ -268,11 +268,7 @@ public class GenericNetService {
                 ostream.flush();
                 socketStream.flush();
             } catch (IOException e) {
-                if (debugPrintSwitch) {
-                    System.out.println(msg);
-                    debugPrintSwitch = false;
-                }
-                //System.out.println("Paxos Message send faliure: "+e.getMessage());
+                System.out.println("Paxos Message send faliure: "+e.getMessage());
             }
         }
     }
@@ -282,6 +278,18 @@ public class GenericNetService {
             if (i != netServiceId){
                 sendPeerMessage(i, msg);
             }
+        }
+    }
+
+    synchronized public void sendClientMessage(@NotNull Socket client, @NotNull Object msg){
+        try {
+            OutputStream socketStream = client.getOutputStream();
+            ObjectOutputStream ostream = new ObjectOutputStream(socketStream);
+            ostream.writeObject(msg);
+            ostream.flush();
+            socketStream.flush();
+        } catch (IOException e) {
+            System.out.println("Client Message send faliure: "+e.getMessage());
         }
     }
 }

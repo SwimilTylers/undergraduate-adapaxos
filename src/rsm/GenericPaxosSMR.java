@@ -204,9 +204,7 @@ public class GenericPaxosSMR implements Runnable{
 
     private void compact(){
         while (true){
-            System.out.println("compacting requests...");
             int cMessageSize = cMessages.size();
-            System.out.println(System.currentTimeMillis() + " csize: " + cMessageSize);
 
             for (int i = 0; i < cMessageSize; i++) {
                 try {
@@ -677,6 +675,7 @@ public class GenericPaxosSMR implements Runnable{
                 if (inst.status == InstanceStatus.PREPARED
                         && inst.leaderMaintenanceUnit.acceptResponse > peerSize/2){
                     inst.status = InstanceStatus.COMMITTED;
+                    logger.commit(ackAccept.inst_no, inst.cmds);
                     net.broadcastPeerMessage(new GenericPaxosMessage.Commit(ackAccept.inst_no, serverId, inst.crtInstBallot, inst.cmds));
                 }
             }

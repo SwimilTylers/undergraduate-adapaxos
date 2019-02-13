@@ -18,7 +18,7 @@ public class NaiveLogger implements PaxosLogger {
     public NaiveLogger(int serverId) {
         id = serverId;
         try {
-            cWriter = new FileWriter("server-"+id+"-commit.log", false);
+            cWriter = new FileWriter("logs/server-"+id+"-commit.log", false);
         } catch (IOException e) {
             e.printStackTrace();
         }
