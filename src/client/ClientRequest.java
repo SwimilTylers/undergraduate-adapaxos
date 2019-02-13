@@ -3,7 +3,6 @@ package client;
 import com.sun.istack.internal.NotNull;
 import network.message.protocols.GenericClientMessage;
 
-import java.io.BufferedOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
 
@@ -14,10 +13,16 @@ import java.net.Socket;
 public class ClientRequest implements Serializable {
     private static final long serialVersionUID = 6199390168731306554L;
     public final String exec;
-    public final Socket to;
+    public final String clientSocketDescription;
+    private transient final Socket clientSocket;
 
     public ClientRequest(@NotNull GenericClientMessage.Propose proposal, @NotNull Socket socket){
         exec = proposal.exec;
-        to = socket;
+        clientSocket = socket;
+        clientSocketDescription = socket.toString();
+    }
+
+    public Socket getLocalClientSocket() {
+        return clientSocket;
     }
 }
