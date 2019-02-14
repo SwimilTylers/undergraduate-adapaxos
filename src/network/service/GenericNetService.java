@@ -3,6 +3,7 @@ package network.service;
 import com.sun.istack.internal.NotNull;
 import client.ClientRequest;
 import javafx.util.Pair;
+import logger.PaxosLogger;
 import network.message.protocols.GenericBeacon;
 import network.message.protocols.Distinguishable;
 import network.message.protocols.GenericClientMessage;
@@ -39,13 +40,20 @@ public class GenericNetService {
     private List<Pair<Distinguishable, BlockingQueue>> channels;
     private boolean onRunning;
 
-    public GenericNetService(int thisId, int toClientPort, @NotNull BlockingQueue<ClientRequest> clientChan, @NotNull BlockingQueue<GenericPaxosMessage> paxosChan){
+    private PaxosLogger logger;
+
+    public GenericNetService(int thisId, int toClientPort,
+                             @NotNull BlockingQueue<ClientRequest> clientChan,
+                             @NotNull BlockingQueue<GenericPaxosMessage> paxosChan,
+                             @NotNull PaxosLogger logger){
         netServiceId = thisId;
         this.toClientPort = toClientPort;
         onRunning = false;
         channels = new ArrayList<>();
         this.clientChan = clientChan;
         this.paxosChan = paxosChan;
+
+        this.logger = logger;
     }
 
     @Override
@@ -261,7 +269,7 @@ public class GenericNetService {
     synchronized public void sendPeerMessage(int toId, @NotNull Object msg){
         if (toId < peerSize && beaconHandler.check(toId)){
             try {
-                System.out.println(netServiceId+"->"+toId);
+                logger.logPeerNet(netServiceId, toId, msg.toString());
                 OutputStream socketStream = peers[toId].getOutputStream();
                 ObjectOutputStream ostream = new ObjectOutputStream(socketStream);
                 ostream.writeObject(msg);

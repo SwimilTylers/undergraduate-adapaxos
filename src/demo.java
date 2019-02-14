@@ -2,6 +2,7 @@ import agent.Acceptor;
 import agent.Proposer;
 import client.FileIteratorClient;
 import javafx.util.Pair;
+import logger.NaiveLogger;
 import network.service.GenericNetService;
 import network.service.ObjectUdpNetService;
 import org.apache.log4j.BasicConfigurator;
@@ -177,7 +178,7 @@ public class demo {
 
         static void emit(ExecutorService service, int id){
             service.execute(() -> {
-                GenericNetService netService = new GenericNetService(id, GenericNetService.DEFAULT_TO_CLIENT_PORT, new ArrayBlockingQueue<>(10), new ArrayBlockingQueue<>(10));
+                GenericNetService netService = new GenericNetService(id, GenericNetService.DEFAULT_TO_CLIENT_PORT, new ArrayBlockingQueue<>(10), new ArrayBlockingQueue<>(10), new NaiveLogger(0));
                 try {
                     netService.connect(addr, port);
                 } catch (InterruptedException e) {
@@ -213,7 +214,7 @@ public class demo {
             for (int i = 0; i < addr.length; i++) {
                 int id = i;
                 service.execute(() -> {
-                    GenericNetService netService = new GenericNetService(id, GenericNetService.DEFAULT_TO_CLIENT_PORT, new ArrayBlockingQueue<>(10), new ArrayBlockingQueue<>(10));
+                    GenericNetService netService = new GenericNetService(id, GenericNetService.DEFAULT_TO_CLIENT_PORT, new ArrayBlockingQueue<>(10), new ArrayBlockingQueue<>(10), new NaiveLogger(0));
                     try {
                         netService.connect(addr, port);
                     } catch (InterruptedException e) {

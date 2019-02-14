@@ -28,7 +28,7 @@ public class ClientRequest implements Serializable {
 
     @Override
     public String toString() {
-        final String format = "[%s][desc=\"%s\"]";
+        final String format = "[client=\"%s\", desc=\"%s\"]";
         return String.format(format, clientSocketDescription, exec);
     }
 }

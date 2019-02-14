@@ -64,10 +64,10 @@ public class GenericPaxosSMR implements Runnable{
         cMessages = new ArrayBlockingQueue<>(DEFAULT_MESSAGE_SIZE);
         pMessage = new ArrayBlockingQueue<>(DEFAULT_MESSAGE_SIZE);
 
-        net = new GenericNetService(id, GenericNetService.DEFAULT_TO_CLIENT_PORT, cMessages, pMessage);
+        logger = new NaiveLogger(id);
+        net = new GenericNetService(id, GenericNetService.DEFAULT_TO_CLIENT_PORT, cMessages, pMessage, logger);
 
         restoredRequestList = new ArrayList<>();
-        logger = new NaiveLogger(id);
     }
 
     public enum InstanceStatus{
@@ -252,23 +252,35 @@ public class GenericPaxosSMR implements Runnable{
 
         if (msg != null) {
             if (msg instanceof GenericPaxosMessage.Prepare) {
-                System.out.println("Receive a Prepare");
-                handlePrepare((GenericPaxosMessage.Prepare) msg);
+                GenericPaxosMessage.Prepare cast = (GenericPaxosMessage.Prepare) msg;
+                logger.logPrepare(cast.inst_no, cast, "handle");
+                handlePrepare(cast);
+                logger.logPrepare(cast.inst_no, cast, "exit handle");
             } else if (msg instanceof GenericPaxosMessage.ackPrepare) {
-                System.out.println("Receive a ackPrepare");
-                handleAckPrepare((GenericPaxosMessage.ackPrepare) msg);
+                GenericPaxosMessage.ackPrepare cast = (GenericPaxosMessage.ackPrepare) msg;
+                logger.logAckPrepare(cast.inst_no, cast, "handle");
+                handleAckPrepare(cast);
+                logger.logAckPrepare(cast.inst_no, cast, "exit handle");
             } else if (msg instanceof GenericPaxosMessage.Accept) {
-                System.out.println("Receive a Accept");
-                handleAccept((GenericPaxosMessage.Accept) msg);
+                GenericPaxosMessage.Accept cast = (GenericPaxosMessage.Accept) msg;
+                logger.logAccept(cast.inst_no, cast, "handle");
+                handleAccept(cast);
+                logger.logAccept(cast.inst_no, cast, "exit handle");
             } else if (msg instanceof GenericPaxosMessage.ackAccept) {
-                System.out.println("Receive a ackAccept");
-                handleAckAccept((GenericPaxosMessage.ackAccept) msg);
+                GenericPaxosMessage.ackAccept cast = (GenericPaxosMessage.ackAccept) msg;
+                logger.logAckAccept(cast.inst_no, cast, "handle");
+                handleAckAccept(cast);
+                logger.logAckAccept(cast.inst_no, cast, "exit handle");
             } else if (msg instanceof GenericPaxosMessage.Commit) {
-                System.out.println("Receive a Commit");
-                handleCommit((GenericPaxosMessage.Commit) msg);
+                GenericPaxosMessage.Commit cast = (GenericPaxosMessage.Commit) msg;
+                logger.logCommit(cast.inst_no, cast, "handle");
+                handleCommit(cast);
+                logger.logCommit(cast.inst_no, cast, "exit handle");
             } else if (msg instanceof GenericPaxosMessage.Restore) {
-                System.out.println("Receive a Restore");
-                handleRestore((GenericPaxosMessage.Restore) msg);
+                GenericPaxosMessage.Restore cast = (GenericPaxosMessage.Restore) msg;
+                logger.logRestore(cast.inst_no, cast, "handle");
+                handleRestore(cast);
+                logger.logRestore(cast.inst_no, cast, "exit handle");
             }
         }
     }
@@ -676,7 +688,7 @@ public class GenericPaxosSMR implements Runnable{
                     inst.status = InstanceStatus.COMMITTED;
 
                     GenericPaxosMessage.Commit sendOut = new GenericPaxosMessage.Commit(ackAccept.inst_no, serverId, inst.crtInstBallot, inst.cmds);
-                    logger.logCommit(ackAccept.inst_no, sendOut, "send");
+                    logger.logCommit(ackAccept.inst_no, sendOut, "settled");
                     net.broadcastPeerMessage(sendOut);
                 }
             }
@@ -706,7 +718,7 @@ public class GenericPaxosSMR implements Runnable{
 
             instanceSpace[commit.inst_no] = inst;
             System.out.println("successfully committed");
-            logger.logCommit(commit.inst_no, commit, "receive");
+            logger.logCommit(commit.inst_no, commit, "settled");
         }
         else{
             PaxosInstance inst = instanceSpace[commit.inst_no];
@@ -717,7 +729,7 @@ public class GenericPaxosSMR implements Runnable{
                     inst.status = InstanceStatus.COMMITTED;
 
                     System.out.println("successfully committed");
-                    logger.logCommit(commit.inst_no, commit, "receive");
+                    logger.logCommit(commit.inst_no, commit, "settled");
                 }
 
                 /* otherwise, drop the message, which is expired */
@@ -733,7 +745,7 @@ public class GenericPaxosSMR implements Runnable{
 
                 net.sendPeerMessage(commit.leaderId, reply);
                 System.out.println("successfully committed");
-                logger.logCommit(commit.inst_no, commit, "receive");
+                logger.logCommit(commit.inst_no, commit, "settled");
             }
 
             /* otherwise, drop the message, which is expired */
