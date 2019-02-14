@@ -1,4 +1,4 @@
-package rsm.agent;
+package agent.learner;
 
 import network.message.protocols.GenericPaxosMessage;
 

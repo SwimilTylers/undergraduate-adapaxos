@@ -1,5 +1,5 @@
-import agent.Acceptor;
-import agent.Proposer;
+import agent.SingleAcceptor;
+import agent.SingleProposer;
 import client.FileIteratorClient;
 import javafx.util.Pair;
 import logger.NaiveLogger;
@@ -10,9 +10,7 @@ import org.apache.log4j.Logger;
 import rsm.GenericPaxosSMR;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.*;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -93,10 +91,10 @@ public class demo {
     }
 
     public static class paxosPhaseTest{
-        static Proposer<Integer> proposer0 = getProposer(netServiceTest.serverPorts[0][0], netServiceTest.serverPorts[0][1]);
-        static Proposer<Integer> proposer1 = getProposer(netServiceTest.serverPorts[1][0], netServiceTest.serverPorts[1][1]);
-        static Acceptor<Integer> acceptor0 = getAcceptor(4, netServiceTest.clientPorts[0][0], netServiceTest.clientPorts[0][1]);
-        static Acceptor<Integer> acceptor1 = getAcceptor(5, netServiceTest.clientPorts[1][0], netServiceTest.clientPorts[1][1]);
+        static SingleProposer<Integer> proposer0 = getProposer(netServiceTest.serverPorts[0][0], netServiceTest.serverPorts[0][1]);
+        static SingleProposer<Integer> proposer1 = getProposer(netServiceTest.serverPorts[1][0], netServiceTest.serverPorts[1][1]);
+        static SingleAcceptor<Integer> acceptor0 = getAcceptor(4, netServiceTest.clientPorts[0][0], netServiceTest.clientPorts[0][1]);
+        static SingleAcceptor<Integer> acceptor1 = getAcceptor(5, netServiceTest.clientPorts[1][0], netServiceTest.clientPorts[1][1]);
 
         static Runnable paxos0 = () -> {
             ExecutorService exe = Executors.newCachedThreadPool();
@@ -141,16 +139,16 @@ public class demo {
             exe.shutdown();
         };
 
-        public static Proposer<Integer> getProposer(int localRegPort, int localComPort){
-            Proposer<Integer> p = new Proposer<>();
+        public static SingleProposer<Integer> getProposer(int localRegPort, int localComPort){
+            SingleProposer<Integer> p = new SingleProposer<>();
             p.setLocalRegPort(localRegPort);
             p.setLocalComPort(localComPort);
 
             return p;
         }
 
-        public static Acceptor<Integer> getAcceptor(Integer init, int localRegPort, int localComPort){
-            Acceptor<Integer> a = new Acceptor<>();
+        public static SingleAcceptor<Integer> getAcceptor(Integer init, int localRegPort, int localComPort){
+            SingleAcceptor<Integer> a = new SingleAcceptor<>();
             a.setInitDecision(init);
             a.setLocalRegPort(localRegPort);
             a.setLocalComPort(localComPort);

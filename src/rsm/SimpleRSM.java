@@ -1,8 +1,8 @@
 package rsm;
 
-import agent.Acceptor;
-import agent.Learner;
-import agent.Proposer;
+import agent.SingleAcceptor;
+import agent.SingleLearner;
+import agent.SingleProposer;
 import com.sun.istack.internal.NotNull;
 import network.pool.FixedPoolDescriptor;
 
@@ -16,9 +16,9 @@ import java.util.concurrent.*;
 
 @Deprecated
 public class SimpleRSM<Consensus> {
-    private Proposer<Consensus> m_proposer;
-    private Acceptor<Consensus> m_acceptor;
-    private Learner<Consensus> m_learner;
+    private SingleProposer<Consensus> m_proposer;
+    private SingleAcceptor<Consensus> m_acceptor;
+    private SingleLearner<Consensus> m_learner;
 
     private FixedPoolDescriptor m_poolDescriptor;
 
@@ -42,13 +42,13 @@ public class SimpleRSM<Consensus> {
     }
 
     protected void initProposer(){
-        m_proposer = new Proposer<>();
+        m_proposer = new SingleProposer<>();
         m_proposer.setLocalRegPort(m_poolDescriptor.fetchRegPort(m_pName));
         m_proposer.setLocalComPort(m_poolDescriptor.fetchComPort(m_pName));
     }
 
     protected void initAcceptor(Consensus initDecision){
-        m_acceptor = new Acceptor<>();
+        m_acceptor = new SingleAcceptor<>();
 
         m_acceptor.setInitDecision(initDecision);
         m_acceptor.setLocalRegPort(m_poolDescriptor.fetchRegPort(m_aName));
@@ -59,7 +59,7 @@ public class SimpleRSM<Consensus> {
     }
 
     protected void initLearner(){
-        m_learner = new Learner<>();
+        m_learner = new SingleLearner<>();
 
         m_learner.setLocalInfoRegPort(m_poolDescriptor.fetchInfoRegPort(m_lName));
         m_learner.setLocalInfoComPort(m_poolDescriptor.fetchInfoComPort(m_lName));

@@ -1,7 +1,7 @@
 package network.message.protocols;
 
 import client.ClientRequest;
-import rsm.GenericPaxosSMR;
+import instance.PaxosInstance;
 
 import java.io.Serializable;
 
@@ -35,9 +35,9 @@ public class GenericPaxosMessage implements Serializable {
         public final ackMessageType type;
         public final int ack_leaderId;
         public final int inst_ballot;
-        public final GenericPaxosSMR.PaxosInstance load;
+        public final PaxosInstance load;
 
-        public ackPrepare(int inst_no, ackMessageType type, int ack_leaderId, int inst_ballot, GenericPaxosSMR.PaxosInstance load) {
+        public ackPrepare(int inst_no, ackMessageType type, int ack_leaderId, int inst_ballot, PaxosInstance load) {
             this.inst_no = inst_no;
             this.type = type;
             this.ack_leaderId = ack_leaderId;
@@ -72,10 +72,10 @@ public class GenericPaxosMessage implements Serializable {
         public final ackMessageType type;
         public final int ack_leaderId;
         public final int inst_ballot;
-        public final GenericPaxosSMR.PaxosInstance load;
+        public final PaxosInstance load;
         public final ClientRequest[] cmds;
 
-        public ackAccept(int inst_no, ackMessageType type, int ack_leaderId, int inst_ballot, GenericPaxosSMR.PaxosInstance load, ClientRequest[] cmds) {
+        public ackAccept(int inst_no, ackMessageType type, int ack_leaderId, int inst_ballot, PaxosInstance load, ClientRequest[] cmds) {
             this.inst_no = inst_no;
             this.type = type;
             this.ack_leaderId = ack_leaderId;
@@ -103,9 +103,9 @@ public class GenericPaxosMessage implements Serializable {
     public static class Restore extends GenericPaxosMessage{
         private static final long serialVersionUID = -6283205199126333110L;
         public final int inst_no;
-        public final GenericPaxosSMR.PaxosInstance load;
+        public final PaxosInstance load;
 
-        public Restore(int inst_no, GenericPaxosSMR.PaxosInstance load) {
+        public Restore(int inst_no, PaxosInstance load) {
             this.inst_no = inst_no;
             this.load = load;
         }

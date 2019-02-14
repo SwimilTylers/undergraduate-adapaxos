@@ -1,4 +1,4 @@
-package rsm.agent;
+package agent.proposer;
 
 import client.ClientRequest;
 import com.sun.istack.internal.NotNull;

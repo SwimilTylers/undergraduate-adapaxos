@@ -17,8 +17,8 @@ import java.util.concurrent.*;
  * @version : 2019/1/3 10:16
  */
 @Deprecated
-public class Learner<Proposal> {
-    private static Logger logger = Logger.getLogger(Proposer.class);
+public class SingleLearner<Proposal> {
+    private static Logger logger = Logger.getLogger(SingleProposer.class);
     public static final int DEFAULT_LEARNER_INFOREG_PORT = 40009;
     public static final int DEFAULT_LEARNER_INFOCOM_PORT = 40019;
 

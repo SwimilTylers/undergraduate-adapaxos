@@ -19,8 +19,8 @@ import java.util.concurrent.*;
  * @version : 2019/1/3 10:16
  */
 @Deprecated
-public class Acceptor<Proposal> {
-    private static Logger logger = Logger.getLogger(Proposer.class);
+public class SingleAcceptor<Proposal> {
+    private static Logger logger = Logger.getLogger(SingleProposer.class);
     public static final int DEFAULT_ACCEPTOR_REG_PORT = 7501;
     public static final int DEFAULT_ACCEPTOR_COM_PORT = 5578;
 
@@ -43,9 +43,9 @@ public class Acceptor<Proposal> {
 
     private Proposal m_initDecision;
 
-    public Acceptor(){}
+    public SingleAcceptor(){}
 
-    public Acceptor(Proposal initDecision){
+    public SingleAcceptor(Proposal initDecision){
         m_initDecision = initDecision;
     }
 

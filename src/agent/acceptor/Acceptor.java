@@ -1,4 +1,4 @@
-package rsm.agent;
+package agent.acceptor;
 
 import network.message.protocols.GenericPaxosMessage;
 
