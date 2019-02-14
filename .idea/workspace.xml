@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/rsm/agent/Acceptor.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/rsm/agent/Learner.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/rsm/agent/Proposer.java" afterDir="false" />
+    <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="Status: set interface&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/rsm/GenericPaxosSMR.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/rsm/GenericPaxosSMR.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -33,23 +31,39 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/rsm/GenericPaxosSMR.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="247">
-              <caret line="304" column="66" selection-start-line="304" selection-start-column="12" selection-end-line="304" selection-end-column="66" />
+            <state relative-caret-position="541">
+              <caret line="715" column="57" selection-start-line="715" selection-start-column="57" selection-end-line="715" selection-end-column="57" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#5470#5471#0" expanded="true" />
-                <element signature="e#5506#5507#0" expanded="true" />
-                <element signature="e#5859#5860#0" expanded="true" />
-                <element signature="e#5921#5922#0" expanded="true" />
+                <element signature="method#GenericPaxosSMR#0;class#GenericPaxosSMR#0" />
+                <element signature="class#InstanceStatus#0;class#GenericPaxosSMR#0" />
+                <element signature="class#HistoryMaintenance#0;class#GenericPaxosSMR#0" />
+                <element signature="class#LeaderMaintenance#0;class#GenericPaxosSMR#0" />
+                <element signature="class#PaxosInstance#0;class#GenericPaxosSMR#0" />
+                <element signature="method#run#0;class#GenericPaxosSMR#0" />
+                <element signature="method#compact#0;class#GenericPaxosSMR#0" />
+                <element signature="method#peerConversation#0;class#GenericPaxosSMR#0" />
+                <element signature="method#paxosRoutine#0;class#GenericPaxosSMR#0" />
+                <element signature="method#handleRestore#0;class#GenericPaxosSMR#0" />
+                <element signature="class#GenericProposer#0;class#GenericPaxosSMR#0" />
+                <element signature="method#handleRequests#0;class#GenericProposer#0;class#GenericPaxosSMR#0" />
+                <element signature="method#handleAckPrepare#0;class#GenericProposer#0;class#GenericPaxosSMR#0" />
+                <element signature="class#GenericAcceptor#0;class#GenericPaxosSMR#0" />
+                <element signature="method#fitRestoreCase#0;class#GenericAcceptor#0;class#GenericPaxosSMR#0" />
+                <element signature="method#handlePrepare#0;class#GenericAcceptor#0;class#GenericPaxosSMR#0" />
+                <element signature="method#handleAccept#0;class#GenericAcceptor#0;class#GenericPaxosSMR#0" />
+                <element signature="class#GenericLearner#0;class#GenericPaxosSMR#0" />
+                <element signature="method#handleAckAccept#0;class#GenericLearner#0;class#GenericPaxosSMR#0" />
+                <element signature="method#handleCommit#0;class#GenericLearner#0;class#GenericPaxosSMR#0" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/rsm/agent/Proposer.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="154">
@@ -161,11 +175,11 @@
         <option value="$PROJECT_DIR$/src/logger/PaxosLogger.java" />
         <option value="$PROJECT_DIR$/src/client/ClientRequest.java" />
         <option value="$PROJECT_DIR$/src/logger/NaiveLogger.java" />
-        <option value="$PROJECT_DIR$/src/rsm/GenericPaxosSMR.java" />
         <option value="$PROJECT_DIR$/src/rsm/agent/proposer.java" />
         <option value="$PROJECT_DIR$/src/rsm/agent/Acceptor.java" />
         <option value="$PROJECT_DIR$/src/rsm/agent/Learner.java" />
         <option value="$PROJECT_DIR$/src/rsm/agent/Proposer.java" />
+        <option value="$PROJECT_DIR$/src/rsm/GenericPaxosSMR.java" />
       </list>
     </option>
   </component>
@@ -246,7 +260,7 @@
     <property name="Repository.Attach.Sources" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1550137263205" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1550140070003" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/lib/apache-log4j-2.11.1-bin" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -481,11 +495,18 @@
       <option name="project" value="LOCAL" />
       <updated>1550041247776</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="Status: set interface&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation">
+      <created>1550137402285</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1550137402285</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="305858000" />
+    <option name="totallyTimeSpent" value="308664000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -500,7 +521,7 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24865952" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24865952" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -599,12 +620,10 @@
     <MESSAGE value="Status: find out the reason of NotSerializableException: Socket is not Serializable&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.rsm&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
     <MESSAGE value="Status: find out the reason of NotSerializableException: Socket is not Serializable - make it transient&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.rsm&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
     <MESSAGE value="Status: epaxos-inspired implementation of basic-paxos&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
-    <option name="LAST_COMMIT_MESSAGE" value="Status: epaxos-inspired implementation of basic-paxos&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
+    <MESSAGE value="Status: set interface&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Status: set interface&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/network/message/PaxosMessage.java" />
-    <entry file="file://$PROJECT_DIR$/src/network/message/header/SenderInfoHeader.java" />
-    <entry file="file://$PROJECT_DIR$/src/network/message/constructor/Constructable.java" />
     <entry file="file://$PROJECT_DIR$/src/network/message/ComPaxosMessage.java" />
     <entry file="jar://C:/Program Files/Java/jdk1.8.0_144/src.zip!/java/io/ObjectOutputStream.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -940,26 +959,51 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/rsm/GenericPaxosSMR.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="304" column="66" selection-start-line="304" selection-start-column="12" selection-end-line="304" selection-end-column="66" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#5470#5471#0" expanded="true" />
-            <element signature="e#5506#5507#0" expanded="true" />
-            <element signature="e#5859#5860#0" expanded="true" />
-            <element signature="e#5921#5922#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/rsm/agent/Proposer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="154">
           <caret line="11" column="59" selection-start-line="11" selection-start-column="59" selection-end-line="11" selection-end-column="59" />
           <folding>
             <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-4.paxos.log">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-4.commit.log">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-0.commit.log">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/rsm/GenericPaxosSMR.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="541">
+          <caret line="715" column="57" selection-start-line="715" selection-start-column="57" selection-end-line="715" selection-end-column="57" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#GenericPaxosSMR#0;class#GenericPaxosSMR#0" />
+            <element signature="class#InstanceStatus#0;class#GenericPaxosSMR#0" />
+            <element signature="class#HistoryMaintenance#0;class#GenericPaxosSMR#0" />
+            <element signature="class#LeaderMaintenance#0;class#GenericPaxosSMR#0" />
+            <element signature="class#PaxosInstance#0;class#GenericPaxosSMR#0" />
+            <element signature="method#run#0;class#GenericPaxosSMR#0" />
+            <element signature="method#compact#0;class#GenericPaxosSMR#0" />
+            <element signature="method#peerConversation#0;class#GenericPaxosSMR#0" />
+            <element signature="method#paxosRoutine#0;class#GenericPaxosSMR#0" />
+            <element signature="method#handleRestore#0;class#GenericPaxosSMR#0" />
+            <element signature="class#GenericProposer#0;class#GenericPaxosSMR#0" />
+            <element signature="method#handleRequests#0;class#GenericProposer#0;class#GenericPaxosSMR#0" />
+            <element signature="method#handleAckPrepare#0;class#GenericProposer#0;class#GenericPaxosSMR#0" />
+            <element signature="class#GenericAcceptor#0;class#GenericPaxosSMR#0" />
+            <element signature="method#fitRestoreCase#0;class#GenericAcceptor#0;class#GenericPaxosSMR#0" />
+            <element signature="method#handlePrepare#0;class#GenericAcceptor#0;class#GenericPaxosSMR#0" />
+            <element signature="method#handleAccept#0;class#GenericAcceptor#0;class#GenericPaxosSMR#0" />
+            <element signature="class#GenericLearner#0;class#GenericPaxosSMR#0" />
+            <element signature="method#handleAckAccept#0;class#GenericLearner#0;class#GenericPaxosSMR#0" />
+            <element signature="method#handleCommit#0;class#GenericLearner#0;class#GenericPaxosSMR#0" />
           </folding>
         </state>
       </provider>
