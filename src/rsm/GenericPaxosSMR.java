@@ -5,7 +5,6 @@ import client.ClientRequest;
 import javafx.util.Pair;
 import logger.NaiveLogger;
 import logger.PaxosLogger;
-import network.message.protocols.GenericClientMessage;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.GenericNetService;
 
@@ -675,8 +674,10 @@ public class GenericPaxosSMR implements Runnable{
                 if (inst.status == InstanceStatus.PREPARED
                         && inst.leaderMaintenanceUnit.acceptResponse > peerSize/2){
                     inst.status = InstanceStatus.COMMITTED;
-                    logger.commit(ackAccept.inst_no, inst.cmds);
-                    net.broadcastPeerMessage(new GenericPaxosMessage.Commit(ackAccept.inst_no, serverId, inst.crtInstBallot, inst.cmds));
+
+                    GenericPaxosMessage.Commit sendOut = new GenericPaxosMessage.Commit(ackAccept.inst_no, serverId, inst.crtInstBallot, inst.cmds);
+                    logger.logCommit(ackAccept.inst_no, sendOut, "send");
+                    net.broadcastPeerMessage(sendOut);
                 }
             }
             else if (ackAccept.type == GenericPaxosMessage.ackMessageType.RECOVER){ // recovery case
@@ -705,7 +706,7 @@ public class GenericPaxosSMR implements Runnable{
 
             instanceSpace[commit.inst_no] = inst;
             System.out.println("successfully committed");
-            logger.commit(commit.inst_no, inst.cmds);
+            logger.logCommit(commit.inst_no, commit, "receive");
         }
         else{
             PaxosInstance inst = instanceSpace[commit.inst_no];
@@ -716,7 +717,7 @@ public class GenericPaxosSMR implements Runnable{
                     inst.status = InstanceStatus.COMMITTED;
 
                     System.out.println("successfully committed");
-                    logger.commit(commit.inst_no, inst.cmds);
+                    logger.logCommit(commit.inst_no, commit, "receive");
                 }
 
                 /* otherwise, drop the message, which is expired */
@@ -732,7 +733,7 @@ public class GenericPaxosSMR implements Runnable{
 
                 net.sendPeerMessage(commit.leaderId, reply);
                 System.out.println("successfully committed");
-                logger.commit(commit.inst_no, inst.cmds);
+                logger.logCommit(commit.inst_no, commit, "receive");
             }
 
             /* otherwise, drop the message, which is expired */

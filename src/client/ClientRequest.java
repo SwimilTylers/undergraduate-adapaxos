@@ -25,4 +25,10 @@ public class ClientRequest implements Serializable {
     public Socket getLocalClientSocket() {
         return clientSocket;
     }
+
+    @Override
+    public String toString() {
+        final String format = "[%s][desc=\"%s\"]";
+        return String.format(format, clientSocketDescription, exec);
+    }
 }

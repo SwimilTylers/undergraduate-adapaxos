@@ -11,6 +11,7 @@ import rsm.GenericPaxosSMR;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.*;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -254,5 +255,9 @@ public class demo {
     public static void main(String[] args) {
         //NetServiceTesting.test2();
         GenericPaxosSMRTesting.test0();
+
+        //Date date = new Date();
+        //final String format = "[%tF %<tT:%<tL %<tz][p%08d][%s][leaderId=%d, inst_no=%d][\"%s\"]%n";
+        //System.out.print(String.format(format, date, 0, "PREPARE", 0, 0, "send"));
     }
 }
