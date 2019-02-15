@@ -2,24 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/agent/acceptor/GenericAcceptor.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/agent/learner/GenericLearner.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/agent/proposer/GenericProposer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/instance/InstanceStatus.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/instance/PaxosInstance.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/instance/maintenance/HistoryMaintenance.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/instance/maintenance/LeaderMaintenance.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/agent/learner/DiskLearner.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/agent/proposer/DiskProposer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/instance/maintenance/DiskLeaderMaintenance.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/network/message/protocols/DiskPaxosMessage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/agent/Acceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/SingleAcceptor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/agent/Learner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/SingleLearner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/agent/Proposer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/SingleProposer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/demo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/demo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/message/protocols/GenericPaxosMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/message/protocols/GenericPaxosMessage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/rsm/GenericPaxosSMR.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/rsm/GenericPaxosSMR.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/rsm/SimpleRSM.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/rsm/SimpleRSM.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/rsm/agent/Acceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/acceptor/Acceptor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/rsm/agent/Learner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/learner/Learner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/rsm/agent/Proposer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/proposer/Proposer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Notes on implementation.md" beforeDir="false" afterPath="$PROJECT_DIR$/Notes on implementation.md" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -35,25 +23,20 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/rsm/GenericPaxosSMR.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-971">
-              <caret line="53" column="30" lean-forward="true" selection-start-line="53" selection-start-column="30" selection-end-line="53" selection-end-column="30" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="method#GenericPaxosSMR#0;class#GenericPaxosSMR#0" />
-                <element signature="method#run#0;class#GenericPaxosSMR#0" />
-              </folding>
+            <state relative-caret-position="-798">
+              <caret line="79" column="5" selection-start-line="79" selection-start-column="5" selection-end-line="79" selection-end-column="5" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/instance/maintenance/HistoryMaintenance.java">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/agent/learner/DiskLearner.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="196">
-              <caret line="14" column="13" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
+            <state relative-caret-position="387">
+              <caret line="52" column="17" selection-start-line="52" selection-start-column="17" selection-end-line="52" selection-end-column="17" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -62,19 +45,48 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/instance/maintenance/LeaderMaintenance.java">
+        <entry file="file://$PROJECT_DIR$/src/agent/proposer/GenericProposer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="84">
-              <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
+            <state relative-caret-position="61">
+              <caret line="97" column="16" selection-start-line="97" selection-start-column="16" selection-end-line="110" selection-end-column="17" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/instance/PaxosInstance.java">
+        <entry file="file://$PROJECT_DIR$/src/network/message/protocols/DiskPaxosMessage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="126">
-              <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
+            <state relative-caret-position="471">
+              <caret line="108" column="13" lean-forward="true" selection-start-line="108" selection-start-column="13" selection-end-line="108" selection-end-column="13" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#371#372#0" expanded="true" />
+                <element signature="e#412#413#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/agent/learner/GenericLearner.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="245">
+              <caret line="82" column="16" lean-forward="true" selection-start-line="82" selection-start-column="16" selection-end-line="89" selection-end-column="17" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/agent/proposer/DiskProposer.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="429">
+              <caret line="89" column="82" lean-forward="true" selection-start-line="89" selection-start-column="82" selection-end-line="89" selection-end-column="82" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -112,18 +124,13 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="poly" />
+        <entry key="$PROJECT_DIR$" value="agent" />
       </map>
     </option>
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/network/message/prefix/SenderInfoPrefix.java" />
-        <option value="$PROJECT_DIR$/src/network/message/header/SenderInfoPrefix.java" />
-        <option value="$PROJECT_DIR$/src/network/message/protocols/PaxosTimestampPrepareProtocol.java" />
-        <option value="$PROJECT_DIR$/src/network/message/exception/IncompatiblePaxosProtocolException.java" />
-        <option value="$PROJECT_DIR$/src/network/message/header/SenderInfoHeader.java" />
         <option value="$PROJECT_DIR$/src/network/message/protocols/PaxosPrepareProposalProtocol.java" />
         <option value="$PROJECT_DIR$/src/network/message/protocols/AcceptorRegistrationProtocol.java" />
         <option value="$PROJECT_DIR$/src/network/demo.java" />
@@ -170,6 +177,11 @@
         <option value="$PROJECT_DIR$/src/rsm/agent/learner/GenericLearner.java" />
         <option value="$PROJECT_DIR$/src/agent/learner/Learner.java" />
         <option value="$PROJECT_DIR$/src/rsm/GenericPaxosSMR.java" />
+        <option value="$PROJECT_DIR$/src/instance/maintenance/DiskMaintenance.java" />
+        <option value="$PROJECT_DIR$/src/network/message/protocols/DiskPaxosMessage.java" />
+        <option value="$PROJECT_DIR$/src/agent/learner/DiskLearner.java" />
+        <option value="$PROJECT_DIR$/src/agent/proposer/DiskProposer.java" />
+        <option value="$PROJECT_DIR$/src/instance/maintenance/DiskLeaderMaintenance.java" />
       </list>
     </option>
   </component>
@@ -206,6 +218,39 @@
               <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
               <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="agent" type="462c0819:PsiDirectoryNode" />
+              <item name="learner" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="agent" type="462c0819:PsiDirectoryNode" />
+              <item name="proposer" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="instance" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="instance" type="462c0819:PsiDirectoryNode" />
+              <item name="maintenance" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="logger" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="network" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -225,8 +270,8 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
       <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -236,7 +281,7 @@
     <property name="Repository.Attach.Sources" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1550142687231" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1550230480749" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/lib/apache-log4j-2.11.1-bin" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -264,7 +309,7 @@
       <module name="adapaxos" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="network.service.*" />
+          <option name="PATTERN" value="network.service.handler.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -274,6 +319,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.demo" />
         <item itemvalue="Application.demo" />
         <item itemvalue="Application.demo" />
         <item itemvalue="Application.demo" />
@@ -330,7 +376,8 @@
       <workItem from="1550035393750" duration="4757000" />
       <workItem from="1550058822601" duration="7095000" />
       <workItem from="1550123964470" duration="1195000" />
-      <workItem from="1550140106084" duration="3331000" />
+      <workItem from="1550140106084" duration="4382000" />
+      <workItem from="1550207211833" duration="15140000" />
     </task>
     <task id="LOCAL-00001" summary="modify README.md">
       <created>1545406849881</created>
@@ -486,11 +533,18 @@
       <option name="project" value="LOCAL" />
       <updated>1550140243217</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="Status: job of GenericPaxosSMR has been separated into several classes&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation">
+      <created>1550143586701</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1550143586701</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="311995000" />
+    <option name="totallyTimeSpent" value="328186000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -505,7 +559,7 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25201073" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25536194" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -606,36 +660,22 @@
     <MESSAGE value="Status: epaxos-inspired implementation of basic-paxos&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
     <MESSAGE value="Status: set interface&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
     <MESSAGE value="Status: inner class&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
-    <option name="LAST_COMMIT_MESSAGE" value="Status: inner class&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
+    <MESSAGE value="Status: job of GenericPaxosSMR has been separated into several classes&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Status: job of GenericPaxosSMR has been separated into several classes&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/network/service/GenericNetService.java</url>
+          <line>94</line>
+          <properties />
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0_144/src.zip!/java/util/ArrayList.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="148">
-          <caret line="105" column="13" selection-start-line="105" selection-start-column="13" selection-end-line="105" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Java/jdk1.8.0_144/src.zip!/java/net/Socket.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="148">
-          <caret line="53" column="6" selection-start-line="53" selection-start-column="6" selection-end-line="53" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/message/protocols/GenericClientMessage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="379">
-          <caret line="36" column="9" lean-forward="true" selection-start-line="36" selection-start-column="9" selection-end-line="36" selection-end-column="9" />
-          <folding>
-            <element signature="e#678#679#0" expanded="true" />
-            <element signature="e#715#716#0" expanded="true" />
-            <element signature="e#1007#1008#0" expanded="true" />
-            <element signature="e#1044#1045#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/network/message/protocols/GenericBeacon.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="126">
@@ -746,34 +786,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/logger/PaxosLogger.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="16" column="44" selection-start-line="16" selection-start-column="44" selection-end-line="16" selection-end-column="44" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/logger/NaiveLogger.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="519">
           <caret line="79" column="28" selection-start-line="79" selection-start-column="28" selection-end-line="79" selection-end-column="28" />
           <folding>
             <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/client/ClientRequest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="30" column="47" selection-start-line="30" selection-start-column="47" selection-end-line="30" selection-end-column="47" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#744#745#0" expanded="true" />
-            <element signature="e#779#780#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -842,14 +860,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/InstanceStatus.java" />
     <entry file="file://$PROJECT_DIR$/logs/server-4.paxos.log">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-4.commit.log">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-0.commit.log">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-0.net.log">
@@ -857,26 +871,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-0.paxos.log">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/GenericNetService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="14">
-          <caret line="202" column="50" selection-start-line="202" selection-start-column="50" selection-end-line="202" selection-end-column="50" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/message/protocols/GenericPaxosMessage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="40" column="95" selection-start-line="40" selection-start-column="95" selection-end-line="40" selection-end-column="95" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/network/message/protocols/PaxosProposalProtocol.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -888,55 +882,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-1.commit.log">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-3.commit.log">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/InstanceStatus.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="84">
-          <caret line="6" column="12" selection-start-line="6" selection-start-column="12" selection-end-line="6" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/PaxosInstance.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/maintenance/HistoryMaintenance.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="14" column="13" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/maintenance/LeaderMaintenance.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="84">
-          <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/agent/proposer/Proposer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="140">
-          <caret line="10" column="17" selection-start-line="10" selection-start-column="17" selection-end-line="10" selection-end-column="17" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/agent/acceptor/GenericAcceptor.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -964,10 +911,98 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/agent/learner/GenericLearner.java">
+    <entry file="file://$PROJECT_DIR$/logs/server-1.commit.log">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-0.commit.log">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/client/ClientRequest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1335">
-          <caret line="17" column="13" selection-start-line="17" selection-start-column="13" selection-end-line="17" selection-end-column="13" />
+        <state relative-caret-position="336">
+          <caret line="24" column="42" lean-forward="true" selection-start-line="24" selection-start-column="42" selection-end-line="24" selection-end-column="42" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#779#780#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/GenericNetService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2618">
+          <caret line="202" column="50" selection-start-line="202" selection-start-column="50" selection-end-line="202" selection-end-column="50" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/logger/PaxosLogger.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="16" column="44" selection-start-line="16" selection-start-column="44" selection-end-line="16" selection-end-column="44" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/agent/proposer/Proposer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="154">
+          <caret line="11" column="4" selection-start-line="11" selection-start-column="4" selection-end-line="11" selection-end-column="59" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/instance/InstanceStatus.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="84">
+          <caret line="6" column="12" selection-start-line="6" selection-start-column="12" selection-end-line="6" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/instance/PaxosInstance.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/instance/maintenance/HistoryMaintenance.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="98">
+          <caret line="19" column="49" lean-forward="true" selection-start-line="19" selection-start-column="49" selection-end-line="19" selection-end-column="49" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/instance/maintenance/LeaderMaintenance.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="84">
+          <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/rsm/GenericPaxosSMR.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-798">
+          <caret line="79" column="5" selection-start-line="79" selection-start-column="5" selection-end-line="79" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/message/protocols/GenericPaxosMessage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-369">
+          <caret line="40" column="35" lean-forward="true" selection-start-line="40" selection-start-column="35" selection-end-line="40" selection-end-column="35" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -976,22 +1011,62 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/agent/proposer/GenericProposer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-971">
-          <caret line="25" column="42" lean-forward="true" selection-start-line="25" selection-start-column="42" selection-end-line="25" selection-end-column="42" />
+        <state relative-caret-position="61">
+          <caret line="97" column="16" selection-start-line="97" selection-start-column="16" selection-end-line="110" selection-end-column="17" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/rsm/GenericPaxosSMR.java">
+    <entry file="file://$PROJECT_DIR$/src/agent/learner/GenericLearner.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-971">
-          <caret line="53" column="30" lean-forward="true" selection-start-line="53" selection-start-column="30" selection-end-line="53" selection-end-column="30" />
+        <state relative-caret-position="245">
+          <caret line="82" column="16" lean-forward="true" selection-start-line="82" selection-start-column="16" selection-end-line="89" selection-end-column="17" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="method#GenericPaxosSMR#0;class#GenericPaxosSMR#0" />
-            <element signature="method#run#0;class#GenericPaxosSMR#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/message/protocols/DiskPaxosMessage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="471">
+          <caret line="108" column="13" lean-forward="true" selection-start-line="108" selection-start-column="13" selection-end-line="108" selection-end-column="13" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#371#372#0" expanded="true" />
+            <element signature="e#412#413#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/instance/maintenance/DiskLeaderMaintenance.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="224">
+          <caret line="16" column="96" selection-start-line="16" selection-start-column="96" selection-end-line="16" selection-end-column="96" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/agent/proposer/DiskProposer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="429">
+          <caret line="89" column="82" lean-forward="true" selection-start-line="89" selection-start-column="82" selection-end-line="89" selection-end-column="82" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/agent/learner/DiskLearner.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="387">
+          <caret line="52" column="17" selection-start-line="52" selection-start-column="17" selection-end-line="52" selection-end-column="17" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>

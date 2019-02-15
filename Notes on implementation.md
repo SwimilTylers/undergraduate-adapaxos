@@ -1,5 +1,3 @@
-
-
 # Server网络构建流程简释
 
 ```flow
@@ -204,3 +202,18 @@ server0-->>lastLeaderId_server: restore(local.proposals)
 Note over server0: <lastLeaderId, _, last_ballot, null>
 ```
 
+## disk-paxos
+
+```sequence
+Title: [0] Start Init NORMAL
+Note over server0: <leaderId, PREPARING, inst_ballot, dialog_no, []>
+server0->>server1: [dialog_no, write(inst_no, leaderId, inst), [read(inst_no, leaderId, accessId_0), ...]]
+server1-->>server0: [dialog_no, ackWrite(inst_no, WRITE_SUCCESS, leaderId, []), []]
+Note over server0: accumulating
+Note over server0: <leaderId, PREPARED, inst_ballot, dialog_no', []>
+server0->>server1: [dialog_no', write(inst_no, leaderId, inst), [read(inst_no, leaderId, accessId_0), ...]]
+server1-->>server0: [dialog_no', ackWrite(inst_no, WRITE_SUCCESS, leaderId, []), []]
+Note over server0: accumulating
+Note over server0: <leaderId, COMMITTED, inst_ballot, []>
+server0->>server1: commit(inst_no, leaderId, inst_ballot, cmds)
+```
