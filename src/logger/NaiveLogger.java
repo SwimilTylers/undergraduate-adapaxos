@@ -63,10 +63,23 @@ public class NaiveLogger implements PaxosLogger {
     }
 
     @Override
-    public void log(String log, boolean isOnScreen) {
+    public void log(boolean isOnScreen, String log) {
         if (isOnScreen)
             System.out.print(log);
         imm_toFile(lWriter, log);
+    }
+
+    @Override
+    public void logFormatted(boolean isOnScreen, String... logs) {
+        Date date = new Date();
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("[%tF %<tT:%<tL %<tz]", date));
+        for (String log :
+                logs) {
+            builder.append("[").append(log).append("]");
+        }
+        builder.append("\n");
+        log(isOnScreen, builder.toString());
     }
 
     @Override
@@ -77,7 +90,7 @@ public class NaiveLogger implements PaxosLogger {
         System.out.print(message);
         imm_toFile(nWriter, message);
 
-        log(message, false);
+        log(false, message);
     }
 
     @Override
@@ -88,7 +101,7 @@ public class NaiveLogger implements PaxosLogger {
         System.out.print(message);
         imm_toFile(nWriter, message);
 
-        log(message, false);
+        log(false, message);
     }
 
     @Override
@@ -99,7 +112,7 @@ public class NaiveLogger implements PaxosLogger {
         //System.out.print(message);
         imm_toFile(pWriter, message);
 
-        log(message, false);
+        log(false, message);
     }
 
     @Override
@@ -110,7 +123,7 @@ public class NaiveLogger implements PaxosLogger {
         //System.out.print(message);
         imm_toFile(pWriter, message);
 
-        log(message, false);
+        log(false, message);
     }
 
     @Override
@@ -121,7 +134,7 @@ public class NaiveLogger implements PaxosLogger {
         //System.out.print(message);
         imm_toFile(pWriter, message);
 
-        log(message, false);
+        log(false, message);
     }
 
     @Override
@@ -132,7 +145,7 @@ public class NaiveLogger implements PaxosLogger {
         //System.out.print(message);
         imm_toFile(pWriter, message);
 
-        log(message, false);
+        log(false, message);
     }
 
     @Override
@@ -143,7 +156,7 @@ public class NaiveLogger implements PaxosLogger {
         //System.out.print(message);
         imm_toFile(pWriter, message);
 
-        log(message, false);
+        log(false, message);
     }
 
     @Override
@@ -154,7 +167,7 @@ public class NaiveLogger implements PaxosLogger {
         //System.out.print(message);
         imm_toFile(pWriter, message);
 
-        log(message, false);
+        log(false, message);
 
         if (supplement.equals("settled")) {
             imm_toFile(cWriter, message);

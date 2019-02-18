@@ -16,7 +16,7 @@ public class DiskPaxosMessage implements Serializable {
         DIALOGUE_NO = dialogue_no;
     }
 
-    public enum DiskStatus{
+    public enum DiskStatus implements Serializable{
         WRITE_SUCCESS,
         READ_SUCCESS, READ_NO_SUCH_FILE
     }
@@ -100,6 +100,11 @@ public class DiskPaxosMessage implements Serializable {
         }
     }
 
+    public static final String IRW_HEADER = "integrated Write and Read";
+    public static final String IR_HEADER = "integrated read";
+    public static final String IRW_ACK_HEADER = "ack: "+IRW_HEADER;
+    public static final String IR_ACK_HEADER = "ack: "+IR_HEADER;
+
     public static DiskPaxosMessage.PackedMessage integratedWriteAndRead(long dialogue_no, int inst_no, int leaderId, int totalSize, PaxosInstance load){
         DiskPaxosMessage.Write writeOp = new DiskPaxosMessage.Write(dialogue_no, inst_no, leaderId, load);
         DiskPaxosMessage.Read[] readOps = new DiskPaxosMessage.Read[totalSize];
@@ -109,7 +114,12 @@ public class DiskPaxosMessage implements Serializable {
             }
         }
 
-        return new DiskPaxosMessage.PackedMessage(dialogue_no, "integrated Write and Read",
-                new DiskPaxosMessage[]{writeOp, new DiskPaxosMessage.PackedMessage(dialogue_no, "integrated read", readOps)});
+        return new DiskPaxosMessage.PackedMessage(dialogue_no, IRW_HEADER,
+                new DiskPaxosMessage[]{writeOp, new DiskPaxosMessage.PackedMessage(dialogue_no, IR_HEADER, readOps)});
+    }
+
+    public static DiskPaxosMessage.PackedMessage integratedWriteAndRead_ack(long dialogue_no, ackWrite ackWrite, ackRead[] ackReads){
+        return new DiskPaxosMessage.PackedMessage(dialogue_no, IRW_ACK_HEADER,
+                new DiskPaxosMessage[]{ackWrite, new DiskPaxosMessage.PackedMessage(dialogue_no, IR_ACK_HEADER, ackReads)});
     }
 }

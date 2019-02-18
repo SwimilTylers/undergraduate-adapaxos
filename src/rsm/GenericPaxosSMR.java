@@ -30,31 +30,31 @@ public class GenericPaxosSMR implements Runnable{
     public static final int DEFAULT_CLIENT_COM_WAITING = 50;
     public static final int DEFAULT_PEER_COM_WAITING = 50;
 
-    private GenericNetService net;
-    private String[] peerAddr;
-    private int[] peerPort;
+    protected GenericNetService net;
+    protected String[] peerAddr;
+    protected int[] peerPort;
 
-    private BlockingQueue<ClientRequest[]> compactChan;
+    protected BlockingQueue<ClientRequest[]> compactChan;
     private int compactInterval;
 
-    private int clientComWaiting;
-    private int peerComWaiting;
+    protected int clientComWaiting;
+    protected int peerComWaiting;
 
     private BlockingQueue<ClientRequest> cMessages;
-    private BlockingQueue<GenericPaxosMessage> pMessage;
+    protected BlockingQueue<GenericPaxosMessage> pMessage;
 
-    private int serverId;
-    private int peerSize;
-    private PaxosInstance[] instanceSpace = new PaxosInstance[DEFAULT_INSTANCE_SIZE];
+    protected int serverId;
+    protected int peerSize;
+    protected PaxosInstance[] instanceSpace = new PaxosInstance[DEFAULT_INSTANCE_SIZE];
     private int excInstance = 0;
 
-    private PaxosLogger logger;
+    protected PaxosLogger logger;
 
     private Proposer proposer;
     private Acceptor acceptor;
     private Learner learner;
 
-    private List<ClientRequest> restoredRequestList;
+    protected List<ClientRequest> restoredRequestList;
 
     public GenericPaxosSMR(int id, @NotNull String[] addr, int[] port){
         assert addr.length == port.length;
@@ -109,7 +109,7 @@ public class GenericPaxosSMR implements Runnable{
         service.shutdown();
     }
 
-    private void compact(){
+    protected void compact(){
         while (true){
             int cMessageSize = cMessages.size();
 
@@ -148,7 +148,7 @@ public class GenericPaxosSMR implements Runnable{
         }
     }
 
-    private void peerConversation(){
+    protected void peerConversation(){
         GenericPaxosMessage msg;
         try {
             msg = pMessage.poll(peerComWaiting, TimeUnit.MILLISECONDS);
@@ -192,7 +192,7 @@ public class GenericPaxosSMR implements Runnable{
         }
     }
 
-    private void paxosRoutine(){
+    protected void paxosRoutine(){
         while (true) {
             try {
                 peerConversation();

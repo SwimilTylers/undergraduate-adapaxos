@@ -28,6 +28,19 @@ public class DiskLearner {
 
     private PaxosLogger logger;
 
+    public DiskLearner(int serverId, int peerSize,
+                          @NotNull PaxosInstance[] instanceSpace,
+                          @NotNull GenericNetService net,
+                          @NotNull List<ClientRequest> restoredRequestList,
+                          @NotNull PaxosLogger logger) {
+        this.serverId = serverId;
+        this.peerSize = peerSize;
+        this.instanceSpace = instanceSpace;
+        this.net = net;
+        this.restoredRequestList = restoredRequestList;
+        this.logger = logger;
+    }
+
     public void handle(@NotNull DiskPaxosMessage.ackWrite ackWrite, DiskPaxosMessage.ackRead[] ackReads) {
         PaxosInstance inst = instanceSpace[ackWrite.inst_no];
         if (inst.leaderMaintenanceUnit instanceof DiskLeaderMaintenance) {

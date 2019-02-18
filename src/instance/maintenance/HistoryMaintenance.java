@@ -3,6 +3,7 @@ package instance.maintenance;
 import client.ClientRequest;
 import javafx.util.Pair;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -12,7 +13,8 @@ import java.util.Set;
  * @author : Swimiltylers
  * @version : 2019/2/14 18:43
  */
-public class HistoryMaintenance{
+public class HistoryMaintenance implements Serializable {
+    private static final long serialVersionUID = -2373815502534795800L;
     private int maxRecvLeaderId;
     private int maxRecvInstBallot;
     public boolean HOST_RESTORE;

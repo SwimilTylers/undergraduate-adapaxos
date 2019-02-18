@@ -11,7 +11,8 @@ import network.message.protocols.GenericPaxosMessage;
 public interface PaxosLogger {
     void error(String error);
     void warn(String warn);
-    void log(String log, boolean isOnScreen);
+    void log(boolean isOnScreen, String log);
+    void logFormatted(boolean isOnScreen, String... logs);
 
     void logPeerNet(int fromId, int toId, @NotNull String desc);
     void logClientNet(@NotNull String client, @NotNull String desc);

@@ -3,11 +3,14 @@ package instance;
 import client.ClientRequest;
 import instance.maintenance.LeaderMaintenance;
 
+import java.io.Serializable;
+
 /**
  * @author : Swimiltylers
  * @version : 2019/2/14 18:37
  */
-public class PaxosInstance {
+public class PaxosInstance implements Serializable {
+    private static final long serialVersionUID = -966463150573981018L;
     public int crtLeaderId;
     public InstanceStatus status;
     public int crtInstBallot;

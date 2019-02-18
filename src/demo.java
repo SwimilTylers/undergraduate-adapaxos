@@ -7,6 +7,7 @@ import network.service.GenericNetService;
 import network.service.ObjectUdpNetService;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+import rsm.DiskPaxosSMR;
 import rsm.GenericPaxosSMR;
 
 import java.io.IOException;
@@ -251,9 +252,31 @@ public class demo {
         }
     }
 
+    static class DiskPaxosSMRTesting{
+        static void emit(ExecutorService service, int id){
+            GenericPaxosSMR rsm = new DiskPaxosSMR(id, NetServiceTesting.addr, NetServiceTesting.port);
+            service.execute(rsm);
+        }
+
+        static void test0(){
+            ExecutorService service = Executors.newCachedThreadPool();
+            for (int i = 0; i < NetServiceTesting.addr.length; i++) {
+                emit(service, i);
+            }
+            FileIteratorClient client = new FileIteratorClient("eros");
+            try {
+                client.connect("localhost", GenericNetService.DEFAULT_TO_CLIENT_PORT);
+            } catch (IOException e) {
+                return;
+            }
+            service.execute(client);
+        }
+    }
+
     public static void main(String[] args) {
         //NetServiceTesting.test2();
-        GenericPaxosSMRTesting.test0();
+        //GenericPaxosSMRTesting.test0();
+        DiskPaxosSMRTesting.test0();
 
         //Date date = new Date();
         //final String format = "[%tF %<tT:%<tL %<tz][p%08d][%s][leaderId=%d, inst_no=%d][\"%s\"]%n";

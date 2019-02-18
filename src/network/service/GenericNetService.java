@@ -21,7 +21,7 @@ import java.util.concurrent.*;
  * @author : Swimiltylers
  * @version : 2019/1/27 11:35
  */
-public class GenericNetService {
+public class GenericNetService implements PeerMessageSender{
     private int netServiceId;
     private int peerSize;
     private String[] peerAddrList;
@@ -178,6 +178,10 @@ public class GenericNetService {
         }
     }
 
+    public void registerChannel(Distinguishable signal, BlockingQueue chan){
+        channels.add(new Pair<>(signal, chan));
+    }
+
     @SuppressWarnings("unchecked")
     private void listenTOPeers(@NotNull Socket chan){
         onRunning = true;
@@ -266,6 +270,7 @@ public class GenericNetService {
         }
     }
 
+    @Override
     synchronized public void sendPeerMessage(int toId, @NotNull Object msg){
         if (toId < peerSize && beaconHandler.check(toId)){
             try {
@@ -281,6 +286,7 @@ public class GenericNetService {
         }
     }
 
+    @Override
     synchronized public void broadcastPeerMessage(@NotNull Object msg){
         for (int i = 0; i < peerSize; i++) {
             if (i != netServiceId){
