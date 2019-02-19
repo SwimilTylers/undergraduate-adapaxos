@@ -9,13 +9,17 @@ import static instance.store.index.OffsetIndexTable.INDEX_FILE_NAME;
  * @version : 2019/2/19 11:11
  */
 public class OffsetIndexReader {
-    private String storeBase = "store";
+    private String rootPath;
 
     private OffsetIndexTable crtOffsetTab = null;
     private File crtBase = null;
 
+    public OffsetIndexReader(String store_root) {
+        rootPath = store_root;
+    }
+
     public boolean existIndex(String base_name){
-        File test = new File(storeBase+File.separator+base_name+File.separator+INDEX_FILE_NAME);
+        File test = new File(rootPath +File.separator+base_name+File.separator+INDEX_FILE_NAME);
         return test.exists();
     }
 
@@ -24,12 +28,12 @@ public class OffsetIndexReader {
     }
 
     public void locate(String base_name) throws IOException, ClassNotFoundException {
-        File base = new File(storeBase+File.separator+base_name+File.separator+INDEX_FILE_NAME);
+        File base = new File(rootPath +File.separator+base_name+File.separator+INDEX_FILE_NAME);
         ObjectInputStream istream = new ObjectInputStream(new FileInputStream(base));
         crtOffsetTab = (OffsetIndexTable) istream.readObject();
         istream.close();
 
-        crtBase = new File(storeBase+File.separator+base_name);
+        crtBase = new File(rootPath +File.separator+base_name);
     }
 
     public byte[] readBytes(String inst_name){

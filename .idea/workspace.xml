@@ -2,12 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/instance/store/OffsetIndexStore.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/instance/store/index/OffsetIndexReader.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/instance/store/index/OffsetIndexTable.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/instance/store/index/OffsetIndexWriter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/demo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/demo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/instance/store/OffsetIndexStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/instance/store/OffsetIndexStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/instance/store/index/OffsetIndexReader.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/instance/store/index/OffsetIndexReader.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/instance/store/index/OffsetIndexWriter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/instance/store/index/OffsetIndexWriter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/rsm/DiskPaxosSMR.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/rsm/DiskPaxosSMR.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -38,8 +38,34 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/instance/store/OffsetIndexStore.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-129">
-              <caret line="60" column="28" selection-start-line="60" selection-start-column="28" selection-end-line="60" selection-end-column="28" />
+            <state relative-caret-position="294">
+              <caret line="21" column="79" selection-start-line="21" selection-start-column="79" selection-end-line="21" selection-end-column="79" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/agent/acceptor/IntegratedDiskAcceptor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="221">
+              <caret line="103" selection-start-line="103" selection-end-line="103" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#1895#1896#0" expanded="true" />
+                <element signature="e#1948#1949#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/agent/acceptor/DiskAcceptor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="148">
+              <caret line="26" selection-start-line="26" selection-end-line="26" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -50,12 +76,14 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/demo.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="267">
-              <caret line="340" column="37" selection-start-line="340" selection-start-column="37" selection-end-line="340" selection-end-column="37" />
+            <state relative-caret-position="211">
+              <caret line="288" lean-forward="true" selection-start-line="288" selection-end-line="288" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="class#netServiceTest#0;class#demo#0" />
                 <element signature="method#test0#0;class#netServiceTest#0;class#demo#0" />
+                <element signature="e#11379#11380#0" expanded="true" />
+                <element signature="e#11410#11411#0" expanded="true" />
                 <element signature="e#11470#11471#0" expanded="true" />
                 <element signature="e#11531#11532#0" expanded="true" />
               </folding>
@@ -78,8 +106,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/rsm/DiskPaxosSMR.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1148">
-              <caret line="91" column="5" selection-start-line="91" selection-start-column="5" selection-end-line="91" selection-end-column="5" />
+            <state relative-caret-position="303">
+              <caret line="29" column="49" selection-start-line="29" selection-start-column="49" selection-end-line="29" selection-end-column="49" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -174,14 +202,14 @@
         <option value="$PROJECT_DIR$/src/logger/NaiveLogger.java" />
         <option value="$PROJECT_DIR$/src/agent/acceptor/DiskAcceptor.java" />
         <option value="$PROJECT_DIR$/src/agent/acceptor/IntegratedDiskAcceptor.java" />
-        <option value="$PROJECT_DIR$/src/rsm/DiskPaxosSMR.java" />
         <option value="$PROJECT_DIR$/src/agent/learner/DiskLearner.java" />
         <option value="$PROJECT_DIR$/src/instance/store/index/OffsetIndex.java" />
         <option value="$PROJECT_DIR$/src/instance/store/index/ReadOffsetIndex.java" />
         <option value="$PROJECT_DIR$/src/instance/store/index/OffsetIndexTable.java" />
-        <option value="$PROJECT_DIR$/src/instance/store/OffsetIndexStore.java" />
-        <option value="$PROJECT_DIR$/src/instance/store/index/OffsetIndexWriter.java" />
         <option value="$PROJECT_DIR$/src/instance/store/index/OffsetIndexReader.java" />
+        <option value="$PROJECT_DIR$/src/instance/store/index/OffsetIndexWriter.java" />
+        <option value="$PROJECT_DIR$/src/instance/store/OffsetIndexStore.java" />
+        <option value="$PROJECT_DIR$/src/rsm/DiskPaxosSMR.java" />
         <option value="$PROJECT_DIR$/src/demo.java" />
       </list>
     </option>
@@ -297,11 +325,6 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="rsm" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
-              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
-              <item name="store" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -316,7 +339,7 @@
     <property name="Repository.Attach.Sources" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1550561470402" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1550563080403" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/lib/apache-log4j-2.11.1-bin" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -414,7 +437,7 @@
       <workItem from="1550140106084" duration="4382000" />
       <workItem from="1550207211833" duration="15489000" />
       <workItem from="1550459362225" duration="21659000" />
-      <workItem from="1550545402740" duration="10292000" />
+      <workItem from="1550545402740" duration="11861000" />
     </task>
     <task id="LOCAL-00001" summary="modify README.md">
       <created>1545406849881</created>
@@ -591,11 +614,18 @@
       <option name="project" value="LOCAL" />
       <updated>1550486737566</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="Status: tested OffsetIndexStore&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation">
+      <created>1550561600772</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1550561600772</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="360486000" />
+    <option name="totallyTimeSpent" value="362055000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -610,7 +640,7 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2613941" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2613941" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -619,7 +649,7 @@
       <window_info id="Favorites" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3286119" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49932975" visible="true" weight="0.3286119" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49932975" visible="true" weight="0.3286119" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39943343" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -689,7 +719,6 @@
     <ignored-roots>
       <path value="E:" />
     </ignored-roots>
-    <MESSAGE value="modify README.md" />
     <MESSAGE value="start Echo" />
     <MESSAGE value="Status: one-turn paxos server-client model, without separate i/o channel &amp; paxos agent&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ logger is working properly&#10;+ cannot separate registration and paxos procedures&#10;+ proposal number is increased sequentially&#10;+ integrated paxos agent &amp; i/o channel" />
     <MESSAGE value="Status: reconstruct proposer, separate two stages of action and add timeout mechanism&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is working properly&#10;+ proposal number is increased sequentially&#10;+ integrated paxos agent &amp; i/o channel&#10;+ Paxos message construction and interpretation are not reliable" />
@@ -714,7 +743,8 @@
     <MESSAGE value="Status: job of GenericPaxosSMR has been separated into several classes&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
     <MESSAGE value="Status: disk-paxos: normal case&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
     <MESSAGE value="Status: disk-paxos normal case tested, with DummyStore&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
-    <option name="LAST_COMMIT_MESSAGE" value="Status: disk-paxos normal case tested, with DummyStore&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
+    <MESSAGE value="Status: tested OffsetIndexStore&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Status: tested OffsetIndexStore&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -729,16 +759,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/network/service/handler/GenericBeaconHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="308">
-          <caret line="28" column="5" selection-start-line="28" selection-start-column="5" selection-end-line="28" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/client/FileIteratorClient.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="411">
@@ -987,16 +1007,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/agent/acceptor/DiskAcceptor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="41" column="48" selection-start-line="41" selection-start-column="48" selection-end-line="41" selection-end-column="48" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-4.net.log">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -1042,32 +1052,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/agent/acceptor/IntegratedDiskAcceptor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="406">
-          <caret line="35" column="58" selection-start-line="35" selection-start-column="58" selection-end-line="35" selection-end-column="58" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1895#1896#0" expanded="true" />
-            <element signature="e#1948#1949#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/agent/proposer/DiskProposer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="714">
           <caret line="59" column="84" selection-start-line="59" selection-start-column="84" selection-end-line="59" selection-end-column="84" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/rsm/DiskPaxosSMR.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1148">
-          <caret line="91" column="5" selection-start-line="91" selection-start-column="5" selection-end-line="91" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1111,28 +1099,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/store/index/OffsetIndexReader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="259">
-          <caret line="32" column="5" lean-forward="true" selection-start-line="32" selection-start-column="5" selection-end-line="32" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#579#580#0" expanded="true" />
-            <element signature="e#601#602#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/store/index/OffsetIndexWriter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="378">
-          <caret line="27" column="53" selection-start-line="27" selection-start-column="44" selection-end-line="27" selection-end-column="53" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/agent/learner/DiskLearner.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="504">
@@ -1143,10 +1109,73 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/agent/acceptor/IntegratedDiskAcceptor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="221">
+          <caret line="103" selection-start-line="103" selection-end-line="103" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1895#1896#0" expanded="true" />
+            <element signature="e#1948#1949#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/agent/acceptor/DiskAcceptor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="148">
+          <caret line="26" selection-start-line="26" selection-end-line="26" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_144/src.zip!/java/io/ObjectInputStream.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="148">
+          <caret line="2916" selection-start-line="2916" selection-end-line="2916" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/instance/store/index/OffsetIndexReader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="322">
+          <caret line="23" column="5" lean-forward="true" selection-start-line="23" selection-start-column="5" selection-end-line="23" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#380#381#0" expanded="true" />
+            <element signature="e#418#419#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/instance/store/index/OffsetIndexWriter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="336">
+          <caret line="24" column="13" lean-forward="true" selection-start-line="24" selection-start-column="13" selection-end-line="24" selection-end-column="13" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#495#496#0" expanded="true" />
+            <element signature="e#533#534#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/instance/store/OffsetIndexStore.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-129">
-          <caret line="60" column="28" selection-start-line="60" selection-start-column="28" selection-end-line="60" selection-end-column="28" />
+        <state relative-caret-position="294">
+          <caret line="21" column="79" selection-start-line="21" selection-start-column="79" selection-end-line="21" selection-end-column="79" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/rsm/DiskPaxosSMR.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="303">
+          <caret line="29" column="49" selection-start-line="29" selection-start-column="49" selection-end-line="29" selection-end-column="49" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1155,12 +1184,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/demo.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="267">
-          <caret line="340" column="37" selection-start-line="340" selection-start-column="37" selection-end-line="340" selection-end-column="37" />
+        <state relative-caret-position="211">
+          <caret line="288" lean-forward="true" selection-start-line="288" selection-end-line="288" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="class#netServiceTest#0;class#demo#0" />
             <element signature="method#test0#0;class#netServiceTest#0;class#demo#0" />
+            <element signature="e#11379#11380#0" expanded="true" />
+            <element signature="e#11410#11411#0" expanded="true" />
             <element signature="e#11470#11471#0" expanded="true" />
             <element signature="e#11531#11532#0" expanded="true" />
           </folding>

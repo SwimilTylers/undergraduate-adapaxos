@@ -11,14 +11,19 @@ import java.io.*;
  * @version : 2019/2/19 14:39
  */
 public class OffsetIndexStore implements InstanceStore{
-    private OffsetIndexReader reader = new OffsetIndexReader();
-    private OffsetIndexWriter writer = new OffsetIndexWriter();
+    private OffsetIndexReader reader;
+    private OffsetIndexWriter writer;
 
     private static final String ACCESS_ID_HEADER = "leader-";
     private static final String INST_ID_HEADER = "";
 
+    public OffsetIndexStore(String store_name) {
+        this.reader = new OffsetIndexReader("store"+File.separator+store_name);
+        this.writer = new OffsetIndexWriter("store"+File.separator+store_name);
+    }
+
     @Override
-    public boolean isExist(int access_id, int inst_id) {
+    synchronized public boolean isExist(int access_id, int inst_id) {
         if (reader.existIndex(ACCESS_ID_HEADER+access_id)){
             try {
                 reader.locate(ACCESS_ID_HEADER+access_id);
@@ -34,7 +39,7 @@ public class OffsetIndexStore implements InstanceStore{
     }
 
     @Override
-    public boolean store(int access_id, int inst_id, PaxosInstance instance) {
+    synchronized public boolean store(int access_id, int inst_id, PaxosInstance instance) {
         if (writer.existIndex(ACCESS_ID_HEADER+access_id)){
             try {
                 writer.relocate(ACCESS_ID_HEADER+access_id);
@@ -71,7 +76,7 @@ public class OffsetIndexStore implements InstanceStore{
     }
 
     @Override
-    public PaxosInstance fetch(int access_id, int inst_id) {
+    synchronized public PaxosInstance fetch(int access_id, int inst_id) {
         if (reader.existIndex(ACCESS_ID_HEADER+access_id)){
             try {
                 reader.locate(ACCESS_ID_HEADER+access_id);

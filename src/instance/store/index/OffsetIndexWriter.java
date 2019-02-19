@@ -12,11 +12,15 @@ import static instance.store.index.OffsetIndexTable.INDEX_FILE_NAME;
  * @version : 2019/2/19 12:02
  */
 public class OffsetIndexWriter {
-    private String storeBase = "store";
+    private String rootPath;
     private static final String DEFAULT_ROLL = "roll-1.store";
 
     private OffsetIndexTable crtOffsetTab = null;
     private File crtBase = null;
+
+    public OffsetIndexWriter(String store_root) {
+        rootPath = store_root;
+    }
 
     @Override
     protected void finalize() throws Throwable {
@@ -25,7 +29,7 @@ public class OffsetIndexWriter {
     }
 
     public boolean existIndex(String base_name){
-        File test = new File(storeBase+File.separator+base_name+File.separator+INDEX_FILE_NAME);
+        File test = new File(rootPath +File.separator+base_name+File.separator+INDEX_FILE_NAME);
         return test.exists();
     }
 
@@ -47,7 +51,7 @@ public class OffsetIndexWriter {
     }
 
     public void create(String base_name, boolean checkout) throws IOException {
-        File base = new File(storeBase+File.separator+base_name);
+        File base = new File(rootPath +File.separator+base_name);
         if (!base.exists() || !base.isDirectory()){
             if (!base.mkdirs())
                 return;
@@ -65,12 +69,12 @@ public class OffsetIndexWriter {
     public void relocate(String base_name) throws IOException, ClassNotFoundException {
         writeBack();
 
-        File base = new File(storeBase+File.separator+base_name+File.separator+INDEX_FILE_NAME);
+        File base = new File(rootPath +File.separator+base_name+File.separator+INDEX_FILE_NAME);
         ObjectInputStream istream = new ObjectInputStream(new FileInputStream(base));
         crtOffsetTab = (OffsetIndexTable) istream.readObject();
         istream.close();
 
-        crtBase = new File(storeBase+File.separator+base_name);
+        crtBase = new File(rootPath +File.separator+base_name);
     }
 
     public void update(String inst_name, byte[] bytes) throws IOException {

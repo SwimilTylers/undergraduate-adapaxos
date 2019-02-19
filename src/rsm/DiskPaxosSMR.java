@@ -4,8 +4,8 @@ import agent.acceptor.IntegratedDiskAcceptor;
 import agent.learner.DiskLearner;
 import agent.proposer.DiskProposer;
 import client.ClientRequest;
-import instance.store.DummyStore;
 import instance.store.InstanceStore;
+import instance.store.OffsetIndexStore;
 import network.message.protocols.DiskPaxosMessage;
 import network.message.protocols.GenericPaxosMessage;
 
@@ -27,7 +27,7 @@ public class DiskPaxosSMR extends GenericPaxosSMR{
         super(id, addr, port);
 
         dMessage = new ArrayBlockingQueue<>(DEFAULT_MESSAGE_SIZE);
-        store = new DummyStore();
+        store = new OffsetIndexStore("disk-"+id);
     }
 
     @Override
