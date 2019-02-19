@@ -1,6 +1,9 @@
 import agent.SingleAcceptor;
 import agent.SingleProposer;
 import client.FileIteratorClient;
+import instance.PaxosInstance;
+import instance.store.InstanceStore;
+import instance.store.OffsetIndexStore;
 import javafx.util.Pair;
 import logger.NaiveLogger;
 import network.service.GenericNetService;
@@ -273,10 +276,69 @@ public class demo {
         }
     }
 
+    static class OffsetIndexStoreTesting{
+        static InstanceStore store = new OffsetIndexStore();
+        static PaxosInstance inst_0;
+        static PaxosInstance inst_1;
+        static PaxosInstance inst_2;
+
+        static {
+            inst_0 = new PaxosInstance();
+            inst_0.crtInstBallot = 0;
+
+            inst_1 = new PaxosInstance();
+            inst_1.crtInstBallot = 1;
+
+            inst_2 = new PaxosInstance();
+            inst_2.crtInstBallot = 2;
+        }
+
+        static void test0(){
+            System.out.println(store.isExist(0,0));
+        }
+
+        static void test1(){
+            store.store(0, 0, new PaxosInstance());
+            System.out.println(store.isExist(0,0));
+        }
+
+        static void test2(){
+            store.store(0, 0, inst_0);
+            store.store(0, 1, inst_1);
+            store.store(0, 2, inst_2);
+
+            System.out.println(store.isExist(0, 0));
+            System.out.println(store.isExist(0, 4));
+            System.out.println(store.isExist(1, 2));
+
+            test4();
+        }
+
+        static void test3(){
+            PaxosInstance instance = new PaxosInstance();
+            instance.crtInstBallot = 10;
+
+            System.out.println(store.isExist(0, 2));
+
+            store.store(0, 1, instance);
+
+            test4();
+        }
+
+        static void test4(){
+            PaxosInstance fetch_0 = store.fetch(0, 0);
+            PaxosInstance fetch_1 = store.fetch(0, 1);
+            PaxosInstance fetch_2 = store.fetch(0, 2);
+
+            System.out.println(fetch_0.crtInstBallot+"\t"+fetch_1.crtInstBallot+"\t"+fetch_2.crtInstBallot);
+        }
+    }
+
     public static void main(String[] args) {
         //NetServiceTesting.test2();
         //GenericPaxosSMRTesting.test0();
-        DiskPaxosSMRTesting.test0();
+        //DiskPaxosSMRTesting.test0();
+        OffsetIndexStoreTesting.test4();
 
         //Date date = new Date();
         //final String format = "[%tF %<tT:%<tL %<tz][p%08d][%s][leaderId=%d, inst_no=%d][\"%s\"]%n";
