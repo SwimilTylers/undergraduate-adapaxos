@@ -1,6 +1,5 @@
 package agent.acceptor;
 
-import instance.PaxosInstance;
 import instance.store.InstanceStore;
 import network.message.protocols.DiskPaxosMessage;
 import network.service.PeerMessageSender;
@@ -28,9 +27,7 @@ public class DiskAcceptor {
 
         if (check)
             ackWrite = new DiskPaxosMessage.ackWrite(
-                    write.DIALOGUE_NO,
-                    write.inst_no,
-                    write.leaderId,
+                    write.inst_no, write.leaderId, write.inst_ballot, write.dialog_no,
                     serverId,
                     DiskPaxosMessage.DiskStatus.WRITE_SUCCESS
             );
@@ -39,12 +36,10 @@ public class DiskAcceptor {
     }
 
     public void handle(DiskPaxosMessage.Read read){
-        DiskPaxosMessage.ackRead ackRead = null;
+        DiskPaxosMessage.ackRead ackRead;
         if (store.isExist(read.accessId, read.inst_no)){
             ackRead = new DiskPaxosMessage.ackRead(
-                    read.DIALOGUE_NO,
-                    read.inst_no,
-                    read.leaderId,
+                    read.inst_no, read.leaderId, read.inst_ballot, read.dialog_no,
                     serverId,
                     read.accessId,
                     DiskPaxosMessage.DiskStatus.READ_SUCCESS,
@@ -53,9 +48,7 @@ public class DiskAcceptor {
         }
         else{
             ackRead = new DiskPaxosMessage.ackRead(
-                    read.DIALOGUE_NO,
-                    read.inst_no,
-                    read.leaderId,
+                    read.inst_no, read.leaderId, read.inst_ballot, read.dialog_no,
                     serverId,
                     read.accessId,
                     DiskPaxosMessage.DiskStatus.READ_NO_SUCH_FILE,

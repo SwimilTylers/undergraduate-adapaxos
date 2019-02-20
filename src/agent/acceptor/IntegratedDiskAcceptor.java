@@ -53,7 +53,7 @@ public class IntegratedDiskAcceptor extends DiskAcceptor{
             net.broadcastPeerMessage(msg);
         }
 
-        synchronized void packAndSend(){
+        synchronized void packAndSend(String header, int inst_no, int leaderId, int inst_ballot, long dialogue_no){
             //System.out.println("@@"+netServiceId+": "+sendOutBuffer.size());
 
             for (Map.Entry<Integer, Pair<DiskPaxosMessage.ackWrite, List<DiskPaxosMessage.ackRead>>> entry :
@@ -62,23 +62,47 @@ public class IntegratedDiskAcceptor extends DiskAcceptor{
                 Pair<DiskPaxosMessage.ackWrite, List<DiskPaxosMessage.ackRead>> info = entry.getValue();
 
                 if (info.getValue().isEmpty()) {
-                    DiskPaxosMessage.PackedMessage sendOut = DiskPaxosMessage.integratedWriteAndRead_ack(
-                            info.getKey().DIALOGUE_NO,
-                            info.getKey(),
-                            null
-                    );
+                    DiskPaxosMessage.PackedMessage sendOut = null;
+                    if (header.equals(DiskPaxosMessage.IRW_ACK_HEADER)) {
+                        sendOut = DiskPaxosMessage.IRW_ACK(
+                                inst_no,
+                                leaderId,
+                                inst_ballot,
+                                dialogue_no,
+                                info.getKey(),
+                                null
+                        );
+                        logger.logPeerNet(netServiceId, toId, "PACKED: " + sendOut.toString());
+                        net.sendPeerMessage(toId, sendOut);
+                    }
+                    else if (header.equals(DiskPaxosMessage.IR_ACK_HEADER)){
+                        sendOut = DiskPaxosMessage.IR_ACK(inst_no, leaderId, inst_ballot, dialogue_no, null);
+                        logger.logPeerNet(netServiceId, toId, "PACKED: " + sendOut.toString());
+                        net.sendPeerMessage(toId, sendOut);
+                    }
+
                     //System.out.println("$$" + sendOut);
-                    logger.logPeerNet(netServiceId, toId, "PACKING: " + sendOut.toString());
-                    net.sendPeerMessage(toId, sendOut);
+
                 } else {
-                    DiskPaxosMessage.PackedMessage sendOut = DiskPaxosMessage.integratedWriteAndRead_ack(
-                            info.getKey().DIALOGUE_NO,
-                            info.getKey(),
-                            info.getValue().toArray(new DiskPaxosMessage.ackRead[0])
-                    );
-                    //System.out.println("%%" + sendOut);
-                    logger.logPeerNet(netServiceId, toId, "PACKING: " + sendOut.toString());
-                    net.sendPeerMessage(toId, sendOut);
+                    DiskPaxosMessage.PackedMessage sendOut;
+                    if (header.equals(DiskPaxosMessage.IRW_ACK_HEADER)) {
+                         sendOut= DiskPaxosMessage.IRW_ACK(
+                                inst_no,
+                                leaderId,
+                                inst_ballot,
+                                dialogue_no,
+                                info.getKey(),
+                                info.getValue().toArray(new DiskPaxosMessage.ackRead[0])
+                        );
+                        //System.out.println("%%" + sendOut);
+                        logger.logPeerNet(netServiceId, toId, "PACKED: " + sendOut.toString());
+                        net.sendPeerMessage(toId, sendOut);
+                    }
+                    else if (header.equals(DiskPaxosMessage.IR_ACK_HEADER)){
+                        sendOut = DiskPaxosMessage.IR_ACK(inst_no, leaderId, inst_ballot, dialogue_no, info.getValue().toArray(new DiskPaxosMessage.ackRead[0]));
+                        logger.logPeerNet(netServiceId, toId, "PACKED: " + sendOut.toString());
+                        net.sendPeerMessage(toId, sendOut);
+                    }
                 }
             }
 
@@ -99,7 +123,7 @@ public class IntegratedDiskAcceptor extends DiskAcceptor{
         return new IntegratedDiskAcceptor(idNet, serverId, store);
     }
 
-    public void handleIntegrated(DiskPaxosMessage.PackedMessage packedMessage){
+    public void handlePacked(DiskPaxosMessage.PackedMessage packedMessage){
         if (packedMessage.desc.equals(DiskPaxosMessage.IRW_HEADER)){
             super.handle((DiskPaxosMessage.Write) packedMessage.packages[0]);
 
@@ -107,7 +131,26 @@ public class IntegratedDiskAcceptor extends DiskAcceptor{
                 if (m != null)  // in normal case, packages[leaderId] == null
                     super.handle((DiskPaxosMessage.Read) m);
             }
-            wrappedNet.packAndSend();
+            wrappedNet.packAndSend(
+                    DiskPaxosMessage.IRW_ACK_HEADER,
+                    packedMessage.inst_no,
+                    packedMessage.leaderId,
+                    packedMessage.inst_ballot,
+                    packedMessage.dialog_no
+            );
+        }
+        else if (packedMessage.desc.equals(DiskPaxosMessage.IR_HEADER)){
+            for (DiskPaxosMessage m:packedMessage.packages) {
+                if (m != null)
+                    super.handle((DiskPaxosMessage.Read) m);
+            }
+            wrappedNet.packAndSend(
+                    DiskPaxosMessage.IR_ACK_HEADER,
+                    packedMessage.inst_no,
+                    packedMessage.leaderId,
+                    packedMessage.inst_ballot,
+                    packedMessage.dialog_no
+            );
         }
     }
 }

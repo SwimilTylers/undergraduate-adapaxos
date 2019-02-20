@@ -59,7 +59,7 @@ public class GenericProposer implements Proposer {
     @Override
     public void handleAckPrepare(GenericPaxosMessage.ackPrepare ackPrepare) {
         if (instanceSpace[ackPrepare.inst_no] != null
-                && instanceSpace[ackPrepare.inst_no].crtLeaderId == serverId){   // on this client, local server works as a leader
+                && instanceSpace[ackPrepare.inst_no].crtLeaderId == serverId){   // on this instance, local server works as a leader
 
             PaxosInstance inst = instanceSpace[ackPrepare.inst_no];
 
@@ -122,7 +122,7 @@ public class GenericProposer implements Proposer {
             }
             else if (ackPrepare.type == GenericPaxosMessage.ackMessageType.ABORT){  // abort case
                 net.sendPeerMessage(ackPrepare.load.crtLeaderId, new GenericPaxosMessage.Restore(ackPrepare.inst_no, inst));  // apply for restoration
-
+                ackPrepare.load.leaderMaintenanceUnit = null;
                 instanceSpace[ackPrepare.inst_no] = ackPrepare.load;
 
                 /* after this point, this server will no longer play the role of leader in this client.

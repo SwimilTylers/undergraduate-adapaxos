@@ -206,14 +206,48 @@ Note over server0: <lastLeaderId, _, last_ballot, null>
 
 ```sequence
 Title: [0] Start Init NORMAL
-Note over server0: <leaderId, PREPARING, inst_ballot, dialog_no, []>
-server0->>server1: [dialog_no, write(inst_no, leaderId, inst), [read(inst_no, leaderId, accessId_0), ...]]
-server1-->>server0: [dialog_no, ackWrite(inst_no, WRITE_SUCCESS, leaderId, []), []]
+Note over server0: <leaderId, PREPARING, inst_ballot, []>
+server0->>server1: [leaderId, inst_ballot, write(cmds), [reads]]
+server1-->>server0: [leaderId, inst_ballot, ackWrite(SUCCESS), []]
 Note over server0: accumulating
-Note over server0: <leaderId, PREPARED, inst_ballot, dialog_no', []>
-server0->>server1: [dialog_no', write(inst_no, leaderId, inst), [read(inst_no, leaderId, accessId_0), ...]]
-server1-->>server0: [dialog_no', ackWrite(inst_no, WRITE_SUCCESS, leaderId, []), []]
+Note over server0: <leaderId, PREPARED, inst_ballot, []>
+server0->>server1: [leaderId, inst_ballot, write(cmds), [reads]]
+server1-->>server0: [leaderId, inst_ballot, ackWrite(SUCCESS), []]
 Note over server0: accumulating
 Note over server0: <leaderId, COMMITTED, inst_ballot, []>
 server0->>server1: commit(inst_no, leaderId, inst_ballot, cmds)
 ```
+
+```sequence
+Title: [1] Start Restore NORMAL (leaderId => last_inst.leaderId) [EARLY RESTORE ONLY]
+Note over server0: <leaderId, PREPARING, inst_ballot, []>
+server0->>server1: [leaderId, inst_ballot, write(cmds), [reads]]
+server1-->>server0: [leaderId, inst_ballot, ackWrite(SUCCESS), [ackRead(last_inst), ...]]
+Note over server0: accumulating
+Note over server0: restore local.cmds and switch to the latest last_inst
+Note over server0: <leaderId, PREPARED, inst_ballot, [...]>
+server0->>server1: [leaderId, inst_ballot, write(last_inst.cmd), [reads]]
+server1-->>server0: [leaderId, inst_ballot, ackWrite(SUCCESS), [ackReads]]
+Note over server0: accumulating
+Note over server0: <leaderId, COMMITTED, inst_ballot, [...]>
+server0->>server1: commit(inst_no, leaderId, inst_ballot, cmds)
+```
+
+```sequence
+Title: [2] Restart Competitors early ABORT (leaderId < last_inst.leaderId)
+Note over server0: <leaderId, PREPARING, inst_ballot, []>
+server0->>server1: [leaderId, inst_ballot, write(cmds), [reads]]
+server1-->>server0: [leaderId, inst_ballot, ackWrite(SUCCESS), [ackRead(last_inst), ...]]
+server0-->>lastLeaderId_server: restore(local.proposals)
+Note over server0: <lastLeaderId, _, last_ballot, null>
+```
+
+```sequence
+Title: [3] Start Competitor late ABORT (leaderId < last_inst.leaderId)
+Note over server0: <leaderId, PREPARED, inst_ballot, [...]>
+server0->>server1: [leaderId, inst_ballot, write(last_inst.cmd), [reads]]
+server1-->>server0: [leaderId, inst_ballot, ackWrite(SUCCESS), [ackRead(last_inst), ...]]]
+server0-->>lastLeaderId_server: restore(local.proposals)
+Note over server0: <lastLeaderId, _, last_ballot, null>
+```
+

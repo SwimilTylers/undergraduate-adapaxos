@@ -1,6 +1,7 @@
 package instance.maintenance;
 
 import client.ClientRequest;
+import com.sun.istack.internal.NotNull;
 import javafx.util.Pair;
 
 import java.io.Serializable;
@@ -17,9 +18,9 @@ public class HistoryMaintenance implements Serializable {
     private static final long serialVersionUID = -2373815502534795800L;
     private int maxRecvLeaderId;
     private int maxRecvInstBallot;
-    public boolean HOST_RESTORE;
-    public ClientRequest[] reservedCmds;
-    private Set<Pair<Integer, Integer>> received;
+    public boolean HOST_RESTORE;      // decide whether to restore local.proposals
+    public ClientRequest[] reservedCmds;       // latest proposals
+    private Set<Pair<Integer, Integer>> received;   // in case of replicated receipt
 
     public HistoryMaintenance(int initLeaderId, int initInstBallot, ClientRequest[] initCmds){
         maxRecvLeaderId = initLeaderId;
@@ -33,7 +34,7 @@ public class HistoryMaintenance implements Serializable {
     }
 
     /* this initiator is designed for restore-late case */
-    public HistoryMaintenance(List<ClientRequest> restoredProposals, int initLeaderId, int initInstBallot, ClientRequest[] initCmds){
+    public HistoryMaintenance(@NotNull List<ClientRequest> restoredProposals, int initLeaderId, int initInstBallot, ClientRequest[] initCmds){
         maxRecvLeaderId = -1;
         maxRecvInstBallot = -1;
         reservedCmds = null;
@@ -47,7 +48,7 @@ public class HistoryMaintenance implements Serializable {
         received.add(new Pair<>(initLeaderId, initInstBallot));
     }
 
-    public void record(List<ClientRequest> restoredProposals, int leaderId, int instBallot, ClientRequest[] cmds){
+    public void record(@NotNull List<ClientRequest> restoredProposals, int leaderId, int instBallot, ClientRequest[] cmds){
         if (!received.contains(new Pair<>(leaderId, instBallot))){
             received.add(new Pair<>(leaderId, instBallot));
 
@@ -69,7 +70,7 @@ public class HistoryMaintenance implements Serializable {
 
     }
 
-    public void restore(List<ClientRequest> restoredProposals, int leaderId, int instBallot, ClientRequest[] cmds){
+    public void restore(@NotNull List<ClientRequest> restoredProposals, int leaderId, int instBallot, ClientRequest[] cmds){
         if (!received.contains(new Pair<>(leaderId, instBallot))){
             received.add(new Pair<>(leaderId, instBallot));
 

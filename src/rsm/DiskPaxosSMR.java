@@ -104,14 +104,11 @@ public class DiskPaxosSMR extends GenericPaxosSMR{
             if (msg instanceof DiskPaxosMessage.PackedMessage) {
                 DiskPaxosMessage.PackedMessage cast = (DiskPaxosMessage.PackedMessage) msg;
                 // logger.logPrepare(cast.inst_no, cast, "handle");
-                if (cast.desc.equals(DiskPaxosMessage.IRW_HEADER)) {
+                if (cast.desc.equals(DiskPaxosMessage.IRW_HEADER) || cast.desc.equals(DiskPaxosMessage.IR_HEADER)) {
                     logger.logFormatted(true, "hehe");
-                    dAcceptor.handleIntegrated(cast);
+                    dAcceptor.handlePacked(cast);
                 }
-                else if (cast.desc.equals(DiskPaxosMessage.IRW_ACK_HEADER)){
-                    DiskPaxosMessage.ackWrite ackWrite = (DiskPaxosMessage.ackWrite) cast.packages[0];
-                    DiskPaxosMessage.ackRead[] ackReads = (DiskPaxosMessage.ackRead[]) ((DiskPaxosMessage.PackedMessage) cast.packages[1]).packages;
-
+                else if (cast.desc.equals(DiskPaxosMessage.IRW_ACK_HEADER) || cast.desc.equals(DiskPaxosMessage.IR_ACK_HEADER)){
                     /* we cannot distinguish which step the message involves in,
                     * so we give both of them an opportunity.
                     *
@@ -119,8 +116,10 @@ public class DiskPaxosSMR extends GenericPaxosSMR{
                     *   - PREPARING ---> PREPARED: risk of duplicated-trial
                     *   - COMMITTED -x-> PREPARING: NO such risk */
 
-                    dLearner.handle(ackWrite, ackReads);
-                    dProposer.handle(ackWrite, ackReads);
+                    boolean isProcessed = dLearner.handlePacked(cast);
+
+                    if (!isProcessed)
+                        dProposer.handlePacked(cast);
                 }
             }
         }

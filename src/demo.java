@@ -354,7 +354,7 @@ public class demo {
     public static void main(String[] args) {
         //NetServiceTesting.test2();
         //GenericPaxosSMRTesting.test0();
-        DiskPaxosSMRTesting.test2();
+        DiskPaxosSMRTesting.test1();
         //OffsetIndexStoreTesting.test4();
 
         //Date date = new Date();

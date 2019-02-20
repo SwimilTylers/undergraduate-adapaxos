@@ -16,11 +16,9 @@ import java.util.Set;
 public class DiskLeaderMaintenance extends LeaderMaintenance{
     private static final long serialVersionUID = 7505325295603950176L;
     public int totalDisk;
-    public Map<Integer, Integer> dialogueRecord = new HashMap<>();      // <disk_no, read_count>
     public long crtDialogue;
 
-    public DiskLeaderMaintenance(int totalDisk, long initDialogue) {
+    public DiskLeaderMaintenance(int totalDisk) {
         this.totalDisk = totalDisk;
-        this.crtDialogue = initDialogue;
     }
 }
