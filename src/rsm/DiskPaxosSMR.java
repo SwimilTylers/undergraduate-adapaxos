@@ -6,6 +6,7 @@ import agent.proposer.DiskProposer;
 import client.ClientRequest;
 import instance.store.InstanceStore;
 import instance.store.OffsetIndexStore;
+import javafx.util.Pair;
 import network.message.protocols.DiskPaxosMessage;
 import network.message.protocols.GenericPaxosMessage;
 
@@ -28,56 +29,17 @@ public class DiskPaxosSMR extends GenericPaxosSMR{
 
         dMessage = new ArrayBlockingQueue<>(DEFAULT_MESSAGE_SIZE);
         store = new OffsetIndexStore("disk-"+id);
+        customizedChannels.add(new Pair<>(o -> o instanceof DiskPaxosMessage, dMessage));
     }
 
     @Override
-    public void run() {
-        try {
-            net.connect(peerAddr, peerPort);
-            net.registerChannel(o -> o instanceof DiskPaxosMessage, dMessage);
-        } catch (InterruptedException e) {
-            System.out.println("Net Connection is interrupted: "+e.getMessage());
-            return;
-        }
-
+    protected void agentDeployment() {
         dProposer = new DiskProposer(serverId, peerSize, instanceSpace, net, restoredRequestList);
         dAcceptor = IntegratedDiskAcceptor.makeInstance(net, serverId, store, logger);
         dLearner = new DiskLearner(serverId, peerSize, instanceSpace, net, restoredRequestList, logger);
-
-        ExecutorService service = Executors.newCachedThreadPool();
-
-        if (serverId == 0) {
-            System.out.println("Server-"+serverId+" is watching");
-            service.execute(() -> net.watch());
-        }
-
-        service.execute(this::compact);
-        service.execute(this::paxosRoutine);
-
-        service.shutdown();
     }
 
-    @Override
-    protected void paxosRoutine() {
-        while (true) {
-            try {
-                diskConversation();
-                peerConversation();
-            } catch (Exception ignored){}
-
-            ClientRequest[] compact = null;
-            try {
-                compact = compactChan.poll(clientComWaiting, TimeUnit.MILLISECONDS);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            if (compact != null)
-                dProposer.handleRequests(compact);
-        }
-    }
-
-    @Override
-    protected void peerConversation() {
+    private void genericPaxosMessageHandler(){
         GenericPaxosMessage msg;
         msg = pMessage.poll();
 
@@ -87,11 +49,16 @@ public class DiskPaxosSMR extends GenericPaxosSMR{
                 logger.logCommit(cast.inst_no, cast, "handle");
                 dLearner.handleCommit(cast);
                 logger.logCommit(cast.inst_no, cast, "exit handle");
+            } else if (msg instanceof GenericPaxosMessage.Restore) {
+                GenericPaxosMessage.Restore cast = (GenericPaxosMessage.Restore) msg;
+                logger.logRestore(cast.inst_no, cast, "handle");
+                handleRestore(cast);
+                logger.logRestore(cast.inst_no, cast, "exit handle");
             }
         }
     }
 
-    private void diskConversation() {
+    private void diskPaxosMessageHandler() {
         DiskPaxosMessage msg;
         try {
             msg = dMessage.poll(peerComWaiting, TimeUnit.MILLISECONDS);
@@ -110,11 +77,11 @@ public class DiskPaxosSMR extends GenericPaxosSMR{
                 }
                 else if (cast.desc.equals(DiskPaxosMessage.IRW_ACK_HEADER) || cast.desc.equals(DiskPaxosMessage.IR_ACK_HEADER)){
                     /* we cannot distinguish which step the message involves in,
-                    * so we give both of them an opportunity.
-                    *
-                    * The order of the following trials should not change:
-                    *   - PREPARING ---> PREPARED: risk of duplicated-trial
-                    *   - COMMITTED -x-> PREPARING: NO such risk */
+                     * so we give both of them an opportunity.
+                     *
+                     * The order of the following trials should not change:
+                     *   - PREPARING ---> PREPARED: risk of duplicated-trial
+                     *   - COMMITTED -x-> PREPARING: NO such risk */
 
                     boolean isProcessed = dLearner.handlePacked(cast);
 
@@ -123,5 +90,25 @@ public class DiskPaxosSMR extends GenericPaxosSMR{
                 }
             }
         }
+    }
+
+    @Override
+    protected void peerConversation() {
+        diskPaxosMessageHandler();
+        genericPaxosMessageHandler();
+    }
+
+
+
+    @Override
+    protected void clientConversation() {
+        ClientRequest[] compact = null;
+        try {
+            compact = compactChan.poll(clientComWaiting, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if (compact != null)
+            dProposer.handleRequests(compact);
     }
 }

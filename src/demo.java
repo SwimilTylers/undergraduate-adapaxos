@@ -10,6 +10,7 @@ import network.service.GenericNetService;
 import network.service.ObjectUdpNetService;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+import rsm.BasicPaxosSMR;
 import rsm.DiskPaxosSMR;
 import rsm.GenericPaxosSMR;
 
@@ -237,7 +238,7 @@ public class demo {
 
     static class GenericPaxosSMRTesting{
         static void emit(ExecutorService service, int id){
-            GenericPaxosSMR rsm = new GenericPaxosSMR(id, NetServiceTesting.addr, NetServiceTesting.port);
+            GenericPaxosSMR rsm = new BasicPaxosSMR(id, NetServiceTesting.addr, NetServiceTesting.port);
             service.execute(rsm);
         }
 
