@@ -22,7 +22,7 @@ public class HistoryMaintenance implements Serializable {
     public ClientRequest[] reservedCmds;       // latest proposals
     private Set<Pair<Integer, Integer>> received;   // in case of replicated receipt
 
-    public HistoryMaintenance(int initLeaderId, int initInstBallot, ClientRequest[] initCmds){
+    private HistoryMaintenance(int initLeaderId, int initInstBallot, ClientRequest[] initCmds){
         maxRecvLeaderId = initLeaderId;
         maxRecvInstBallot = initInstBallot;
         reservedCmds = initCmds;
@@ -34,7 +34,7 @@ public class HistoryMaintenance implements Serializable {
     }
 
     /* this initiator is designed for restore-late case */
-    public HistoryMaintenance(@NotNull List<ClientRequest> restoredProposals, int initLeaderId, int initInstBallot, ClientRequest[] initCmds){
+    private HistoryMaintenance(@NotNull List<ClientRequest> restoredProposals, int initLeaderId, int initInstBallot, ClientRequest[] initCmds){
         maxRecvLeaderId = -1;
         maxRecvInstBallot = -1;
         reservedCmds = null;
@@ -48,7 +48,7 @@ public class HistoryMaintenance implements Serializable {
         received.add(new Pair<>(initLeaderId, initInstBallot));
     }
 
-    public void record(@NotNull List<ClientRequest> restoredProposals, int leaderId, int instBallot, ClientRequest[] cmds){
+    private void record(@NotNull List<ClientRequest> restoredProposals, int leaderId, int instBallot, ClientRequest[] cmds){
         if (!received.contains(new Pair<>(leaderId, instBallot))){
             received.add(new Pair<>(leaderId, instBallot));
 
@@ -70,12 +70,42 @@ public class HistoryMaintenance implements Serializable {
 
     }
 
-    public void restore(@NotNull List<ClientRequest> restoredProposals, int leaderId, int instBallot, ClientRequest[] cmds){
+    private void restore(@NotNull List<ClientRequest> restoredProposals, int leaderId, int instBallot, ClientRequest[] cmds){
         if (!received.contains(new Pair<>(leaderId, instBallot))){
             received.add(new Pair<>(leaderId, instBallot));
 
             if (cmds != null)
                 restoredProposals.addAll(Arrays.asList(cmds));
+        }
+    }
+
+    public enum RESTORE_TYPE{
+        EARLY, LATE
+    }
+
+    public static HistoryMaintenance restoreHelper(HistoryMaintenance oldUnit, RESTORE_TYPE type,
+                                                   @NotNull List<ClientRequest> restoredProposals,
+                                                   int leaderId, int instBallot, ClientRequest[] cmds){
+
+        if (type == RESTORE_TYPE.EARLY){
+            if (oldUnit == null)
+                /* watch out for the constructor
+                 * it is a restore-early-style one */
+                oldUnit = new HistoryMaintenance(leaderId, instBallot, cmds);
+            else
+                oldUnit.record(restoredProposals, leaderId, instBallot, cmds);
+
+            return oldUnit;
+        }
+        else {
+            if (oldUnit == null)
+                /* watch out for the constructor
+                 * it is a restore-late-style one */
+                oldUnit = new HistoryMaintenance(restoredProposals, leaderId, instBallot, cmds);
+            else
+                oldUnit.restore(restoredProposals, leaderId, instBallot, cmds);
+
+            return oldUnit;
         }
     }
 }

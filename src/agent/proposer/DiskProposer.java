@@ -107,21 +107,16 @@ public class DiskProposer {
                     for (DiskPaxosMessage.ackRead ack : ackReads) {
                         PaxosInstance last_inst = ack.load;
                         if (last_inst.crtLeaderId <= serverId){     // restore case
-                            if (diskUnit.historyMaintenanceUnit == null)
-                                /* watch out for the constructor
-                                 * it is a restore-early-style one */
-                                diskUnit.historyMaintenanceUnit = new HistoryMaintenance(
-                                        last_inst.crtLeaderId,
-                                        last_inst.crtInstBallot,
-                                        last_inst.cmds
-                                );
-                            else
-                                diskUnit.historyMaintenanceUnit.record(
+                            if (last_inst.cmds != null){     // a meaningful restoration request
+                                diskUnit.historyMaintenanceUnit = HistoryMaintenance.restoreHelper(
+                                        diskUnit.historyMaintenanceUnit,
+                                        HistoryMaintenance.RESTORE_TYPE.EARLY,
                                         restoredRequestList,
                                         last_inst.crtLeaderId,
                                         last_inst.crtInstBallot,
                                         last_inst.cmds
                                 );
+                            }
                         }
                         else {      // abort case
                             net.sendPeerMessage(last_inst.crtLeaderId, new GenericPaxosMessage.Restore(inst_no, inst));  // apply for restoration

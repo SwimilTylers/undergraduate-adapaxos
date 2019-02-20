@@ -77,21 +77,14 @@ public class GenericProposer implements Proposer {
                     ++inst.leaderMaintenanceUnit.prepareResponse;
 
                     if (ackPrepare.load != null){     // a meaningful restoration request
-                        if (inst.leaderMaintenanceUnit.historyMaintenanceUnit == null)
-                            /* watch out for the constructor
-                             * it is a restore-early-style one */
-                            inst.leaderMaintenanceUnit.historyMaintenanceUnit = new HistoryMaintenance(
-                                    ackPrepare.load.crtLeaderId,
-                                    ackPrepare.load.crtInstBallot,
-                                    ackPrepare.load.cmds
-                            );
-                        else
-                            inst.leaderMaintenanceUnit.historyMaintenanceUnit.record(
-                                    restoredRequestList,
-                                    ackPrepare.load.crtLeaderId,
-                                    ackPrepare.load.crtInstBallot,
-                                    ackPrepare.load.cmds
-                            );
+                        inst.leaderMaintenanceUnit.historyMaintenanceUnit = HistoryMaintenance.restoreHelper(
+                                inst.leaderMaintenanceUnit.historyMaintenanceUnit,
+                                HistoryMaintenance.RESTORE_TYPE.EARLY,
+                                restoredRequestList,
+                                ackPrepare.load.crtLeaderId,
+                                ackPrepare.load.crtInstBallot,
+                                ackPrepare.load.cmds
+                        );
                     }
                 }
 

@@ -61,22 +61,14 @@ public class GenericLearner implements Learner {
                     ++inst.leaderMaintenanceUnit.acceptResponse;
 
                     if (ackAccept.load != null){     // a meaningful restoration request
-                        if (inst.leaderMaintenanceUnit.historyMaintenanceUnit == null)
-                            /* watch out for the constructor
-                             * it is a restore-late-style one */
-                            inst.leaderMaintenanceUnit.historyMaintenanceUnit = new HistoryMaintenance(
-                                    restoredRequestList,
-                                    ackAccept.load.crtLeaderId,
-                                    ackAccept.load.crtInstBallot,
-                                    ackAccept.load.cmds
-                            );
-                        else
-                            inst.leaderMaintenanceUnit.historyMaintenanceUnit.restore(
-                                    restoredRequestList,
-                                    ackAccept.load.crtLeaderId,
-                                    ackAccept.load.crtInstBallot,
-                                    ackAccept.load.cmds
-                            );
+                        inst.leaderMaintenanceUnit.historyMaintenanceUnit = HistoryMaintenance.restoreHelper(
+                                inst.leaderMaintenanceUnit.historyMaintenanceUnit,
+                                HistoryMaintenance.RESTORE_TYPE.LATE,
+                                restoredRequestList,
+                                ackAccept.load.crtLeaderId,
+                                ackAccept.load.crtInstBallot,
+                                ackAccept.load.cmds
+                        );
                     }
                 }
 

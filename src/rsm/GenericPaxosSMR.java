@@ -212,22 +212,14 @@ public class GenericPaxosSMR implements Runnable{
     private void handleRestore(GenericPaxosMessage.Restore restore){
         PaxosInstance inst = instanceSpace[restore.inst_no];
         if (inst.leaderMaintenanceUnit != null && restore.load != null){ // a meaningful restoration request
-            if (inst.leaderMaintenanceUnit.historyMaintenanceUnit == null)
-                /* watch out for the constructor
-                * it is a restore-late-style one */
-                inst.leaderMaintenanceUnit.historyMaintenanceUnit = new HistoryMaintenance(
-                        restoredRequestList,
-                        restore.load.crtLeaderId,
-                        restore.load.crtInstBallot,
-                        restore.load.cmds
-                );
-            else
-                inst.leaderMaintenanceUnit.historyMaintenanceUnit.restore(
-                        restoredRequestList,
-                        restore.load.crtLeaderId,
-                        restore.load.crtInstBallot,
-                        restore.load.cmds
-                );
+            inst.leaderMaintenanceUnit.historyMaintenanceUnit = HistoryMaintenance.restoreHelper(
+                    inst.leaderMaintenanceUnit.historyMaintenanceUnit,
+                    HistoryMaintenance.RESTORE_TYPE.LATE,
+                    restoredRequestList,
+                    restore.load.crtLeaderId,
+                    restore.load.crtInstBallot,
+                    restore.load.cmds
+            );
         }
     }
 }
