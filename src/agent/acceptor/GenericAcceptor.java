@@ -1,19 +1,19 @@
 package agent.acceptor;
 
 import network.message.protocols.GenericPaxosMessage;
-import network.service.GenericNetService;
 import instance.InstanceStatus;
 import instance.PaxosInstance;
+import network.service.PeerMessageSender;
 
 /**
  * @author : Swimiltylers
  * @version : 2019/2/14 19:08
  */
 public class GenericAcceptor implements Acceptor {
-    private GenericNetService net;
+    private PeerMessageSender net;
     private PaxosInstance[] instanceSpace;
 
-    public GenericAcceptor(PaxosInstance[] instanceSpace, GenericNetService net) {
+    public GenericAcceptor(PaxosInstance[] instanceSpace, PeerMessageSender net) {
         this.instanceSpace = instanceSpace;
         this.net = net;
     }

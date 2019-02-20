@@ -3,11 +3,11 @@ package agent.proposer;
 import client.ClientRequest;
 import com.sun.istack.internal.NotNull;
 import network.message.protocols.GenericPaxosMessage;
-import network.service.GenericNetService;
 import instance.InstanceStatus;
 import instance.PaxosInstance;
 import instance.maintenance.HistoryMaintenance;
 import instance.maintenance.LeaderMaintenance;
+import network.service.PeerMessageSender;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.List;
  * @version : 2019/2/14 18:57
  */
 public class GenericProposer implements Proposer {
-    private GenericNetService net;
+    private PeerMessageSender net;
     private List<ClientRequest> restoredRequestList;
 
     private int serverId;
@@ -30,7 +30,7 @@ public class GenericProposer implements Proposer {
 
     public GenericProposer(int serverId, int peerSize,
                            @NotNull PaxosInstance[] instanceSpace,
-                           @NotNull GenericNetService net,
+                           @NotNull PeerMessageSender net,
                            @NotNull List<ClientRequest> restoredRequestList) {
         this.serverId = serverId;
         this.peerSize = peerSize;

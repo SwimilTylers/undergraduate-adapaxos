@@ -4,10 +4,10 @@ import client.ClientRequest;
 import com.sun.istack.internal.NotNull;
 import logger.PaxosLogger;
 import network.message.protocols.GenericPaxosMessage;
-import network.service.GenericNetService;
 import instance.InstanceStatus;
 import instance.PaxosInstance;
 import instance.maintenance.HistoryMaintenance;
+import network.service.PeerMessageSender;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import java.util.List;
  * @version : 2019/2/14 19:09
  */
 public class GenericLearner implements Learner {
-    private GenericNetService net;
+    private PeerMessageSender net;
 
     private int serverId;
     private int peerSize;
@@ -29,7 +29,7 @@ public class GenericLearner implements Learner {
 
     public GenericLearner(int serverId, int peerSize,
                           @NotNull PaxosInstance[] instanceSpace,
-                          @NotNull GenericNetService net,
+                          @NotNull PeerMessageSender net,
                           @NotNull List<ClientRequest> restoredRequestList,
                           @NotNull PaxosLogger logger) {
         this.serverId = serverId;

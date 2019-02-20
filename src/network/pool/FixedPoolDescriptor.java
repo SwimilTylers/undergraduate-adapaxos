@@ -10,6 +10,7 @@ import java.util.Set;
  * @author : Swimiltylers
  * @version : 2019/1/21 10:40
  */
+@Deprecated
 public class FixedPoolDescriptor {
     public int fetchRegPort(String id){
         return 0;

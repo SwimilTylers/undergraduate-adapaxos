@@ -9,8 +9,6 @@ import agent.proposer.Proposer;
 import client.ClientRequest;
 import network.message.protocols.GenericPaxosMessage;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**

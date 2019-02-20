@@ -72,8 +72,9 @@ public class DiskPaxosSMR extends GenericPaxosSMR{
                 DiskPaxosMessage.PackedMessage cast = (DiskPaxosMessage.PackedMessage) msg;
                 // logger.logPrepare(cast.inst_no, cast, "handle");
                 if (cast.desc.equals(DiskPaxosMessage.IRW_HEADER) || cast.desc.equals(DiskPaxosMessage.IR_HEADER)) {
-                    logger.logFormatted(true, "hehe");
+                    logger.logFormatted(true, "DISK-PAXOS", cast.desc, "handle");
                     dAcceptor.handlePacked(cast);
+                    logger.logFormatted(true, "DISK-PAXOS", cast.desc, "exit handle");
                 }
                 else if (cast.desc.equals(DiskPaxosMessage.IRW_ACK_HEADER) || cast.desc.equals(DiskPaxosMessage.IR_ACK_HEADER)){
                     /* we cannot distinguish which step the message involves in,
@@ -83,10 +84,15 @@ public class DiskPaxosSMR extends GenericPaxosSMR{
                      *   - PREPARING ---> PREPARED: risk of duplicated-trial
                      *   - COMMITTED -x-> PREPARING: NO such risk */
 
+                    logger.logFormatted(true, "DISK-PAXOS", cast.desc, "learner", "trial", "handle");
                     boolean isProcessed = dLearner.handlePacked(cast);
+                    logger.logFormatted(true, "DISK-PAXOS", cast.desc, "learner", "processed="+isProcessed, "exit handle");
 
-                    if (!isProcessed)
-                        dProposer.handlePacked(cast);
+                    if (!isProcessed) {
+                        logger.logFormatted(true, "DISK-PAXOS", cast.desc, "learner", "trial", "handle");
+                        isProcessed =dProposer.handlePacked(cast);
+                        logger.logFormatted(true, "DISK-PAXOS", cast.desc, "learner", "processed="+isProcessed, "exit handle");
+                    }
                 }
             }
         }
