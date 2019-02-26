@@ -4,11 +4,12 @@ import com.sun.istack.internal.NotNull;
 import client.ClientRequest;
 import javafx.util.Pair;
 import logger.PaxosLogger;
-import network.message.protocols.GenericBeacon;
+import network.message.protocols.GenericConnectionMessage;
 import network.message.protocols.Distinguishable;
 import network.message.protocols.GenericClientMessage;
 import network.message.protocols.GenericPaxosMessage;
-import network.service.handler.GenericBeaconHandler;
+import network.service.module.ConnectionModule;
+import network.service.module.HeartBeatModule;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -31,7 +32,10 @@ public class GenericNetService implements PeerMessageSender{
     private int toClientPort;
 
     private Socket[] peers;
-    private GenericBeaconHandler beaconHandler;
+
+    public static final int DEFAULT_BEACON_INTERVAL = 800;
+    private int beaconItv;
+    private ConnectionModule cModule;
 
     private ExecutorService listenService;
 
@@ -52,6 +56,8 @@ public class GenericNetService implements PeerMessageSender{
         channels = new ArrayList<>();
         this.clientChan = clientChan;
         this.paxosChan = paxosChan;
+
+        this.beaconItv = DEFAULT_BEACON_INTERVAL;
 
         this.logger = logger;
     }
@@ -77,14 +83,14 @@ public class GenericNetService implements PeerMessageSender{
         peerPortList = port;
 
         peers = new Socket[peerSize];
-        beaconHandler = new GenericBeaconHandler(peerSize);
+        cModule = new HeartBeatModule(netServiceId, peerSize);
 
         CountDownLatch latch = new CountDownLatch(2);
 
         ExecutorService service = Executors.newCachedThreadPool();
         service.execute(() -> connectToPeers(latch));
         service.execute(() -> waitingForPeers(latch));
-        service.shutdown();
+
 
         latch.await();
 
@@ -97,6 +103,10 @@ public class GenericNetService implements PeerMessageSender{
                 listenService.execute(() -> listenTOPeers(socket));
             }
         }
+
+        service.execute(this::beacon);
+
+        service.shutdown();
     }
 
     private void connectToPeers(@NotNull CountDownLatch latch){
@@ -130,7 +140,7 @@ public class GenericNetService implements PeerMessageSender{
                     continue;
                 }
                 peers[i] = socket;
-                beaconHandler.alive(i);
+                cModule.init(i);
             }
         } finally {
             latch.countDown();
@@ -168,7 +178,7 @@ public class GenericNetService implements PeerMessageSender{
                 }
 
                 peers[remoteId] = conn;
-                beaconHandler.alive(remoteId);
+                cModule.init(remoteId);
                 System.out.println("Successfully Connected: from "+remoteId+" to "+netServiceId);
             }
         } catch (IOException e) {
@@ -180,6 +190,19 @@ public class GenericNetService implements PeerMessageSender{
 
     public void registerChannel(Distinguishable signal, BlockingQueue chan){
         channels.add(new Pair<>(signal, chan));
+    }
+
+    private void beacon(){
+        while (onRunning){
+            logger.log(false, cModule.toString());
+            broadcastPeerMessage(cModule.makeBeacon(System.currentTimeMillis()));
+            try {
+                Thread.sleep(beaconItv);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                break;
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -195,10 +218,17 @@ public class GenericNetService implements PeerMessageSender{
                 continue;
             }
 
-            if (msg instanceof GenericBeacon){
-                System.out.println("Receive beacon");
-                GenericBeacon cast = (GenericBeacon) msg;
-                sendPeerMessage(cast.fromId, beaconHandler.handle(cast));
+            if (msg instanceof GenericConnectionMessage.Beacon){
+                long ts = System.currentTimeMillis();
+                GenericConnectionMessage.Beacon cast = (GenericConnectionMessage.Beacon) msg;
+                GenericConnectionMessage.ackBeacon ack = cModule.ack(ts, cast);
+                if (ack != null) sendPeerMessage(cast.fromId, ack);
+                cModule.updateByBeacon(ts, cast);
+            }
+            else if (msg instanceof GenericConnectionMessage.ackBeacon){
+                long ts = System.currentTimeMillis();
+                GenericConnectionMessage.ackBeacon cast = (GenericConnectionMessage.ackBeacon) msg;
+                cModule.updateByAckBeacon(ts, cast);
             }
             else if (msg instanceof GenericPaxosMessage){
                 GenericPaxosMessage cast = (GenericPaxosMessage) msg;
@@ -272,7 +302,7 @@ public class GenericNetService implements PeerMessageSender{
 
     @Override
     synchronized public void sendPeerMessage(int toId, @NotNull Object msg){
-        if (toId < peerSize && beaconHandler.check(toId)){
+        if (toId < peerSize && cModule.connected(toId)){
             try {
                 logger.logPeerNet(netServiceId, toId, msg.toString());
                 OutputStream socketStream = peers[toId].getOutputStream();

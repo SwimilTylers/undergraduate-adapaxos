@@ -90,7 +90,7 @@ public class OffsetIndexWriter {
 
         file.close();
 
-        /* update crtOffsetTab */
+        /* updateByBeacon crtOffsetTab */
 
         crtOffsetTab.crtRollOffset += len;
 
