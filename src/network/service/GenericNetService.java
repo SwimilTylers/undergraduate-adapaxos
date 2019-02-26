@@ -22,7 +22,7 @@ import java.util.concurrent.*;
  * @author : Swimiltylers
  * @version : 2019/1/27 11:35
  */
-public class GenericNetService implements PeerMessageSender{
+public class GenericNetService {
     private int netServiceId;
     private int peerSize;
     private String[] peerAddrList;
@@ -32,6 +32,9 @@ public class GenericNetService implements PeerMessageSender{
     private int toClientPort;
 
     private Socket[] peers;
+
+    private PeerMessageSender sender;
+    private PeerMessageReceiver receiver;
 
     public static final int DEFAULT_BEACON_INTERVAL = 800;
     private int beaconItv;
@@ -70,9 +73,8 @@ public class GenericNetService implements PeerMessageSender{
         super.finalize();
     }
 
-    public void addNewChannel(@NotNull Distinguishable condition, @NotNull BlockingQueue channel){
-        if (!onRunning)
-            channels.add(new Pair<>(condition, channel));
+    public PeerMessageSender getPeerMessageSender() {
+        return sender;
     }
 
     public void connect(@NotNull String[] addr, @NotNull int[] port) throws InterruptedException {
@@ -94,13 +96,18 @@ public class GenericNetService implements PeerMessageSender{
 
         latch.await();
 
+        sender = new BasicPeerMessageSender(netServiceId, peerSize, peers, cModule, logger);
+        receiver = new BasicPeerMessageReceiver(netServiceId, sender, cModule, paxosChan, channels);
+
+        onRunning = true;
+
         if (listenService == null)
             listenService = Executors.newCachedThreadPool();
 
         for (int i = 0; i < peerSize; i++) {
             if (i != netServiceId){
                 Socket socket = peers[i];
-                listenService.execute(() -> listenTOPeers(socket));
+                listenService.execute(() -> receiver.listenToPeers(socket));
             }
         }
 
@@ -195,60 +202,12 @@ public class GenericNetService implements PeerMessageSender{
     private void beacon(){
         while (onRunning){
             logger.log(false, cModule.toString());
-            broadcastPeerMessage(cModule.makeBeacon(System.currentTimeMillis()));
+            sender.broadcastPeerMessage(cModule.makeBeacon(System.currentTimeMillis()));
             try {
                 Thread.sleep(beaconItv);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 break;
-            }
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void listenTOPeers(@NotNull Socket chan){
-        onRunning = true;
-
-        while (onRunning){
-            Object msg;
-            try {
-                msg = (new ObjectInputStream(chan.getInputStream())).readObject();
-            } catch (IOException|ClassNotFoundException e) {
-                System.out.println("ERROR [server "+netServiceId+"]: " + e.getMessage());
-                continue;
-            }
-
-            if (msg instanceof GenericConnectionMessage.Beacon){
-                long ts = System.currentTimeMillis();
-                GenericConnectionMessage.Beacon cast = (GenericConnectionMessage.Beacon) msg;
-                GenericConnectionMessage.ackBeacon ack = cModule.ack(ts, cast);
-                if (ack != null) sendPeerMessage(cast.fromId, ack);
-                cModule.updateByBeacon(ts, cast);
-            }
-            else if (msg instanceof GenericConnectionMessage.ackBeacon){
-                long ts = System.currentTimeMillis();
-                GenericConnectionMessage.ackBeacon cast = (GenericConnectionMessage.ackBeacon) msg;
-                cModule.updateByAckBeacon(ts, cast);
-            }
-            else if (msg instanceof GenericPaxosMessage){
-                GenericPaxosMessage cast = (GenericPaxosMessage) msg;
-                try {
-                    paxosChan.put(cast);
-                } catch (InterruptedException e) {
-                    System.out.println("Generic Paxos Message Interrupted");
-                }
-            }
-            else{
-                for (Pair<Distinguishable, BlockingQueue> t:channels) {
-                    if (t.getKey().meet(msg)){
-                        try {
-                            t.getValue().put(msg);
-                            break;
-                        } catch (InterruptedException e) {
-                            System.out.println("Costumed Message Interrupted");
-                        }
-                    }
-                }
             }
         }
     }
@@ -296,31 +255,6 @@ public class GenericNetService implements PeerMessageSender{
                 } catch (InterruptedException e) {
                     System.out.println("Generic Client Message Interrupted");
                 }
-            }
-        }
-    }
-
-    @Override
-    synchronized public void sendPeerMessage(int toId, @NotNull Object msg){
-        if (toId < peerSize && cModule.connected(toId)){
-            try {
-                logger.logPeerNet(netServiceId, toId, msg.toString());
-                OutputStream socketStream = peers[toId].getOutputStream();
-                ObjectOutputStream ostream = new ObjectOutputStream(socketStream);
-                ostream.writeObject(msg);
-                ostream.flush();
-                socketStream.flush();
-            } catch (IOException e) {
-                System.out.println("Paxos Message send faliure: "+e.getMessage());
-            }
-        }
-    }
-
-    @Override
-    synchronized public void broadcastPeerMessage(@NotNull Object msg){
-        for (int i = 0; i < peerSize; i++) {
-            if (i != netServiceId){
-                sendPeerMessage(i, msg);
             }
         }
     }

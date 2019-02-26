@@ -9,6 +9,7 @@ import instance.maintenance.HistoryMaintenance;
 import network.message.protocols.DiskPaxosMessage;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.GenericNetService;
+import network.service.PeerMessageSender;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.List;
  * @version : 2019/2/15 14:13
  */
 public class DiskProposer {
-    private GenericNetService net;
+    private PeerMessageSender net;
     private List<ClientRequest> restoredRequestList;
 
     private int serverId;
@@ -31,7 +32,7 @@ public class DiskProposer {
 
     public DiskProposer(int serverId, int peerSize,
                            @NotNull PaxosInstance[] instanceSpace,
-                           @NotNull GenericNetService net,
+                           @NotNull PeerMessageSender net,
                            @NotNull List<ClientRequest> restoredRequestList) {
         this.serverId = serverId;
         this.peerSize = peerSize;

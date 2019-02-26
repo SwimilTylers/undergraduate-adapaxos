@@ -225,11 +225,11 @@ public class demo {
                         e.printStackTrace();
                     }
                     if (id == 0){
-                        netService.broadcastPeerMessage("world");
-                        netService.broadcastPeerMessage("peer");
+                        netService.getPeerMessageSender().broadcastPeerMessage("world");
+                        netService.getPeerMessageSender().broadcastPeerMessage("peer");
                     }
                     else {
-                        netService.sendPeerMessage(0, "hello");
+                        netService.getPeerMessageSender().sendPeerMessage(0, "hello");
                     }
                 });
             }

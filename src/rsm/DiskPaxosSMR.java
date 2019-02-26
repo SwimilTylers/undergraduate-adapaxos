@@ -34,9 +34,9 @@ public class DiskPaxosSMR extends GenericPaxosSMR{
 
     @Override
     protected void agentDeployment() {
-        dProposer = new DiskProposer(serverId, peerSize, instanceSpace, net, restoredRequestList);
-        dAcceptor = IntegratedDiskAcceptor.makeInstance(net, serverId, store, logger);
-        dLearner = new DiskLearner(serverId, peerSize, instanceSpace, net, restoredRequestList, logger);
+        dProposer = new DiskProposer(serverId, peerSize, instanceSpace, net.getPeerMessageSender(), restoredRequestList);
+        dAcceptor = IntegratedDiskAcceptor.makeInstance(net.getPeerMessageSender(), serverId, store, logger);
+        dLearner = new DiskLearner(serverId, peerSize, instanceSpace, net.getPeerMessageSender(), restoredRequestList, logger);
     }
 
     private void genericPaxosMessageHandler(){

@@ -26,9 +26,9 @@ public class BasicPaxosSMR extends GenericPaxosSMR{
 
     @Override
     protected void agentDeployment() {
-        proposer = new GenericProposer(serverId, peerSize, instanceSpace, net, restoredRequestList);
-        acceptor = new GenericAcceptor(instanceSpace, net);
-        learner = new GenericLearner(serverId, peerSize, instanceSpace, net, restoredRequestList, logger);
+        proposer = new GenericProposer(serverId, peerSize, instanceSpace, net.getPeerMessageSender(), restoredRequestList);
+        acceptor = new GenericAcceptor(instanceSpace, net.getPeerMessageSender());
+        learner = new GenericLearner(serverId, peerSize, instanceSpace, net.getPeerMessageSender(), restoredRequestList, logger);
     }
 
     @Override
