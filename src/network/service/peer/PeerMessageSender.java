@@ -1,10 +1,6 @@
-package network.service;
+package network.service.peer;
 
 import com.sun.istack.internal.NotNull;
-
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 
 /**
  * @author : Swimiltylers

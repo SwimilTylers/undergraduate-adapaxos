@@ -1,4 +1,4 @@
-package network.service;
+package network.service.peer;
 
 import com.sun.istack.internal.NotNull;
 import javafx.util.Pair;
@@ -17,7 +17,7 @@ import java.util.concurrent.BlockingQueue;
  * @author : Swimiltylers
  * @version : 2019/2/26 20:13
  */
-public class BasicPeerMessageReceiver implements PeerMessageReceiver{
+public class BasicPeerMessageReceiver implements PeerMessageReceiver {
     private int netServiceId;
 
     private PeerMessageSender sender;
@@ -40,7 +40,6 @@ public class BasicPeerMessageReceiver implements PeerMessageReceiver{
         this.channels = channels;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void listenToPeers(@NotNull Socket chan){
         while (true){
@@ -51,38 +50,47 @@ public class BasicPeerMessageReceiver implements PeerMessageReceiver{
                 System.out.println("ERROR [server "+netServiceId+"]: " + e.getMessage());
                 continue;
             }
+            try {
+                putInChannel(msg);
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
+    }
 
-            if (msg instanceof GenericConnectionMessage.Beacon){
-                long ts = System.currentTimeMillis();
-                GenericConnectionMessage.Beacon cast = (GenericConnectionMessage.Beacon) msg;
-                GenericConnectionMessage.ackBeacon ack = cModule.ack(ts, cast);
-                if (ack != null) sender.sendPeerMessage(cast.fromId, ack);
-                cModule.updateByBeacon(ts, cast);
+    @SuppressWarnings("unchecked")
+    @Override
+    public void putInChannel(Object msg) throws InterruptedException {
+        if (msg instanceof GenericConnectionMessage.Beacon){
+            long ts = System.currentTimeMillis();
+            GenericConnectionMessage.Beacon cast = (GenericConnectionMessage.Beacon) msg;
+            GenericConnectionMessage.ackBeacon ack = cModule.ack(ts, cast);
+            if (ack != null) sender.sendPeerMessage(cast.fromId, ack);
+            cModule.updateByBeacon(ts, cast);
+        }
+        else if (msg instanceof GenericConnectionMessage.ackBeacon){
+            long ts = System.currentTimeMillis();
+            GenericConnectionMessage.ackBeacon cast = (GenericConnectionMessage.ackBeacon) msg;
+            cModule.updateByAckBeacon(ts, cast);
+        }
+        else if (msg instanceof GenericPaxosMessage){
+            GenericPaxosMessage cast = (GenericPaxosMessage) msg;
+            try {
+                paxosChan.put(cast);
+            } catch (InterruptedException e) {
+                System.out.println("Generic Paxos Message Interrupted");
+                throw e;
             }
-            else if (msg instanceof GenericConnectionMessage.ackBeacon){
-                long ts = System.currentTimeMillis();
-                GenericConnectionMessage.ackBeacon cast = (GenericConnectionMessage.ackBeacon) msg;
-                cModule.updateByAckBeacon(ts, cast);
-            }
-            else if (msg instanceof GenericPaxosMessage){
-                GenericPaxosMessage cast = (GenericPaxosMessage) msg;
-                try {
-                    paxosChan.put(cast);
-                } catch (InterruptedException e) {
-                    System.out.println("Generic Paxos Message Interrupted");
-                    break;
-                }
-            }
-            else{
-                for (Pair<Distinguishable, BlockingQueue> t:channels) {
-                    if (t.getKey().meet(msg)){
-                        try {
-                            t.getValue().put(msg);
-                            break;
-                        } catch (InterruptedException e) {
-                            System.out.println("Costumed Message Interrupted");
-                            break;
-                        }
+        }
+        else{
+            for (Pair<Distinguishable, BlockingQueue> t:channels) {
+                if (t.getKey().meet(msg)){
+                    try {
+                        t.getValue().put(msg);
+                        break;
+                    } catch (InterruptedException e) {
+                        System.out.println("Costumed Message Interrupted");
+                        throw e;
                     }
                 }
             }

@@ -4,7 +4,7 @@ import instance.store.InstanceStore;
 import javafx.util.Pair;
 import logger.PaxosLogger;
 import network.message.protocols.DiskPaxosMessage;
-import network.service.PeerMessageSender;
+import network.service.peer.PeerMessageSender;
 
 import java.util.*;
 

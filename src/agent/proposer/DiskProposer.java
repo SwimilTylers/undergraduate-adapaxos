@@ -8,8 +8,7 @@ import instance.maintenance.DiskLeaderMaintenance;
 import instance.maintenance.HistoryMaintenance;
 import network.message.protocols.DiskPaxosMessage;
 import network.message.protocols.GenericPaxosMessage;
-import network.service.GenericNetService;
-import network.service.PeerMessageSender;
+import network.service.peer.PeerMessageSender;
 
 import java.util.Arrays;
 import java.util.List;

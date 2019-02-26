@@ -3,7 +3,7 @@ package agent.acceptor;
 import network.message.protocols.GenericPaxosMessage;
 import instance.InstanceStatus;
 import instance.PaxosInstance;
-import network.service.PeerMessageSender;
+import network.service.peer.PeerMessageSender;
 
 /**
  * @author : Swimiltylers

@@ -5,12 +5,10 @@ import com.sun.istack.internal.NotNull;
 import instance.InstanceStatus;
 import instance.PaxosInstance;
 import instance.maintenance.DiskLeaderMaintenance;
-import instance.maintenance.HistoryMaintenance;
 import logger.PaxosLogger;
 import network.message.protocols.DiskPaxosMessage;
 import network.message.protocols.GenericPaxosMessage;
-import network.service.GenericNetService;
-import network.service.PeerMessageSender;
+import network.service.peer.PeerMessageSender;
 
 import java.util.List;
 

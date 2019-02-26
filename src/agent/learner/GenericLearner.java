@@ -7,7 +7,7 @@ import network.message.protocols.GenericPaxosMessage;
 import instance.InstanceStatus;
 import instance.PaxosInstance;
 import instance.maintenance.HistoryMaintenance;
-import network.service.PeerMessageSender;
+import network.service.peer.PeerMessageSender;
 
 import java.util.List;
 

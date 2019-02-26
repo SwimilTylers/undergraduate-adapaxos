@@ -2,16 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/network/service/BasicPeerMessageReceiver.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/network/service/BasicPeerMessageSender.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/network/service/PeerMessageReceiver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/agent/acceptor/DiskAcceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/acceptor/DiskAcceptor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/agent/acceptor/GenericAcceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/acceptor/GenericAcceptor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/agent/acceptor/IntegratedDiskAcceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/acceptor/IntegratedDiskAcceptor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/agent/learner/DiskLearner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/learner/DiskLearner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/agent/learner/GenericLearner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/learner/GenericLearner.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/agent/proposer/DiskProposer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/proposer/DiskProposer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/demo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/demo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/agent/proposer/GenericProposer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/proposer/GenericProposer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/network/service/BasicPeerMessageReceiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/peer/BasicPeerMessageReceiver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/network/service/BasicPeerMessageSender.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/peer/BasicPeerMessageSender.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/network/service/GenericNetService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/GenericNetService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/rsm/BasicPaxosSMR.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/rsm/BasicPaxosSMR.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/rsm/DiskPaxosSMR.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/rsm/DiskPaxosSMR.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/network/service/PeerMessageReceiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/peer/PeerMessageReceiver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/network/service/PeerMessageSender.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/peer/PeerMessageSender.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -46,24 +49,17 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/network/service/module/ConnectionModule.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="168">
-              <caret line="12" column="47" selection-start-line="12" selection-start-column="47" selection-end-line="12" selection-end-column="47" />
+            <state relative-caret-position="98">
+              <caret line="7" column="3" lean-forward="true" selection-start-line="7" selection-start-column="3" selection-end-line="7" selection-end-column="3" />
             </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/logs/server-1.log">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-112" />
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/network/service/GenericNetService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="275">
-              <caret line="101" column="25" selection-start-line="101" selection-start-column="25" selection-end-line="101" selection-end-column="25" />
+            <state relative-caret-position="499">
+              <caret line="271" column="33" lean-forward="true" selection-start-line="271" selection-start-column="33" selection-end-line="271" selection-end-column="33" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#2240#2241#0" expanded="true" />
@@ -73,11 +69,27 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/client.txt">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/network/service/peer/BasicPeerMessageSender.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="140">
-              <caret line="10" column="10" selection-start-line="10" selection-start-column="10" selection-end-line="10" selection-end-column="10" />
+            <state relative-caret-position="84">
+              <caret line="15" column="13" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="13" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/network/service/peer/BasicPeerMessageReceiver.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="714">
+              <caret line="66" column="40" lean-forward="true" selection-start-line="66" selection-start-column="40" selection-end-line="66" selection-end-column="40" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#1844#1874#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -101,31 +113,6 @@
               <caret line="30" column="98" selection-start-line="30" selection-start-column="98" selection-end-line="30" selection-end-column="98" />
               <folding>
                 <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/network/service/BasicPeerMessageSender.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="560">
-              <caret line="53" column="13" selection-start-line="53" selection-start-column="13" selection-end-line="53" selection-end-column="13" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/network/service/BasicPeerMessageReceiver.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="149">
-              <caret line="16" column="25" selection-start-line="16" selection-start-column="25" selection-end-line="16" selection-end-column="25" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#1513#1543#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -176,10 +163,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/rsm/GenericProposer.java" />
-        <option value="$PROJECT_DIR$/src/rsm/GenericAcceptor.java" />
-        <option value="$PROJECT_DIR$/src/rsm/GenericLearner.java" />
-        <option value="$PROJECT_DIR$/src/rsm/PaxosInstance.java" />
         <option value="$PROJECT_DIR$/src/rsm/instance/PaxosInstance.java" />
         <option value="$PROJECT_DIR$/src/rsm/HistoryMaintenance.java" />
         <option value="$PROJECT_DIR$/src/rsm/instance/maintenance/HistoryMaintenance.java" />
@@ -227,6 +210,10 @@
         <option value="$PROJECT_DIR$/src/network/service/BasicPeerMessageReceiver.java" />
         <option value="$PROJECT_DIR$/src/network/service/GenericNetService.java" />
         <option value="$PROJECT_DIR$/client.txt" />
+        <option value="$PROJECT_DIR$/src/network/service/peer/BasicPeerMessageSender.java" />
+        <option value="$PROJECT_DIR$/src/network/service/peer/PeerMessageSender.java" />
+        <option value="$PROJECT_DIR$/src/network/service/peer/BasicPeerMessageReceiver.java" />
+        <option value="$PROJECT_DIR$/src/network/service/peer/PeerMessageReceiver.java" />
       </list>
     </option>
   </component>
@@ -248,11 +235,6 @@
             <path>
               <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
               <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
-              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
-              <item name="logs" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
@@ -303,6 +285,14 @@
               <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
               <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="network" type="462c0819:PsiDirectoryNode" />
+              <item name="service" type="462c0819:PsiDirectoryNode" />
+              <item name="peer" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="rsm" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
@@ -319,7 +309,7 @@
     <property name="Repository.Attach.Sources" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1551183989806" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1551184965661" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/lib/apache-log4j-2.11.1-bin" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -420,7 +410,7 @@
       <workItem from="1550545402740" duration="18418000" />
       <workItem from="1550631274689" duration="17821000" />
       <workItem from="1551144153266" duration="13305000" />
-      <workItem from="1551177260121" duration="6665000" />
+      <workItem from="1551177260121" duration="7636000" />
     </task>
     <task id="LOCAL-00001" summary="modify README.md">
       <created>1545406849881</created>
@@ -639,11 +629,18 @@
       <option name="project" value="LOCAL" />
       <updated>1551181493939</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Status: PeerMessageSender &amp; PeerMessageReceiver&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation">
+      <created>1551184086286</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1551184086286</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="407064000" />
+    <option name="totallyTimeSpent" value="408035000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -737,7 +734,6 @@
     <ignored-roots>
       <path value="E:" />
     </ignored-roots>
-    <MESSAGE value="Status: decouple network service and agent, *untested* mechanics of transmission&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is working properly&#10;+ proposal number is increased sequentially&#10;+ integrated paxos agent &amp; i/o channel&#10;+ Paxos message construction needs utilization of constructors" />
     <MESSAGE value="Status: decouple network service and agent, leaving *untested* mechanics &#10;of transmission&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is working properly&#10;+ proposal number is increased sequentially&#10;+ integrated paxos agent &amp; i/o channel&#10;+ Paxos message construction needs utilization of constructors" />
     <MESSAGE value="Status: finish Learner &amp; PROPOSAL_KILL&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;# Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is working properly&#10;+ timestamped proposal number&#10;+ decoupled paxos agent &amp; i/o channel&#10;+ requires integrate Paxos procedure" />
     <MESSAGE value="Status: expaxos-implementation-style netService establishment&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.rsm&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
@@ -762,7 +758,8 @@
     <MESSAGE value="Status: elaborated HistoryMaintenance&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
     <MESSAGE value="Status: BasicPaxosSMR&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
     <MESSAGE value="Status: HeartBeatModule&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
-    <option name="LAST_COMMIT_MESSAGE" value="Status: HeartBeatModule&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
+    <MESSAGE value="Status: PeerMessageSender &amp; PeerMessageReceiver&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Status: PeerMessageSender &amp; PeerMessageReceiver&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/logs/server-4.paxos.log">
@@ -932,9 +929,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-3.commit.log">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-1.commit.log">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -1001,23 +995,6 @@
             <element signature="imports" expanded="true" />
             <element signature="e#655#656#0" expanded="true" />
             <element signature="e#735#736#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/module/ConnectionModule.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="12" column="47" selection-start-line="12" selection-start-column="47" selection-end-line="12" selection-end-column="47" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/PeerMessageSender.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="14" column="58" lean-forward="true" selection-start-line="14" selection-start-column="58" selection-end-line="14" selection-end-column="58" />
-          <folding>
-            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1100,25 +1077,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/PeerMessageReceiver.java">
+    <entry file="file://$PROJECT_DIR$/logs/server-0.commit.log">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="154">
-          <caret line="11" column="45" selection-start-line="11" selection-start-column="45" selection-end-line="11" selection-end-column="45" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="140">
+          <caret line="10" column="10" selection-start-line="10" selection-start-column="10" selection-end-line="10" selection-end-column="10" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/BasicPeerMessageSender.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="560">
-          <caret line="53" column="13" selection-start-line="53" selection-start-column="13" selection-end-line="53" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
+    <entry file="file://$PROJECT_DIR$/logs/server-3.commit.log">
+      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/src/rsm/BasicPaxosSMR.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -1130,24 +1100,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/BasicPeerMessageReceiver.java">
+    <entry file="file://$PROJECT_DIR$/src/network/service/peer/PeerMessageSender.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="149">
-          <caret line="16" column="25" selection-start-line="16" selection-start-column="25" selection-end-line="16" selection-end-column="25" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1513#1543#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="28">
+          <caret line="2" column="39" selection-start-line="2" selection-start-column="39" selection-end-line="2" selection-end-column="39" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-0.commit.log">
-      <provider selected="true" editor-type-id="text-editor" />
+    <entry file="file://$PROJECT_DIR$/src/network/service/module/ConnectionModule.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="98">
+          <caret line="7" column="3" lean-forward="true" selection-start-line="7" selection-start-column="3" selection-end-line="7" selection-end-column="3" />
+        </state>
+      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/network/service/GenericNetService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="275">
-          <caret line="101" column="25" selection-start-line="101" selection-start-column="25" selection-end-line="101" selection-end-column="25" />
+        <state relative-caret-position="499">
+          <caret line="271" column="33" lean-forward="true" selection-start-line="271" selection-start-column="33" selection-end-line="271" selection-end-column="33" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#2240#2241#0" expanded="true" />
@@ -1156,10 +1126,34 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client.txt">
+    <entry file="file://$PROJECT_DIR$/src/network/service/peer/BasicPeerMessageSender.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="140">
-          <caret line="10" column="10" selection-start-line="10" selection-start-column="10" selection-end-line="10" selection-end-column="10" />
+        <state relative-caret-position="84">
+          <caret line="15" column="13" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="13" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/peer/PeerMessageReceiver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="168">
+          <caret line="12" column="21" selection-start-line="12" selection-start-column="21" selection-end-line="12" selection-end-column="21" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/peer/BasicPeerMessageReceiver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="714">
+          <caret line="66" column="40" lean-forward="true" selection-start-line="66" selection-start-column="40" selection-end-line="66" selection-end-column="40" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1844#1874#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

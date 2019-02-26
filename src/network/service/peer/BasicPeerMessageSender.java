@@ -1,4 +1,4 @@
-package network.service;
+package network.service.peer;
 
 import com.sun.istack.internal.NotNull;
 import logger.PaxosLogger;
@@ -13,7 +13,7 @@ import java.net.Socket;
  * @author : Swimiltylers
  * @version : 2019/2/26 19:48
  */
-public class BasicPeerMessageSender implements PeerMessageSender{
+public class BasicPeerMessageSender implements PeerMessageSender {
     private int netServiceId;
     private int peerSize;
     private Socket[] peers;

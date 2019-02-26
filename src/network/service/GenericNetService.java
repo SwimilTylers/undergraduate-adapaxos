@@ -4,12 +4,15 @@ import com.sun.istack.internal.NotNull;
 import client.ClientRequest;
 import javafx.util.Pair;
 import logger.PaxosLogger;
-import network.message.protocols.GenericConnectionMessage;
 import network.message.protocols.Distinguishable;
 import network.message.protocols.GenericClientMessage;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.module.ConnectionModule;
 import network.service.module.HeartBeatModule;
+import network.service.peer.BasicPeerMessageReceiver;
+import network.service.peer.BasicPeerMessageSender;
+import network.service.peer.PeerMessageReceiver;
+import network.service.peer.PeerMessageSender;
 
 import java.io.*;
 import java.net.ServerSocket;
