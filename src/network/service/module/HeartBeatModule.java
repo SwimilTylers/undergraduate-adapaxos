@@ -102,11 +102,13 @@ public class HeartBeatModule implements ConnectionModule{
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("[module:").append(moduleId).append("]\n").append("\t id | isConn | lst_srv | lst_rndSrv | lst_rnd <INIT, ARR> | rnd \n");
+        int i = 0;
         for (NodeMonitor node :
                 nodes) {
             if (node != null) {
-                builder.append("\t ").append(moduleId).append(" | ").append(node);
+                builder.append("\t ").append(i).append(" | ").append(node);
             }
+            ++i;
         }
         return builder.toString();
     }

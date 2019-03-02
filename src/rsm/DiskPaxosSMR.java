@@ -9,6 +9,9 @@ import instance.store.OffsetIndexStore;
 import javafx.util.Pair;
 import network.message.protocols.DiskPaxosMessage;
 import network.message.protocols.GenericPaxosMessage;
+import network.service.SimulatedNetService;
+import network.service.module.simulator.CrushedSimulator;
+import network.service.module.simulator.DelayedSimulator;
 
 import java.util.concurrent.*;
 
@@ -26,6 +29,8 @@ public class DiskPaxosSMR extends GenericPaxosSMR{
 
     public DiskPaxosSMR(int id, String[] addr, int[] port) {
         super(id, addr, port);
+
+        net = new SimulatedNetService(net, id != 2 ? new DelayedSimulator(200, 50) : new CrushedSimulator());
 
         dMessage = new ArrayBlockingQueue<>(DEFAULT_MESSAGE_SIZE);
         store = new OffsetIndexStore("disk-"+id);

@@ -26,31 +26,31 @@ import java.util.concurrent.*;
  * @version : 2019/1/27 11:35
  */
 public class GenericNetService {
-    private int netServiceId;
-    private int peerSize;
+    protected int netServiceId;
+    protected int peerSize;
     private String[] peerAddrList;
     private int[] peerPortList;
 
     public static final int DEFAULT_TO_CLIENT_PORT = 41020;
-    private int toClientPort;
+    protected int toClientPort;
 
-    private Socket[] peers;
+    protected Socket[] peers;
 
-    private PeerMessageSender sender;
-    private PeerMessageReceiver receiver;
+    protected PeerMessageSender sender;
+    protected PeerMessageReceiver receiver;
 
     public static final int DEFAULT_BEACON_INTERVAL = 800;
     private int beaconItv;
-    private ConnectionModule cModule;
+    protected ConnectionModule cModule;
 
     private ExecutorService listenService;
 
-    private BlockingQueue<ClientRequest> clientChan;
-    private BlockingQueue<GenericPaxosMessage> paxosChan;
-    private List<Pair<Distinguishable, BlockingQueue>> channels;
+    protected BlockingQueue<ClientRequest> clientChan;
+    protected BlockingQueue<GenericPaxosMessage> paxosChan;
+    protected List<Pair<Distinguishable, BlockingQueue>> channels;
     private boolean onRunning;
 
-    private PaxosLogger logger;
+    protected PaxosLogger logger;
 
     public GenericNetService(int thisId, int toClientPort,
                              @NotNull BlockingQueue<ClientRequest> clientChan,
@@ -99,8 +99,7 @@ public class GenericNetService {
 
         latch.await();
 
-        sender = new BasicPeerMessageSender(netServiceId, peerSize, peers, cModule, logger);
-        receiver = new BasicPeerMessageReceiver(netServiceId, sender, cModule, paxosChan, channels);
+        peerTransDeployment();
 
         onRunning = true;
 
@@ -117,6 +116,11 @@ public class GenericNetService {
         service.execute(this::beacon);
 
         service.shutdown();
+    }
+
+    protected void peerTransDeployment(){
+        sender = new BasicPeerMessageSender(netServiceId, peerSize, peers, cModule, logger);
+        receiver = new BasicPeerMessageReceiver(netServiceId, sender, cModule, paxosChan, channels);
     }
 
     private void connectToPeers(@NotNull CountDownLatch latch){
