@@ -56,9 +56,11 @@ public class FileIteratorClient implements Runnable{
         String str = "";
         try{
             while ((str = reader.readLine()) != null){
-                System.out.println("client: "+str);
-                sendServerMessage(net, new GenericClientMessage.Propose(str));
-                Thread.sleep(2400);
+                synchronized (this) {
+                    System.out.println("client: " + str);
+                    sendServerMessage(net, new GenericClientMessage.Propose(str));
+                    wait(30);
+                }
             }
         } catch (Exception e){e.printStackTrace();}
     }

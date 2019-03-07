@@ -4,6 +4,7 @@ import client.ClientRequest;
 import logger.PaxosLogger;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.module.simulator.SimulatorModule;
+import network.service.peer.BasicPeerMessageReceiver;
 import network.service.peer.BasicPeerMessageSender;
 import network.service.peer.SimulatorReceiver;
 import network.service.peer.SimulatorSender;
@@ -34,6 +35,6 @@ public class SimulatedNetService extends GenericNetService{
     @Override
     protected void peerTransDeployment() {
         sender = new SimulatorSender(netServiceId, peerSize, new BasicPeerMessageSender(netServiceId, peerSize, peers, cModule, logger), simulator);
-        receiver = new SimulatorReceiver(netServiceId, sender, cModule, paxosChan, channels, simulator);
+        receiver = new SimulatorReceiver(netServiceId, new BasicPeerMessageReceiver(netServiceId, sender, cModule, paxosChan, channels), simulator);
     }
 }

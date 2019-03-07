@@ -10,7 +10,7 @@ import network.service.peer.PeerMessageSender;
  * @author : Swimiltylers
  * @version : 2019/2/18 13:19
  */
-public class IntegratedDiskAcceptor extends DiskAcceptor{
+public class IntegratedDiskAcceptor extends DiskAcceptor {
 
     private BufferedDiskAcceptorSender wrappedNet;
 

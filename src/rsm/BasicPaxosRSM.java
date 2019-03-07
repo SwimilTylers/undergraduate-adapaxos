@@ -15,12 +15,12 @@ import java.util.concurrent.TimeUnit;
  * @author : Swimiltylers
  * @version : 2019/2/20 15:33
  */
-public class BasicPaxosSMR extends GenericPaxosSMR{
+public class BasicPaxosRSM extends GenericPaxosSMR{
     private Proposer proposer;
     private Acceptor acceptor;
     private Learner learner;
 
-    public BasicPaxosSMR(int id, String[] addr, int[] port) {
+    public BasicPaxosRSM(int id, String[] addr, int[] port) {
         super(id, addr, port);
     }
 

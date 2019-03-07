@@ -19,7 +19,7 @@ import java.util.concurrent.*;
  * @author : Swimiltylers
  * @version : 2019/2/18 15:09
  */
-public class DiskPaxosSMR extends GenericPaxosSMR{
+public class DiskPaxosRSM extends GenericPaxosSMR{
     private DiskProposer dProposer;
     private IntegratedDiskAcceptor dAcceptor;
     private DiskLearner dLearner;
@@ -27,10 +27,10 @@ public class DiskPaxosSMR extends GenericPaxosSMR{
     private BlockingQueue<DiskPaxosMessage> dMessage;
     private InstanceStore store;
 
-    public DiskPaxosSMR(int id, String[] addr, int[] port) {
+    public DiskPaxosRSM(int id, String[] addr, int[] port) {
         super(id, addr, port);
 
-        net = new SimulatedNetService(net, id != 2 ? new DelayedSimulator(200, 50) : new CrushedSimulator());
+        net = new SimulatedNetService(net, id != 2 ? new DelayedSimulator(100, 10) : new CrushedSimulator());
 
         dMessage = new ArrayBlockingQueue<>(DEFAULT_MESSAGE_SIZE);
         store = new OffsetIndexStore("disk-"+id);
