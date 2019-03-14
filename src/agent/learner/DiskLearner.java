@@ -8,7 +8,7 @@ import instance.maintenance.DiskLeaderMaintenance;
 import logger.PaxosLogger;
 import network.message.protocols.DiskPaxosMessage;
 import network.message.protocols.GenericPaxosMessage;
-import network.service.peer.PeerMessageSender;
+import network.service.sender.PeerMessageSender;
 
 import java.util.List;
 
@@ -29,10 +29,10 @@ public class DiskLearner {
     private PaxosLogger logger;
 
     public DiskLearner(int serverId, int peerSize,
-                          @NotNull PaxosInstance[] instanceSpace,
-                          @NotNull PeerMessageSender net,
-                          @NotNull List<ClientRequest> restoredRequestList,
-                          @NotNull PaxosLogger logger) {
+                       @NotNull PaxosInstance[] instanceSpace,
+                       @NotNull PeerMessageSender net,
+                       @NotNull List<ClientRequest> restoredRequestList,
+                       @NotNull PaxosLogger logger) {
         this.serverId = serverId;
         this.peerSize = peerSize;
         this.instanceSpace = instanceSpace;

@@ -59,7 +59,7 @@ public class FileIteratorClient implements Runnable{
                 synchronized (this) {
                     System.out.println("client: " + str);
                     sendServerMessage(net, new GenericClientMessage.Propose(str));
-                    wait(30);
+                    wait(3000);
                 }
             }
         } catch (Exception e){e.printStackTrace();}

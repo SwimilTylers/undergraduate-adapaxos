@@ -7,7 +7,7 @@ import instance.InstanceStatus;
 import instance.PaxosInstance;
 import instance.maintenance.HistoryMaintenance;
 import instance.maintenance.LeaderMaintenance;
-import network.service.peer.PeerMessageSender;
+import network.service.sender.PeerMessageSender;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,9 +24,6 @@ public class GenericProposer implements Proposer {
     private int peerSize;
 
     private PaxosInstance[] instanceSpace;
-    private int crtInstance = 0;
-
-    private int crtBallot = 0;
 
     public GenericProposer(int serverId, int peerSize,
                            @NotNull PaxosInstance[] instanceSpace,
@@ -40,20 +37,18 @@ public class GenericProposer implements Proposer {
     }
 
     @Override
-    public void handleRequests(ClientRequest[] requests) {
+    public void handleRequests(int inst_no, int ballot, ClientRequest[] requests) {
         PaxosInstance inst = new PaxosInstance();
 
         inst.crtLeaderId = serverId;
-        inst.crtInstBallot = ++crtBallot;
+        inst.crtInstBallot = ballot;
         inst.cmds = requests;
         inst.status = InstanceStatus.PREPARING;
         inst.leaderMaintenanceUnit = new LeaderMaintenance();
 
-        instanceSpace[crtInstance] = inst;
+        instanceSpace[inst_no] = inst;
 
-        net.broadcastPeerMessage(new GenericPaxosMessage.Prepare(crtInstance, inst.crtLeaderId, inst.crtInstBallot));
-
-        ++crtInstance;
+        net.broadcastPeerMessage(new GenericPaxosMessage.Prepare(inst_no, inst.crtLeaderId, inst.crtInstBallot));
     }
 
     @Override

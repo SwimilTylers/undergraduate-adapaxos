@@ -7,7 +7,7 @@ import network.message.protocols.GenericPaxosMessage;
 import instance.InstanceStatus;
 import instance.PaxosInstance;
 import instance.maintenance.HistoryMaintenance;
-import network.service.peer.PeerMessageSender;
+import network.service.sender.PeerMessageSender;
 
 import java.util.List;
 
@@ -107,7 +107,7 @@ public class GenericLearner implements Learner {
             inst.status = InstanceStatus.COMMITTED;
 
             instanceSpace[commit.inst_no] = inst;
-            System.out.println("successfully committed");
+            //System.out.println("successfully committed");
             logger.logCommit(commit.inst_no, commit, "settled");
         }
         else{
@@ -118,7 +118,7 @@ public class GenericLearner implements Learner {
                     inst.cmds = commit.cmds;
                     inst.status = InstanceStatus.COMMITTED;
 
-                    System.out.println("successfully committed");
+                    //System.out.println("successfully committed");
                     logger.logCommit(commit.inst_no, commit, "settled");
                 }
 
@@ -134,7 +134,7 @@ public class GenericLearner implements Learner {
                 inst.leaderMaintenanceUnit = null;
 
                 net.sendPeerMessage(commit.leaderId, reply);
-                System.out.println("successfully committed");
+                //System.out.println("successfully committed");
                 logger.logCommit(commit.inst_no, commit, "settled");
             }
 

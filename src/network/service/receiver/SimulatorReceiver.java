@@ -1,17 +1,11 @@
-package network.service.peer;
+package network.service.receiver;
 
 import com.sun.istack.internal.NotNull;
-import javafx.util.Pair;
-import network.message.protocols.Distinguishable;
-import network.message.protocols.GenericPaxosMessage;
-import network.service.module.ConnectionModule;
 import network.service.module.simulator.SimulatorModule;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
 
 /**
  * @author : Swimiltylers
@@ -41,7 +35,7 @@ public class SimulatorReceiver implements PeerMessageReceiver{
                 continue;
             }
             try {
-                putInChannel(msg);
+                messageProcess(msg);
             } catch (InterruptedException e) {
                 break;
             }
@@ -49,8 +43,8 @@ public class SimulatorReceiver implements PeerMessageReceiver{
     }
 
     @Override
-    public void putInChannel(Object msg) throws InterruptedException {
+    public void messageProcess(Object msg) throws InterruptedException {
         if (!simulator.crush())
-            receiver.putInChannel(msg);
+            receiver.messageProcess(msg);
     }
 }

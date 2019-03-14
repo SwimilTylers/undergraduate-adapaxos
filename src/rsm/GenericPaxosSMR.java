@@ -2,6 +2,7 @@ package rsm;
 
 import com.sun.istack.internal.NotNull;
 import client.ClientRequest;
+import instance.InstanceStatus;
 import javafx.util.Pair;
 import logger.NaiveLogger;
 import logger.PaxosLogger;
@@ -13,6 +14,7 @@ import instance.maintenance.HistoryMaintenance;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author : Swimiltylers
@@ -40,11 +42,15 @@ abstract public class GenericPaxosSMR implements Runnable{
     protected BlockingQueue<GenericPaxosMessage> pMessage;
 
     protected List<Pair<Distinguishable, BlockingQueue>> customizedChannels;
+    protected List<Runnable> customizedRoutines;
 
     protected int serverId;
     protected int peerSize;
     protected PaxosInstance[] instanceSpace = new PaxosInstance[DEFAULT_INSTANCE_SIZE];
-    private int excInstance = 0;
+    protected AtomicInteger crtBallot = new AtomicInteger(0);
+
+    protected AtomicInteger maxInstance = new AtomicInteger(0);
+    protected AtomicInteger consecutiveCommit = new AtomicInteger(0);
 
     protected PaxosLogger logger;
 
@@ -68,6 +74,7 @@ abstract public class GenericPaxosSMR implements Runnable{
         pMessage = new ArrayBlockingQueue<>(DEFAULT_MESSAGE_SIZE);
 
         customizedChannels = new ArrayList<>();
+        customizedRoutines = new ArrayList<>();
 
         logger = new NaiveLogger(id);
         net = new GenericNetService(id, GenericNetService.DEFAULT_TO_CLIENT_PORT, cMessages, pMessage, logger);
@@ -75,7 +82,32 @@ abstract public class GenericPaxosSMR implements Runnable{
         restoredRequestList = new ArrayList<>();
     }
 
-    private boolean isLeader(int inst_no){
+    public GenericPaxosSMR(int id, @NotNull String[] addr, int[] port, PaxosLogger logger){
+        assert addr.length == port.length;
+
+        peerAddr = addr;
+        peerPort = port;
+        peerSize = addr.length;
+        serverId = id;
+
+        compactChan = new ArrayBlockingQueue<>(1);
+
+        compactInterval = DEFAULT_COMPACT_INTERVAL;
+        clientComWaiting = DEFAULT_CLIENT_COM_WAITING;
+        peerComWaiting = DEFAULT_PEER_COM_WAITING;
+
+        cMessages = new ArrayBlockingQueue<>(DEFAULT_MESSAGE_SIZE);
+        pMessage = new ArrayBlockingQueue<>(DEFAULT_MESSAGE_SIZE);
+
+        customizedChannels = new ArrayList<>();
+
+        this.logger = logger;
+        net = new GenericNetService(id, GenericNetService.DEFAULT_TO_CLIENT_PORT, cMessages, pMessage, logger);
+
+        restoredRequestList = new ArrayList<>();
+    }
+
+    protected boolean isLeader(int inst_no){
         return serverId == 0;
     }
 
@@ -100,6 +132,7 @@ abstract public class GenericPaxosSMR implements Runnable{
 
         service.execute(this::compact);
         service.execute(this::paxosRoutine);
+        customizedRoutines.forEach(service::execute);
 
         service.shutdown();
     }
@@ -177,5 +210,14 @@ abstract public class GenericPaxosSMR implements Runnable{
                     restore.load.cmds
             );
         }
+    }
+
+    protected void updateConsecutiveCommit(){
+        int iter = consecutiveCommit.get();
+        while (iter < maxInstance.get()
+                && instanceSpace[iter] != null
+                && instanceSpace[iter].status == InstanceStatus.COMMITTED)
+            ++iter;
+        consecutiveCommit.set(iter);
     }
 }

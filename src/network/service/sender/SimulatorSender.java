@@ -1,14 +1,8 @@
-package network.service.peer;
+package network.service.sender;
 
 import com.sun.istack.internal.NotNull;
-import logger.PaxosLogger;
-import network.service.module.ConnectionModule;
 import network.service.module.simulator.SimulatorModule;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 

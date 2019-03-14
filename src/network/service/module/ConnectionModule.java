@@ -8,11 +8,12 @@ import network.message.protocols.GenericConnectionMessage;
  */
 public interface ConnectionModule {
     GenericConnectionMessage.Beacon makeBeacon(long ts);
-    GenericConnectionMessage.ackBeacon ack(long recvTs, GenericConnectionMessage.Beacon beacon);
+    GenericConnectionMessage.ackBeacon makeAck(long recvTs, GenericConnectionMessage.Beacon beacon);
 
     void updateByBeacon(long recvTs, GenericConnectionMessage.Beacon beacon);
     void updateByAckBeacon(long recvTs, GenericConnectionMessage.ackBeacon ackBeacon);
 
-    boolean connected(int toId);
     void init(int toId);
+
+    int[] filter(long threshold);
 }

@@ -121,8 +121,8 @@ public class DiskPaxosMessage implements Serializable {
 
     public static final String IRW_HEADER = "integrated Write and Read";
     public static final String IR_HEADER = "integrated read";
-    public static final String IRW_ACK_HEADER = "ack: "+IRW_HEADER;
-    public static final String IR_ACK_HEADER = "ack: "+IR_HEADER;
+    public static final String IRW_ACK_HEADER = "makeAck: "+IRW_HEADER;
+    public static final String IR_ACK_HEADER = "makeAck: "+IR_HEADER;
 
     public static DiskPaxosMessage.PackedMessage IRW(int inst_no, int leaderId, int inst_ballot,
                                                      long dialog_no,

@@ -9,6 +9,6 @@ import network.message.protocols.GenericPaxosMessage;
  * @version : 2019/2/14 17:32
  */
 public interface Proposer {
-    void handleRequests(@NotNull ClientRequest[] requests);
+    void handleRequests(int inst_no, int ballot, @NotNull ClientRequest[] requests);
     void handleAckPrepare(GenericPaxosMessage.ackPrepare ackPrepare);
 }

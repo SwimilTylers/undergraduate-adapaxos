@@ -3,7 +3,7 @@ package agent.acceptor;
 import network.message.protocols.GenericPaxosMessage;
 import instance.InstanceStatus;
 import instance.PaxosInstance;
-import network.service.peer.PeerMessageSender;
+import network.service.sender.PeerMessageSender;
 
 /**
  * @author : Swimiltylers
@@ -12,6 +12,7 @@ import network.service.peer.PeerMessageSender;
 public class GenericAcceptor implements Acceptor {
     private PeerMessageSender net;
     private PaxosInstance[] instanceSpace;
+
 
     public GenericAcceptor(PaxosInstance[] instanceSpace, PeerMessageSender net) {
         this.instanceSpace = instanceSpace;

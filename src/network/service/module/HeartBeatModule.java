@@ -3,6 +3,11 @@ package network.service.module;
 import com.sun.istack.internal.NotNull;
 import network.message.protocols.GenericConnectionMessage;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author : Swimiltylers
  * @version : 2019/2/26 17:19
@@ -17,10 +22,6 @@ public class HeartBeatModule implements ConnectionModule{
         private long lst_rndInit = 0;
         private long lst_rndRecv = 0;
         private long rnd = Long.MAX_VALUE;
-
-        private boolean isConnected(){
-            return isConn;
-        }
 
         private void updateBeacon(long sndTs){
             synchronized (this) {lst_srv = Long.max(lst_srv, sndTs);}
@@ -37,6 +38,13 @@ public class HeartBeatModule implements ConnectionModule{
                     lst_rndRecv = arrTs;
                     rnd = lst_rndRecv - lst_rndInit;
                 }
+            }
+        }
+
+        private boolean testSrv(long threshold){
+            synchronized (this){
+                isConn = System.currentTimeMillis() - lst_srv <= threshold;
+                return isConn;
             }
         }
 
@@ -67,7 +75,7 @@ public class HeartBeatModule implements ConnectionModule{
     }
 
     @Override
-    public GenericConnectionMessage.ackBeacon ack(long recvTs, @NotNull GenericConnectionMessage.Beacon beacon) {
+    public GenericConnectionMessage.ackBeacon makeAck(long recvTs, @NotNull GenericConnectionMessage.Beacon beacon) {
         return new GenericConnectionMessage.ackBeacon(moduleId, recvTs, beacon);
     }
 
@@ -86,16 +94,27 @@ public class HeartBeatModule implements ConnectionModule{
     }
 
     @Override
-    public boolean connected(int toId) {
-        if (nodes[toId] != null)
-            return nodes[toId].isConnected();
-        else
-            return false;
+    public void init(int toId) {
+        nodes[toId] = new NodeMonitor();
     }
 
     @Override
-    public void init(int toId) {
-        nodes[toId] = new NodeMonitor();
+    public int[] filter(long threshold) {
+        List<Integer> lost = new ArrayList<>();
+        for (int i = 0; i < nodes.length; i++) {
+            if (i != moduleId && !nodes[i].testSrv(threshold))
+                lost.add(i);
+        }
+
+        if (lost.isEmpty())
+            return null;
+        else{
+            int[] ret = new int[lost.size()];
+            for (int i = 0; i < lost.size(); i++) {
+                ret[i] = lost.get(i);
+            }
+            return ret;
+        }
     }
 
     @Override

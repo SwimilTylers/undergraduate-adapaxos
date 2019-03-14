@@ -9,10 +9,10 @@ import network.message.protocols.GenericClientMessage;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.module.ConnectionModule;
 import network.service.module.HeartBeatModule;
-import network.service.peer.BasicPeerMessageReceiver;
-import network.service.peer.BasicPeerMessageSender;
-import network.service.peer.PeerMessageReceiver;
-import network.service.peer.PeerMessageSender;
+import network.service.receiver.BasicPeerMessageReceiver;
+import network.service.sender.BasicPeerMessageSender;
+import network.service.receiver.PeerMessageReceiver;
+import network.service.sender.PeerMessageSender;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -39,8 +39,9 @@ public class GenericNetService {
     protected PeerMessageSender sender;
     protected PeerMessageReceiver receiver;
 
-    public static final int DEFAULT_BEACON_INTERVAL = 800;
-    private int beaconItv;
+    public static final int DEFAULT_BEACON_INTERVAL = 10;
+    private int beaconItv = DEFAULT_BEACON_INTERVAL;
+
     protected ConnectionModule cModule;
 
     private ExecutorService listenService;
@@ -63,9 +64,14 @@ public class GenericNetService {
         this.clientChan = clientChan;
         this.paxosChan = paxosChan;
 
-        this.beaconItv = DEFAULT_BEACON_INTERVAL;
-
         this.logger = logger;
+    }
+
+    public GenericNetService(int thisId, int toClientPort){
+        netServiceId = thisId;
+        this.toClientPort = toClientPort;
+        onRunning = false;
+        channels = new ArrayList<>();
     }
 
     @Override
@@ -74,6 +80,22 @@ public class GenericNetService {
             listenService.shutdown();
         onRunning = false;
         super.finalize();
+    }
+
+    public void setClientChan(BlockingQueue<ClientRequest> clientChan) {
+        this.clientChan = clientChan;
+    }
+
+    public void setPaxosChan(BlockingQueue<GenericPaxosMessage> paxosChan) {
+        this.paxosChan = paxosChan;
+    }
+
+    public void setLogger(PaxosLogger logger) {
+        this.logger = logger;
+    }
+
+    public ConnectionModule getConnectionModule() {
+        return cModule;
     }
 
     public PeerMessageSender getPeerMessageSender() {
@@ -254,7 +276,7 @@ public class GenericNetService {
             if (msg instanceof GenericClientMessage.Propose){
                 GenericClientMessage.Propose cast = (GenericClientMessage.Propose) msg;
 
-                sendClientMessage(socket, new GenericClientMessage.ackPropose(cast));   // ack to client
+                sendClientMessage(socket, new GenericClientMessage.ackPropose(cast));   // makeAck to client
                 System.out.println("PROPOSE "+cast.exec);
                 try {
                     clientChan.put(new ClientRequest(cast, socket));

@@ -1,4 +1,4 @@
-package network.service.peer;
+package network.service.sender;
 
 import com.sun.istack.internal.NotNull;
 import logger.PaxosLogger;
@@ -32,7 +32,7 @@ public class BasicPeerMessageSender implements PeerMessageSender {
 
     @Override
     synchronized public void sendPeerMessage(int toId, @NotNull Object msg){
-        if (toId < peerSize && cModule.connected(toId)){
+        if (toId < peerSize){
             try {
                 logger.logPeerNet(netServiceId, toId, msg.toString());
                 OutputStream socketStream = peers[toId].getOutputStream();

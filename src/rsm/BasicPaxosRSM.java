@@ -7,6 +7,7 @@ import agent.learner.Learner;
 import agent.proposer.GenericProposer;
 import agent.proposer.Proposer;
 import client.ClientRequest;
+import logger.PaxosLogger;
 import network.message.protocols.GenericPaxosMessage;
 
 import java.util.concurrent.TimeUnit;
@@ -24,6 +25,22 @@ public class BasicPaxosRSM extends GenericPaxosSMR{
         super(id, addr, port);
     }
 
+    public BasicPaxosRSM(int id, String[] addr, int[] port, PaxosLogger logger) {
+        super(id, addr, port, logger);
+    }
+
+    public Proposer getProposer() {
+        return proposer;
+    }
+
+    public Acceptor getAcceptor() {
+        return acceptor;
+    }
+
+    public Learner getLearner() {
+        return learner;
+    }
+
     @Override
     protected void agentDeployment() {
         proposer = new GenericProposer(serverId, peerSize, instanceSpace, net.getPeerMessageSender(), restoredRequestList);
@@ -39,19 +56,14 @@ public class BasicPaxosRSM extends GenericPaxosSMR{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if (compact != null)
-            proposer.handleRequests(compact);
+        if (compact != null) {
+            proposer.handleRequests(maxInstance.getAndIncrement(), crtBallot.getAndIncrement(), compact);
+        }
     }
 
     @Override
     protected void peerConversation(){
-        GenericPaxosMessage msg;
-        try {
-            msg = pMessage.poll(peerComWaiting, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            System.out.println("Unsuccessfully message taking");
-            return;
-        }
+        GenericPaxosMessage msg = pMessage.poll();
 
         if (msg != null) {
             if (msg instanceof GenericPaxosMessage.Prepare) {
@@ -78,6 +90,7 @@ public class BasicPaxosRSM extends GenericPaxosSMR{
                 GenericPaxosMessage.Commit cast = (GenericPaxosMessage.Commit) msg;
                 logger.logCommit(cast.inst_no, cast, "handle");
                 learner.handleCommit(cast);
+                updateConsecutiveCommit();
                 logger.logCommit(cast.inst_no, cast, "exit handle");
             } else if (msg instanceof GenericPaxosMessage.Restore) {
                 GenericPaxosMessage.Restore cast = (GenericPaxosMessage.Restore) msg;

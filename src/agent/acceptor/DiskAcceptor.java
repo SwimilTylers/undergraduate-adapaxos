@@ -2,7 +2,7 @@ package agent.acceptor;
 
 import instance.store.InstanceStore;
 import network.message.protocols.DiskPaxosMessage;
-import network.service.peer.PeerMessageSender;
+import network.service.sender.PeerMessageSender;
 
 /**
  * @author : Swimiltylers

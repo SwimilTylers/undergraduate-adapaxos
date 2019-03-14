@@ -4,10 +4,10 @@ import client.ClientRequest;
 import logger.PaxosLogger;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.module.simulator.SimulatorModule;
-import network.service.peer.BasicPeerMessageReceiver;
-import network.service.peer.BasicPeerMessageSender;
-import network.service.peer.SimulatorReceiver;
-import network.service.peer.SimulatorSender;
+import network.service.receiver.BasicPeerMessageReceiver;
+import network.service.sender.BasicPeerMessageSender;
+import network.service.receiver.SimulatorReceiver;
+import network.service.sender.SimulatorSender;
 
 import java.util.concurrent.BlockingQueue;
 

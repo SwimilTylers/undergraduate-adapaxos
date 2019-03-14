@@ -1,4 +1,4 @@
-package network.service.peer;
+package network.service.receiver;
 
 import com.sun.istack.internal.NotNull;
 
@@ -10,5 +10,5 @@ import java.net.Socket;
  */
 public interface PeerMessageReceiver {
     void listenToPeers(@NotNull Socket chan);
-    void putInChannel(Object msg) throws InterruptedException;
+    void messageProcess(Object msg) throws InterruptedException;
 }

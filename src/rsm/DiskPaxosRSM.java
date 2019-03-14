@@ -7,6 +7,7 @@ import client.ClientRequest;
 import instance.store.InstanceStore;
 import instance.store.OffsetIndexStore;
 import javafx.util.Pair;
+import logger.PaxosLogger;
 import network.message.protocols.DiskPaxosMessage;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.SimulatedNetService;
@@ -20,6 +21,7 @@ import java.util.concurrent.*;
  * @version : 2019/2/18 15:09
  */
 public class DiskPaxosRSM extends GenericPaxosSMR{
+    public static final String LOCAL_STORAGE_PREFIX = "disk-";
     private DiskProposer dProposer;
     private IntegratedDiskAcceptor dAcceptor;
     private DiskLearner dLearner;
@@ -30,11 +32,37 @@ public class DiskPaxosRSM extends GenericPaxosSMR{
     public DiskPaxosRSM(int id, String[] addr, int[] port) {
         super(id, addr, port);
 
+        //if (id == 2)
+        //    net = new SimulatedNetService(net, new CrushedSimulator());
+        //net = new SimulatedNetService(net, id != 2 ? new DelayedSimulator(20, 0) : new CrushedSimulator());
+
+        dMessage = new ArrayBlockingQueue<>(DEFAULT_MESSAGE_SIZE);
+        store = new OffsetIndexStore(LOCAL_STORAGE_PREFIX+id);
+
+        customizedChannels.add(new Pair<>(o -> o instanceof DiskPaxosMessage, dMessage));
+    }
+
+    public DiskPaxosRSM(int id, String[] addr, int[] port, InstanceStore store, PaxosLogger logger) {
+        super(id, addr, port, logger);
+
         net = new SimulatedNetService(net, id != 2 ? new DelayedSimulator(100, 10) : new CrushedSimulator());
 
         dMessage = new ArrayBlockingQueue<>(DEFAULT_MESSAGE_SIZE);
-        store = new OffsetIndexStore("disk-"+id);
+        this.store = store;
+
         customizedChannels.add(new Pair<>(o -> o instanceof DiskPaxosMessage, dMessage));
+    }
+
+    public DiskProposer getProposer() {
+        return dProposer;
+    }
+
+    public IntegratedDiskAcceptor getAcceptor() {
+        return dAcceptor;
+    }
+
+    public DiskLearner getLearner() {
+        return dLearner;
     }
 
     @Override
@@ -45,14 +73,14 @@ public class DiskPaxosRSM extends GenericPaxosSMR{
     }
 
     private void genericPaxosMessageHandler(){
-        GenericPaxosMessage msg;
-        msg = pMessage.poll();
+        GenericPaxosMessage msg = pMessage.poll();
 
         if (msg != null) {
             if (msg instanceof GenericPaxosMessage.Commit) {
                 GenericPaxosMessage.Commit cast = (GenericPaxosMessage.Commit) msg;
                 logger.logCommit(cast.inst_no, cast, "handle");
                 dLearner.handleCommit(cast);
+                updateConsecutiveCommit();
                 logger.logCommit(cast.inst_no, cast, "exit handle");
             } else if (msg instanceof GenericPaxosMessage.Restore) {
                 GenericPaxosMessage.Restore cast = (GenericPaxosMessage.Restore) msg;
@@ -63,14 +91,8 @@ public class DiskPaxosRSM extends GenericPaxosSMR{
         }
     }
 
-    private void diskPaxosMessageHandler() {
-        DiskPaxosMessage msg;
-        try {
-            msg = dMessage.poll(peerComWaiting, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            System.out.println("Unsuccessfully message taking");
-            return;
-        }
+    void diskPaxosMessageHandler() {
+        DiskPaxosMessage msg = dMessage.poll();
 
         if (msg != null) {
             if (msg instanceof DiskPaxosMessage.PackedMessage) {
@@ -120,6 +142,6 @@ public class DiskPaxosRSM extends GenericPaxosSMR{
             e.printStackTrace();
         }
         if (compact != null)
-            dProposer.handleRequests(compact);
+            dProposer.handleRequests(maxInstance.getAndIncrement(), crtBallot.getAndIncrement(), compact);
     }
 }

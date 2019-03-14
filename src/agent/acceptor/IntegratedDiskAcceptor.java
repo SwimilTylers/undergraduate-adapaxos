@@ -3,8 +3,8 @@ package agent.acceptor;
 import instance.store.InstanceStore;
 import logger.PaxosLogger;
 import network.message.protocols.DiskPaxosMessage;
-import network.service.peer.BufferedDiskAcceptorSender;
-import network.service.peer.PeerMessageSender;
+import network.service.sender.BufferedDiskAcceptorSender;
+import network.service.sender.PeerMessageSender;
 
 /**
  * @author : Swimiltylers

@@ -8,11 +8,10 @@ import instance.maintenance.DiskLeaderMaintenance;
 import instance.maintenance.HistoryMaintenance;
 import network.message.protocols.DiskPaxosMessage;
 import network.message.protocols.GenericPaxosMessage;
-import network.service.peer.PeerMessageSender;
+import network.service.sender.PeerMessageSender;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.SynchronousQueue;
 
 /**
  * @author : Swimiltylers
@@ -26,14 +25,11 @@ public class DiskProposer {
     private int peerSize;
 
     private PaxosInstance[] instanceSpace;
-    private int crtInstance = 0;
-
-    private int crtBallot = 0;
 
     public DiskProposer(int serverId, int peerSize,
-                           @NotNull PaxosInstance[] instanceSpace,
-                           @NotNull PeerMessageSender net,
-                           @NotNull List<ClientRequest> restoredRequestList) {
+                        @NotNull PaxosInstance[] instanceSpace,
+                        @NotNull PeerMessageSender net,
+                        @NotNull List<ClientRequest> restoredRequestList) {
         this.serverId = serverId;
         this.peerSize = peerSize;
         this.instanceSpace = instanceSpace;
@@ -41,22 +37,20 @@ public class DiskProposer {
         this.restoredRequestList = restoredRequestList;
     }
 
-    public void handleRequests(@NotNull ClientRequest[] requests){
+    public void handleRequests(int inst_no, int ballot, @NotNull ClientRequest[] requests){
         PaxosInstance inst = new PaxosInstance();
 
         inst.crtLeaderId = serverId;
-        inst.crtInstBallot = ++crtBallot;
+        inst.crtInstBallot = ballot;
         inst.cmds = requests;
         inst.status = InstanceStatus.PREPARING;
         long initDialogue = System.currentTimeMillis();
         inst.leaderMaintenanceUnit = new DiskLeaderMaintenance(peerSize);
 
         ((DiskLeaderMaintenance) inst.leaderMaintenanceUnit).crtDialogue = initDialogue;
-        instanceSpace[crtInstance] = inst;
+        instanceSpace[inst_no] = inst;
 
-        net.broadcastPeerMessage(DiskPaxosMessage.IRW(crtInstance, serverId, crtBallot, initDialogue, peerSize, inst));
-
-        ++crtInstance;
+        net.broadcastPeerMessage(DiskPaxosMessage.IRW(inst_no, inst.crtLeaderId, inst.crtInstBallot, initDialogue, peerSize, inst));
     }
 
     private boolean isSuspend(int inst_no){
@@ -127,7 +121,6 @@ public class DiskProposer {
                             /* after this point, this server will no longer play the role of leader in this client.
                              * ABORT msg will only react once, since control flow will not reach here again.
                              * There must be only ONE leader in the network ! */
-
                             return true;
                         }
                     }

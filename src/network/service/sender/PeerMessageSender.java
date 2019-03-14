@@ -1,4 +1,4 @@
-package network.service.peer;
+package network.service.sender;
 
 import com.sun.istack.internal.NotNull;
 

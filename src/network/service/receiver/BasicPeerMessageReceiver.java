@@ -1,4 +1,4 @@
-package network.service.peer;
+package network.service.receiver;
 
 import com.sun.istack.internal.NotNull;
 import javafx.util.Pair;
@@ -6,12 +6,15 @@ import network.message.protocols.Distinguishable;
 import network.message.protocols.GenericConnectionMessage;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.module.ConnectionModule;
+import network.service.sender.PeerMessageSender;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author : Swimiltylers
@@ -27,6 +30,8 @@ public class BasicPeerMessageReceiver implements PeerMessageReceiver {
     private BlockingQueue<GenericPaxosMessage> paxosChan;
     private List<Pair<Distinguishable, BlockingQueue>> channels;
 
+    private ExecutorService msgProcessor;
+
     public BasicPeerMessageReceiver(int netServiceId,
                                     @NotNull PeerMessageSender sender,
                                     @NotNull ConnectionModule cModule,
@@ -38,6 +43,15 @@ public class BasicPeerMessageReceiver implements PeerMessageReceiver {
         this.cModule = cModule;
         this.paxosChan = paxosChan;
         this.channels = channels;
+
+        msgProcessor = Executors.newCachedThreadPool();
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        if (msgProcessor != null)
+            msgProcessor.shutdown();
+        super.finalize();
     }
 
     @Override
@@ -51,7 +65,7 @@ public class BasicPeerMessageReceiver implements PeerMessageReceiver {
                 continue;
             }
             try {
-                putInChannel(msg);
+                messageProcess(msg);
             } catch (InterruptedException e) {
                 break;
             }
@@ -60,11 +74,11 @@ public class BasicPeerMessageReceiver implements PeerMessageReceiver {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void putInChannel(Object msg) throws InterruptedException {
+    public void messageProcess(Object msg) throws InterruptedException {
         if (msg instanceof GenericConnectionMessage.Beacon){
             long ts = System.currentTimeMillis();
             GenericConnectionMessage.Beacon cast = (GenericConnectionMessage.Beacon) msg;
-            GenericConnectionMessage.ackBeacon ack = cModule.ack(ts, cast);
+            GenericConnectionMessage.ackBeacon ack = cModule.makeAck(ts, cast);
             if (ack != null) sender.sendPeerMessage(cast.fromId, ack);
             cModule.updateByBeacon(ts, cast);
         }
@@ -74,26 +88,28 @@ public class BasicPeerMessageReceiver implements PeerMessageReceiver {
             cModule.updateByAckBeacon(ts, cast);
         }
         else if (msg instanceof GenericPaxosMessage){
-            GenericPaxosMessage cast = (GenericPaxosMessage) msg;
-            try {
-                paxosChan.put(cast);
-            } catch (InterruptedException e) {
-                System.out.println("Generic Paxos Message Interrupted");
-                throw e;
-            }
+            msgProcessor.execute(()->{
+                GenericPaxosMessage cast = (GenericPaxosMessage) msg;
+                try {
+                    paxosChan.put(cast);
+                } catch (InterruptedException e) {
+                    System.out.println("Generic Paxos Message Interrupted");
+                }
+            });
         }
         else{
-            for (Pair<Distinguishable, BlockingQueue> t:channels) {
-                if (t.getKey().meet(msg)){
-                    try {
-                        t.getValue().put(msg);
-                        break;
-                    } catch (InterruptedException e) {
-                        System.out.println("Costumed Message Interrupted");
-                        throw e;
+            msgProcessor.execute(()->{
+                for (Pair<Distinguishable, BlockingQueue> t:channels) {
+                    if (t.getKey().meet(msg)){
+                        try {
+                            t.getValue().put(msg);
+                            break;
+                        } catch (InterruptedException e) {
+                            System.out.println("Costumed Message Interrupted");
+                        }
                     }
                 }
-            }
+            });
         }
     }
 }

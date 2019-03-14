@@ -12,6 +12,7 @@ import java.io.Serializable;
 public class GenericPaxosMessage implements Serializable {
     private static final long serialVersionUID = 4362925581572352758L;
 
+
     public enum ackMessageType {
         PROCEEDING, RESTORE, RECOVER, ABORT
     }
