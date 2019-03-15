@@ -2,15 +2,14 @@ package agent.proposer;
 
 import client.ClientRequest;
 import com.sun.istack.internal.NotNull;
+import instance.StaticPaxosInstance;
 import network.message.protocols.GenericPaxosMessage;
 import instance.InstanceStatus;
-import instance.PaxosInstance;
 import instance.maintenance.HistoryMaintenance;
 import instance.maintenance.LeaderMaintenance;
 import network.service.sender.PeerMessageSender;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Queue;
 
 /**
@@ -24,10 +23,10 @@ public class GenericProposer implements Proposer {
     private int serverId;
     private int peerSize;
 
-    private PaxosInstance[] instanceSpace;
+    private StaticPaxosInstance[] instanceSpace;
 
     public GenericProposer(int serverId, int peerSize,
-                           @NotNull PaxosInstance[] instanceSpace,
+                           @NotNull StaticPaxosInstance[] instanceSpace,
                            @NotNull PeerMessageSender net,
                            @NotNull Queue<ClientRequest> restoredRequestList) {
         this.serverId = serverId;
@@ -39,16 +38,16 @@ public class GenericProposer implements Proposer {
 
     @Override
     public void handleRequests(int inst_no, int ballot, ClientRequest[] requests) {
-        PaxosInstance inst = new PaxosInstance();
+        StaticPaxosInstance inst = new StaticPaxosInstance();
 
         inst.crtLeaderId = serverId;
         inst.crtInstBallot = ballot;
-        inst.cmds = requests;
+        inst.requests = requests;
         inst.status = InstanceStatus.PREPARING;
         inst.leaderMaintenanceUnit = new LeaderMaintenance();
 
         instanceSpace[inst_no] = inst;
-        //System.out.println("eueu="+Arrays.toString(inst.cmds));
+        //System.out.println("eueu="+Arrays.toString(inst.requests));
 
         net.broadcastPeerMessage(new GenericPaxosMessage.Prepare(inst_no, inst.crtLeaderId, inst.crtInstBallot));
     }
@@ -58,7 +57,7 @@ public class GenericProposer implements Proposer {
         if (instanceSpace[ackPrepare.inst_no] != null
                 && instanceSpace[ackPrepare.inst_no].crtLeaderId == serverId){   // on this instance, local server works as a leader
 
-            PaxosInstance inst = instanceSpace[ackPrepare.inst_no];
+            StaticPaxosInstance inst = instanceSpace[ackPrepare.inst_no];
 
             if (ackPrepare.type == GenericPaxosMessage.ackMessageType.PROCEEDING || ackPrepare.type == GenericPaxosMessage.ackMessageType.RESTORE){
                 if (ackPrepare.type == GenericPaxosMessage.ackMessageType.PROCEEDING
@@ -80,7 +79,7 @@ public class GenericProposer implements Proposer {
                                 restoredRequestList,
                                 ackPrepare.load.crtLeaderId,
                                 ackPrepare.load.crtInstBallot,
-                                ackPrepare.load.cmds
+                                ackPrepare.load.requests
                         );
                     }
                 }
@@ -92,28 +91,28 @@ public class GenericProposer implements Proposer {
                         && inst.leaderMaintenanceUnit.prepareResponse > peerSize/2){
                     if (inst.leaderMaintenanceUnit.historyMaintenanceUnit != null
                             && inst.leaderMaintenanceUnit.historyMaintenanceUnit.HOST_RESTORE){ // restore-early case: exists formal paxos conversation
-                        restoredRequestList.addAll(Arrays.asList(inst.cmds));   // restore local cmds
+                        restoredRequestList.addAll(Arrays.asList(inst.requests));   // restore local requests
 
-                        inst.cmds = inst.leaderMaintenanceUnit.historyMaintenanceUnit.reservedCmds;
+                        inst.requests = inst.leaderMaintenanceUnit.historyMaintenanceUnit.reservedCmds;
                     }
                     inst.status = InstanceStatus.PREPARED;
-                    net.broadcastPeerMessage(new GenericPaxosMessage.Accept(ackPrepare.inst_no, serverId, inst.crtInstBallot, inst.cmds));
+                    net.broadcastPeerMessage(new GenericPaxosMessage.Accept(ackPrepare.inst_no, serverId, inst.crtInstBallot, inst.requests));
                 }
             }
             else if (ackPrepare.type == GenericPaxosMessage.ackMessageType.RECOVER){
                 if (inst.status == InstanceStatus.PREPARING){   // recovery case: check status to avoid broadcasting duplicated COMMIT
-                    restoredRequestList.addAll(Arrays.asList(inst.cmds));
+                    restoredRequestList.addAll(Arrays.asList(inst.requests));
 
-                    inst.cmds = ackPrepare.load.cmds;
+                    inst.requests = ackPrepare.load.requests;
                     inst.status = InstanceStatus.COMMITTED;
 
-                    net.broadcastPeerMessage(new GenericPaxosMessage.Commit(ackPrepare.inst_no, serverId, inst.crtInstBallot, inst.cmds));
+                    net.broadcastPeerMessage(new GenericPaxosMessage.Commit(ackPrepare.inst_no, serverId, inst.crtInstBallot, inst.requests));
                 }
             }
             else if (ackPrepare.type == GenericPaxosMessage.ackMessageType.ABORT){  // abort case
                 net.sendPeerMessage(ackPrepare.load.crtLeaderId, new GenericPaxosMessage.Restore(ackPrepare.inst_no, inst));  // apply for restoration
-                ackPrepare.load.leaderMaintenanceUnit = null;
-                instanceSpace[ackPrepare.inst_no] = ackPrepare.load;
+                ((StaticPaxosInstance)ackPrepare.load).leaderMaintenanceUnit = null;
+                instanceSpace[ackPrepare.inst_no] = (StaticPaxosInstance) ackPrepare.load;
 
                 /* after this point, this server will no longer play the role of leader in this client.
                  * ABORT msg will only react once, since control flow will not reach here again.

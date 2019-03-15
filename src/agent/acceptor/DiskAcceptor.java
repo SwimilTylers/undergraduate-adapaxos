@@ -1,5 +1,6 @@
 package agent.acceptor;
 
+import instance.StaticPaxosInstance;
 import instance.store.InstanceStore;
 import network.message.protocols.DiskPaxosMessage;
 import network.service.sender.PeerMessageSender;

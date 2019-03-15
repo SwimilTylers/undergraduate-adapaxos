@@ -1,15 +1,13 @@
 package rsm;
 
 import agent.acceptor.Acceptor;
-import agent.learner.DiskLearner;
+import agent.learner.AdaLearner;
 import agent.learner.Learner;
-import agent.proposer.DiskProposer;
-import agent.proposer.GenericProposer;
+import agent.proposer.AdaProposer;
 import agent.proposer.Proposer;
 import client.ClientRequest;
 import instance.AdaPaxosInstance;
 import instance.InstanceStatus;
-import instance.PaxosInstance;
 import instance.store.InstanceStore;
 import instance.store.OffsetIndexStore;
 import instance.store.RemoteInstanceStore;
@@ -74,8 +72,8 @@ public class AdaPaxosRSM implements Serializable{
     transient protected AtomicIntegerArray fsyncSignature;
 
     /* agents */
-    transient protected Proposer proposer;
-    transient protected Learner learner;
+    transient protected AdaProposer proposer;
+    transient protected AdaLearner learner;
     transient protected Acceptor acceptor;
 
     /* misc */
@@ -387,7 +385,7 @@ public class AdaPaxosRSM implements Serializable{
 
     /*
     protected void handleRestore(GenericPaxosMessage.Restore restore){
-        PaxosInstance inst = instanceSpace[restore.inst_no];
+        StaticPaxosInstance inst = instanceSpace[restore.inst_no];
         if (inst.leaderMaintenanceUnit != null && restore.load != null){ // a meaningful restoration request
             inst.leaderMaintenanceUnit.historyMaintenanceUnit = HistoryMaintenance.restoreHelper(
                     inst.leaderMaintenanceUnit.historyMaintenanceUnit,
@@ -395,7 +393,7 @@ public class AdaPaxosRSM implements Serializable{
                     restoredRequestList,
                     restore.load.crtLeaderId,
                     restore.load.crtInstBallot,
-                    restore.load.cmds
+                    restore.load.requests
             );
         }
     }

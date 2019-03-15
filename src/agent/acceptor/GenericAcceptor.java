@@ -1,8 +1,8 @@
 package agent.acceptor;
 
+import instance.StaticPaxosInstance;
 import network.message.protocols.GenericPaxosMessage;
 import instance.InstanceStatus;
-import instance.PaxosInstance;
 import network.service.sender.PeerMessageSender;
 
 /**
@@ -11,28 +11,28 @@ import network.service.sender.PeerMessageSender;
  */
 public class GenericAcceptor implements Acceptor {
     private PeerMessageSender net;
-    private PaxosInstance[] instanceSpace;
+    private StaticPaxosInstance[] instanceSpace;
 
 
-    public GenericAcceptor(PaxosInstance[] instanceSpace, PeerMessageSender net) {
+    public GenericAcceptor(StaticPaxosInstance[] instanceSpace, PeerMessageSender net) {
         this.instanceSpace = instanceSpace;
         this.net = net;
     }
 
-    private boolean fitRestoreCase(PaxosInstance inst){
+    private boolean fitRestoreCase(StaticPaxosInstance inst){
         if (inst.status == InstanceStatus.PREPARING || inst.status == InstanceStatus.PREPARED)
             return inst.leaderMaintenanceUnit != null;      // former leader
         else return inst.status == InstanceStatus.ACCEPTED;
     }
 
-    private boolean fitRecoveryCase(PaxosInstance inst){
+    private boolean fitRecoveryCase(StaticPaxosInstance inst){
         return inst.status == InstanceStatus.COMMITTED;
     }
 
     @Override
     public void handlePrepare(GenericPaxosMessage.Prepare prepare) {
         if (instanceSpace[prepare.inst_no] == null){    // normal case
-            PaxosInstance inst = new PaxosInstance();
+            StaticPaxosInstance inst = new StaticPaxosInstance();
             inst.crtLeaderId = prepare.leaderId;
             inst.crtInstBallot = prepare.inst_ballot;
             inst.status = InstanceStatus.PREPARING;
@@ -50,7 +50,7 @@ public class GenericAcceptor implements Acceptor {
             );
         }
         else if (instanceSpace[prepare.inst_no].crtLeaderId < prepare.leaderId){
-            PaxosInstance inst = instanceSpace[prepare.inst_no];
+            StaticPaxosInstance inst = instanceSpace[prepare.inst_no];
             if (fitRestoreCase(inst)){      // restore-early case
                 GenericPaxosMessage.ackPrepare reply = new GenericPaxosMessage.ackPrepare(
                         prepare.inst_no,
@@ -63,7 +63,7 @@ public class GenericAcceptor implements Acceptor {
                 inst.crtLeaderId = prepare.leaderId;
                 inst.crtInstBallot = prepare.inst_ballot;
                 inst.status = InstanceStatus.PREPARING;
-                inst.cmds = null;
+                inst.requests = null;
                 inst.leaderMaintenanceUnit = null;
 
                 net.sendPeerMessage(prepare.leaderId, reply);
@@ -90,7 +90,7 @@ public class GenericAcceptor implements Acceptor {
                 inst.status = InstanceStatus.PREPARING;
 
                 inst.leaderMaintenanceUnit = null;
-                inst.cmds = null;
+                inst.requests = null;
 
                 net.sendPeerMessage(
                         prepare.leaderId,
@@ -104,13 +104,13 @@ public class GenericAcceptor implements Acceptor {
             }
         }
         else if (instanceSpace[prepare.inst_no].crtLeaderId == prepare.leaderId){
-            PaxosInstance inst = instanceSpace[prepare.inst_no];
+            StaticPaxosInstance inst = instanceSpace[prepare.inst_no];
             if (inst.crtInstBallot < prepare.inst_ballot){
                 if (fitRestoreCase(inst)){  // restore-back-online case: catch up with current situation
                     inst.crtLeaderId = prepare.leaderId;
                     inst.crtInstBallot = prepare.inst_ballot;
                     inst.status = InstanceStatus.PREPARING;
-                    inst.cmds = null;
+                    inst.requests = null;
 
                     net.sendPeerMessage(
                             prepare.leaderId,
@@ -138,7 +138,7 @@ public class GenericAcceptor implements Acceptor {
                     net.sendPeerMessage(prepare.leaderId, reply);
                 }
                 else{   // overwrite case
-                    inst.cmds = null;
+                    inst.requests = null;
                     inst.crtInstBallot = prepare.inst_ballot;
                     inst.status = InstanceStatus.PREPARING;
 
@@ -159,7 +159,7 @@ public class GenericAcceptor implements Acceptor {
             /* otherwise, drop the message, which is expired */
         }
         else{   // abort case
-            PaxosInstance sendOut = instanceSpace[prepare.inst_no].copyOf();
+            StaticPaxosInstance sendOut = instanceSpace[prepare.inst_no].copyOf();
             sendOut.leaderMaintenanceUnit = null;
             net.sendPeerMessage(prepare.leaderId, sendOut);
         }
@@ -168,11 +168,11 @@ public class GenericAcceptor implements Acceptor {
     @Override
     public void handleAccept(GenericPaxosMessage.Accept accept) {
         if (instanceSpace[accept.inst_no] == null){     // back-online case: catch up with current situation
-            PaxosInstance inst = new PaxosInstance();
+            StaticPaxosInstance inst = new StaticPaxosInstance();
             inst.crtLeaderId = accept.leaderId;
             inst.crtInstBallot = accept.inst_ballot;
 
-            inst.cmds = accept.cmds;
+            inst.requests = accept.cmds;
             inst.status = InstanceStatus.ACCEPTED;
 
             instanceSpace[accept.inst_no] = inst;
@@ -184,13 +184,13 @@ public class GenericAcceptor implements Acceptor {
                             GenericPaxosMessage.ackMessageType.PROCEEDING,
                             accept.leaderId,
                             accept.inst_ballot, null,
-                            inst.cmds)
+                            inst.requests)
             );
         }
         else if (instanceSpace[accept.inst_no].crtLeaderId == accept.leaderId){
-            PaxosInstance inst = instanceSpace[accept.inst_no];
+            StaticPaxosInstance inst = instanceSpace[accept.inst_no];
             if (inst.crtInstBallot == accept.inst_ballot && inst.status == InstanceStatus.PREPARING){  // normal case
-                inst.cmds = accept.cmds;
+                inst.requests = accept.cmds;
                 inst.status = InstanceStatus.ACCEPTED;
 
                 net.sendPeerMessage(
@@ -200,14 +200,14 @@ public class GenericAcceptor implements Acceptor {
                                 GenericPaxosMessage.ackMessageType.PROCEEDING,
                                 accept.leaderId,
                                 accept.inst_ballot, null,
-                                inst.cmds)
+                                inst.requests)
                 );
             }
             else if (inst.crtInstBallot < accept.inst_ballot){  // back-online case: catch up with current situation
                 inst.crtLeaderId = accept.leaderId;
                 inst.crtInstBallot = accept.inst_ballot;
                 inst.status = InstanceStatus.ACCEPTED;
-                inst.cmds = accept.cmds;
+                inst.requests = accept.cmds;
 
                 net.sendPeerMessage(
                         accept.leaderId,
@@ -216,14 +216,14 @@ public class GenericAcceptor implements Acceptor {
                                 GenericPaxosMessage.ackMessageType.PROCEEDING,
                                 accept.leaderId,
                                 accept.inst_ballot, null,
-                                inst.cmds)
+                                inst.requests)
                 );
             }
 
             /* otherwise, drop the message, which is expired */
         }
         else if (instanceSpace[accept.inst_no].crtLeaderId < accept.leaderId){
-            PaxosInstance inst = instanceSpace[accept.inst_no];
+            StaticPaxosInstance inst = instanceSpace[accept.inst_no];
             if (fitRestoreCase(inst)){ // restore-late case
                 GenericPaxosMessage.ackAccept reply = new GenericPaxosMessage.ackAccept(
                         accept.inst_no,
@@ -237,7 +237,7 @@ public class GenericAcceptor implements Acceptor {
                 inst.crtLeaderId = accept.leaderId;
                 inst.crtInstBallot = accept.inst_ballot;
                 inst.status = InstanceStatus.ACCEPTED;
-                inst.cmds = accept.cmds;
+                inst.requests = accept.cmds;
                 inst.leaderMaintenanceUnit = null;
 
                 net.sendPeerMessage(accept.leaderId, reply);
@@ -251,7 +251,7 @@ public class GenericAcceptor implements Acceptor {
                 inst.crtLeaderId = accept.leaderId;
                 inst.crtInstBallot = accept.inst_ballot;
                 inst.status = InstanceStatus.COMMITTED;
-                inst.cmds = accept.cmds;
+                inst.requests = accept.cmds;
                 inst.leaderMaintenanceUnit = null;
             }
             else{   // overwrite case
@@ -260,7 +260,7 @@ public class GenericAcceptor implements Acceptor {
                 inst.status = InstanceStatus.PREPARING;
 
                 inst.leaderMaintenanceUnit = null;
-                inst.cmds = accept.cmds;
+                inst.requests = accept.cmds;
 
                 net.sendPeerMessage(
                         accept.leaderId,
@@ -269,13 +269,13 @@ public class GenericAcceptor implements Acceptor {
                                 GenericPaxosMessage.ackMessageType.PROCEEDING,
                                 accept.leaderId,
                                 accept.inst_ballot, null,
-                                inst.cmds
+                                inst.requests
                         )
                 );
             }
         }
         else {  // abort case
-            PaxosInstance sendOut = instanceSpace[accept.inst_no].copyOf();
+            StaticPaxosInstance sendOut = instanceSpace[accept.inst_no].copyOf();
             sendOut.leaderMaintenanceUnit = null;
             net.sendPeerMessage(accept.leaderId, sendOut);
         }

@@ -1,6 +1,7 @@
 package instance.store;
 
 import instance.PaxosInstance;
+import instance.StaticPaxosInstance;
 import instance.store.index.OffsetIndexReader;
 import instance.store.index.OffsetIndexWriter;
 
@@ -75,6 +76,7 @@ public class OffsetIndexStore implements InstanceStore{
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     synchronized public PaxosInstance fetch(int access_id, int inst_id) {
         if (reader.existIndex(ACCESS_ID_HEADER+access_id)){

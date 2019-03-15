@@ -3,14 +3,13 @@ package agent.learner;
 import client.ClientRequest;
 import com.sun.istack.internal.NotNull;
 import instance.InstanceStatus;
-import instance.PaxosInstance;
+import instance.StaticPaxosInstance;
 import instance.maintenance.DiskLeaderMaintenance;
 import logger.PaxosLogger;
 import network.message.protocols.DiskPaxosMessage;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.sender.PeerMessageSender;
 
-import java.util.List;
 import java.util.Queue;
 
 /**
@@ -23,14 +22,14 @@ public class DiskLearner {
     private int serverId;
     private int peerSize;
 
-    private PaxosInstance[] instanceSpace;
+    private StaticPaxosInstance[] instanceSpace;
 
     private Queue<ClientRequest> restoredRequestList;
 
     private PaxosLogger logger;
 
     public DiskLearner(int serverId, int peerSize,
-                       @NotNull PaxosInstance[] instanceSpace,
+                       @NotNull StaticPaxosInstance[] instanceSpace,
                        @NotNull PeerMessageSender net,
                        @NotNull Queue<ClientRequest> restoredRequestList,
                        @NotNull PaxosLogger logger) {
@@ -59,7 +58,7 @@ public class DiskLearner {
     }
 
     private boolean handle(int inst_no, int ack_leaderId, int inst_ballot, long dialogue_no, DiskPaxosMessage.ackRead[] ackReads) {
-        PaxosInstance inst = instanceSpace[inst_no];
+        StaticPaxosInstance inst = instanceSpace[inst_no];
 
         /* only when it is a DiskLeaderMaintenance can it proceed disk-paxos procedure */
 
@@ -83,7 +82,7 @@ public class DiskLearner {
                 else {
                     for (DiskPaxosMessage.ackRead ack : ackReads) {
                         if (ack.status == DiskPaxosMessage.DiskStatus.READ_SUCCESS){
-                            PaxosInstance last_inst = ack.load;
+                            StaticPaxosInstance last_inst = (StaticPaxosInstance) ack.load;
                             if (last_inst.crtLeaderId > serverId){      // abort case
                                 net.sendPeerMessage(last_inst.crtLeaderId, new GenericPaxosMessage.Restore(inst_no, inst));  // apply for restoration
                                 last_inst.leaderMaintenanceUnit = null;
@@ -108,7 +107,7 @@ public class DiskLearner {
 
                     inst.status = InstanceStatus.COMMITTED;
 
-                    GenericPaxosMessage.Commit sendOut = new GenericPaxosMessage.Commit(inst_no, serverId, inst.crtInstBallot, inst.cmds);
+                    GenericPaxosMessage.Commit sendOut = new GenericPaxosMessage.Commit(inst_no, serverId, inst.crtInstBallot, inst.requests);
                     logger.logCommit(inst_no, sendOut, "settled");
                     net.broadcastPeerMessage(sendOut);
                 }
@@ -123,11 +122,11 @@ public class DiskLearner {
 
     public void handleCommit(GenericPaxosMessage.Commit commit) {
         if (instanceSpace[commit.inst_no] == null){     // back-online case: catch up with current situation
-            PaxosInstance inst = new PaxosInstance();
+            StaticPaxosInstance inst = new StaticPaxosInstance();
             inst.crtLeaderId = commit.leaderId;
             inst.crtInstBallot = commit.inst_ballot;
 
-            inst.cmds = commit.cmds;
+            inst.requests = commit.cmds;
             inst.status = InstanceStatus.COMMITTED;
 
             instanceSpace[commit.inst_no] = inst;
@@ -135,11 +134,11 @@ public class DiskLearner {
             logger.logCommit(commit.inst_no, commit, "settled");
         }
         else{
-            PaxosInstance inst = instanceSpace[commit.inst_no];
+            StaticPaxosInstance inst = instanceSpace[commit.inst_no];
             if (inst.crtLeaderId == commit.leaderId){      // normal case: whatever the status is, COMMIT demands comply
                 if (inst.crtInstBallot <= commit.inst_ballot){
                     inst.crtInstBallot = commit.inst_ballot;
-                    inst.cmds = commit.cmds;
+                    inst.requests = commit.cmds;
                     inst.status = InstanceStatus.COMMITTED;
 
                     System.out.println("successfully committed");
@@ -153,7 +152,7 @@ public class DiskLearner {
 
                 inst.crtLeaderId = commit.leaderId;
                 inst.crtInstBallot = commit.inst_ballot;
-                inst.cmds = commit.cmds;
+                inst.requests = commit.cmds;
                 inst.status = InstanceStatus.COMMITTED;
                 inst.leaderMaintenanceUnit = null;
 

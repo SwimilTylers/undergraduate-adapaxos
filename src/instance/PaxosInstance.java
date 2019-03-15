@@ -1,31 +1,19 @@
 package instance;
 
 import client.ClientRequest;
-import instance.maintenance.LeaderMaintenance;
 
 import java.io.Serializable;
 
 /**
  * @author : Swimiltylers
- * @version : 2019/2/14 18:37
+ * @version : 2019/3/15 13:51
  */
-public class PaxosInstance implements Serializable {
-    private static final long serialVersionUID = -966463150573981018L;
+abstract public class PaxosInstance implements Serializable {
+    private static final long serialVersionUID = 5675852448786423374L;
+
     public int crtLeaderId;
-    public InstanceStatus status;
     public int crtInstBallot;
-    public ClientRequest[] cmds;
-    public LeaderMaintenance leaderMaintenanceUnit;
+    public InstanceStatus status;
 
-    public PaxosInstance copyOf() {
-        PaxosInstance ret = new PaxosInstance();
-
-        ret.crtLeaderId = crtLeaderId;
-        ret.status = status;
-        ret.crtInstBallot = crtInstBallot;
-        ret.cmds = cmds;
-        ret.leaderMaintenanceUnit = leaderMaintenanceUnit;
-
-        return ret;
-    }
+    public ClientRequest[] requests;
 }

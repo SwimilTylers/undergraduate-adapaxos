@@ -3,13 +3,13 @@ package rsm;
 import com.sun.istack.internal.NotNull;
 import client.ClientRequest;
 import instance.InstanceStatus;
+import instance.StaticPaxosInstance;
 import javafx.util.Pair;
 import logger.NaiveLogger;
 import logger.PaxosLogger;
 import network.message.protocols.Distinguishable;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.GenericNetService;
-import instance.PaxosInstance;
 import instance.maintenance.HistoryMaintenance;
 
 import java.util.*;
@@ -47,7 +47,7 @@ abstract public class GenericPaxosSMR implements Runnable{
 
     protected int serverId;
     protected int peerSize;
-    protected PaxosInstance[] instanceSpace = new PaxosInstance[DEFAULT_INSTANCE_SIZE];
+    protected StaticPaxosInstance[] instanceSpace = new StaticPaxosInstance[DEFAULT_INSTANCE_SIZE];
     protected AtomicInteger crtBallot = new AtomicInteger(0);
 
     protected AtomicInteger maxInstance = new AtomicInteger(0);
@@ -204,7 +204,7 @@ abstract public class GenericPaxosSMR implements Runnable{
     abstract protected void clientConversation();
 
     protected void handleRestore(GenericPaxosMessage.Restore restore){
-        PaxosInstance inst = instanceSpace[restore.inst_no];
+        StaticPaxosInstance inst = instanceSpace[restore.inst_no];
         if (inst.leaderMaintenanceUnit != null && restore.load != null){ // a meaningful restoration request
             inst.leaderMaintenanceUnit.historyMaintenanceUnit = HistoryMaintenance.restoreHelper(
                     inst.leaderMaintenanceUnit.historyMaintenanceUnit,
@@ -212,7 +212,7 @@ abstract public class GenericPaxosSMR implements Runnable{
                     restoredRequestList,
                     restore.load.crtLeaderId,
                     restore.load.crtInstBallot,
-                    restore.load.cmds
+                    restore.load.requests
             );
         }
     }

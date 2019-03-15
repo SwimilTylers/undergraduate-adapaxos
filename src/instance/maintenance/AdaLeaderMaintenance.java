@@ -28,4 +28,15 @@ public class AdaLeaderMaintenance {
         Arrays.fill(writeSign, false);
         Arrays.fill(readCount, 0);
     }
+
+    public void refresh(long token, int id){
+        this.token = token;
+        this.response = 1;
+
+        Arrays.fill(ignore, false);
+        ignore[id] = true;
+
+        Arrays.fill(writeSign, false);
+        Arrays.fill(readCount, 0);
+    }
 }

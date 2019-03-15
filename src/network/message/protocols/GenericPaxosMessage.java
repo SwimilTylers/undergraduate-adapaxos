@@ -2,6 +2,7 @@ package network.message.protocols;
 
 import client.ClientRequest;
 import instance.PaxosInstance;
+import instance.StaticPaxosInstance;
 
 import java.io.Serializable;
 

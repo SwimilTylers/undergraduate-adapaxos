@@ -1,7 +1,7 @@
 package instance.store;
 
-import instance.AdaPaxosInstance;
 import instance.PaxosInstance;
+import instance.StaticPaxosInstance;
 
 /**
  * @author : Swimiltylers

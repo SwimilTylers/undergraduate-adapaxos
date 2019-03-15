@@ -1,5 +1,5 @@
 import client.FileIteratorClient;
-import instance.PaxosInstance;
+import instance.StaticPaxosInstance;
 import instance.store.InstanceStore;
 import instance.store.OffsetIndexStore;
 import logger.NaiveLogger;
@@ -138,30 +138,30 @@ public class demo {
         static void test2(){
             OffsetIndexStore store = new OffsetIndexStore("disk-4");
 
-            PaxosInstance fetch_0 = store.fetch(0, 0);
-            PaxosInstance fetch_1 = store.fetch(0, 1);
-            PaxosInstance fetch_2 = store.fetch(0, 2);
+            StaticPaxosInstance fetch_0 = (StaticPaxosInstance) store.fetch(0, 0);
+            StaticPaxosInstance fetch_1 = (StaticPaxosInstance) store.fetch(0, 1);
+            StaticPaxosInstance fetch_2 = (StaticPaxosInstance) store.fetch(0, 2);
 
-            System.out.println(Arrays.toString(fetch_0.cmds));
-            System.out.println(Arrays.toString(fetch_1.cmds));
-            System.out.println(Arrays.toString(fetch_2.cmds));
+            System.out.println(Arrays.toString(fetch_0.requests));
+            System.out.println(Arrays.toString(fetch_1.requests));
+            System.out.println(Arrays.toString(fetch_2.requests));
         }
     }
 
     static class OffsetIndexStoreTesting{
         static InstanceStore store = new OffsetIndexStore("demo");
-        static PaxosInstance inst_0;
-        static PaxosInstance inst_1;
-        static PaxosInstance inst_2;
+        static StaticPaxosInstance inst_0;
+        static StaticPaxosInstance inst_1;
+        static StaticPaxosInstance inst_2;
 
         static {
-            inst_0 = new PaxosInstance();
+            inst_0 = new StaticPaxosInstance();
             inst_0.crtInstBallot = 0;
 
-            inst_1 = new PaxosInstance();
+            inst_1 = new StaticPaxosInstance();
             inst_1.crtInstBallot = 1;
 
-            inst_2 = new PaxosInstance();
+            inst_2 = new StaticPaxosInstance();
             inst_2.crtInstBallot = 2;
         }
 
@@ -170,7 +170,7 @@ public class demo {
         }
 
         static void test1(){
-            store.store(0, 0, new PaxosInstance());
+            store.store(0, 0, new StaticPaxosInstance());
             System.out.println(store.isExist(0,0));
         }
 
@@ -187,7 +187,7 @@ public class demo {
         }
 
         static void test3(){
-            PaxosInstance instance = new PaxosInstance();
+            StaticPaxosInstance instance = new StaticPaxosInstance();
             instance.crtInstBallot = 10;
 
             System.out.println(store.isExist(0, 2));
@@ -198,9 +198,9 @@ public class demo {
         }
 
         static void test4(){
-            PaxosInstance fetch_0 = store.fetch(0, 0);
-            PaxosInstance fetch_1 = store.fetch(0, 1);
-            PaxosInstance fetch_2 = store.fetch(0, 2);
+            StaticPaxosInstance fetch_0 = (StaticPaxosInstance) store.fetch(0, 0);
+            StaticPaxosInstance fetch_1 = (StaticPaxosInstance) store.fetch(0, 1);
+            StaticPaxosInstance fetch_2 = (StaticPaxosInstance) store.fetch(0, 2);
 
             System.out.println(fetch_0.crtInstBallot+"\t"+fetch_1.crtInstBallot+"\t"+fetch_2.crtInstBallot);
         }

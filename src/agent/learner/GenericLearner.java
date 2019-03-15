@@ -2,14 +2,13 @@ package agent.learner;
 
 import client.ClientRequest;
 import com.sun.istack.internal.NotNull;
+import instance.StaticPaxosInstance;
 import logger.PaxosLogger;
 import network.message.protocols.GenericPaxosMessage;
 import instance.InstanceStatus;
-import instance.PaxosInstance;
 import instance.maintenance.HistoryMaintenance;
 import network.service.sender.PeerMessageSender;
 
-import java.util.List;
 import java.util.Queue;
 
 /**
@@ -22,14 +21,14 @@ public class GenericLearner implements Learner {
     private int serverId;
     private int peerSize;
 
-    private PaxosInstance[] instanceSpace;
+    private StaticPaxosInstance[] instanceSpace;
 
     private Queue<ClientRequest> restoredRequestList;
 
     private PaxosLogger logger;
 
     public GenericLearner(int serverId, int peerSize,
-                          @NotNull PaxosInstance[] instanceSpace,
+                          @NotNull StaticPaxosInstance[] instanceSpace,
                           @NotNull PeerMessageSender net,
                           @NotNull Queue<ClientRequest> restoredRequestList,
                           @NotNull PaxosLogger logger) {
@@ -46,7 +45,7 @@ public class GenericLearner implements Learner {
         if (instanceSpace[ackAccept.inst_no] != null
                 && instanceSpace[ackAccept.inst_no].crtLeaderId == serverId){         // on this client, local server works as a leader
 
-            PaxosInstance inst = instanceSpace[ackAccept.inst_no];
+            StaticPaxosInstance inst = instanceSpace[ackAccept.inst_no];
 
             if (ackAccept.type == GenericPaxosMessage.ackMessageType.PROCEEDING || ackAccept.type == GenericPaxosMessage.ackMessageType.RESTORE){
                 if (ackAccept.type == GenericPaxosMessage.ackMessageType.PROCEEDING
@@ -68,7 +67,7 @@ public class GenericLearner implements Learner {
                                 restoredRequestList,
                                 ackAccept.load.crtLeaderId,
                                 ackAccept.load.crtInstBallot,
-                                ackAccept.load.cmds
+                                ackAccept.load.requests
                         );
                     }
                 }
@@ -77,7 +76,7 @@ public class GenericLearner implements Learner {
                         && inst.leaderMaintenanceUnit.acceptResponse > peerSize/2){
                     inst.status = InstanceStatus.COMMITTED;
 
-                    GenericPaxosMessage.Commit sendOut = new GenericPaxosMessage.Commit(ackAccept.inst_no, serverId, inst.crtInstBallot, inst.cmds);
+                    GenericPaxosMessage.Commit sendOut = new GenericPaxosMessage.Commit(ackAccept.inst_no, serverId, inst.crtInstBallot, inst.requests);
                     logger.logCommit(ackAccept.inst_no, sendOut, "settled");
                     net.broadcastPeerMessage(sendOut);
                 }
@@ -88,7 +87,7 @@ public class GenericLearner implements Learner {
             else if (ackAccept.type == GenericPaxosMessage.ackMessageType.ABORT){   // abort case
                 net.sendPeerMessage(ackAccept.load.crtLeaderId, new GenericPaxosMessage.Restore(ackAccept.inst_no, inst));  // apply for restoration
 
-                instanceSpace[ackAccept.inst_no] = ackAccept.load;
+                instanceSpace[ackAccept.inst_no] = (StaticPaxosInstance) ackAccept.load;
 
                 /* after this point, this server will no longer play the role of leader in this client.
                  * ABORT msg will only react once, since control flow will not reach here again.
@@ -100,11 +99,11 @@ public class GenericLearner implements Learner {
     @Override
     public void handleCommit(GenericPaxosMessage.Commit commit) {
         if (instanceSpace[commit.inst_no] == null){     // back-online case: catch up with current situation
-            PaxosInstance inst = new PaxosInstance();
+            StaticPaxosInstance inst = new StaticPaxosInstance();
             inst.crtLeaderId = commit.leaderId;
             inst.crtInstBallot = commit.inst_ballot;
 
-            inst.cmds = commit.cmds;
+            inst.requests = commit.cmds;
             inst.status = InstanceStatus.COMMITTED;
 
             instanceSpace[commit.inst_no] = inst;
@@ -112,11 +111,11 @@ public class GenericLearner implements Learner {
             logger.logCommit(commit.inst_no, commit, "settled");
         }
         else{
-            PaxosInstance inst = instanceSpace[commit.inst_no];
+            StaticPaxosInstance inst = instanceSpace[commit.inst_no];
             if (inst.crtLeaderId == commit.leaderId){      // normal case: whatever the status is, COMMIT demands comply
                 if (inst.crtInstBallot <= commit.inst_ballot){
                     inst.crtInstBallot = commit.inst_ballot;
-                    inst.cmds = commit.cmds;
+                    inst.requests = commit.cmds;
                     inst.status = InstanceStatus.COMMITTED;
 
                     //System.out.println("successfully committed");
@@ -130,7 +129,7 @@ public class GenericLearner implements Learner {
 
                 inst.crtLeaderId = commit.leaderId;
                 inst.crtInstBallot = commit.inst_ballot;
-                inst.cmds = commit.cmds;
+                inst.requests = commit.cmds;
                 inst.status = InstanceStatus.COMMITTED;
                 inst.leaderMaintenanceUnit = null;
 

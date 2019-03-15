@@ -3,7 +3,7 @@ package agent.proposer;
 import client.ClientRequest;
 import com.sun.istack.internal.NotNull;
 import instance.InstanceStatus;
-import instance.PaxosInstance;
+import instance.StaticPaxosInstance;
 import instance.maintenance.DiskLeaderMaintenance;
 import instance.maintenance.HistoryMaintenance;
 import network.message.protocols.DiskPaxosMessage;
@@ -11,7 +11,6 @@ import network.message.protocols.GenericPaxosMessage;
 import network.service.sender.PeerMessageSender;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Queue;
 
 /**
@@ -25,10 +24,10 @@ public class DiskProposer {
     private int serverId;
     private int peerSize;
 
-    private PaxosInstance[] instanceSpace;
+    private StaticPaxosInstance[] instanceSpace;
 
     public DiskProposer(int serverId, int peerSize,
-                        @NotNull PaxosInstance[] instanceSpace,
+                        @NotNull StaticPaxosInstance[] instanceSpace,
                         @NotNull PeerMessageSender net,
                         @NotNull Queue<ClientRequest> restoredRequestList) {
         this.serverId = serverId;
@@ -39,11 +38,11 @@ public class DiskProposer {
     }
 
     public void handleRequests(int inst_no, int ballot, @NotNull ClientRequest[] requests){
-        PaxosInstance inst = new PaxosInstance();
+        StaticPaxosInstance inst = new StaticPaxosInstance();
 
         inst.crtLeaderId = serverId;
         inst.crtInstBallot = ballot;
-        inst.cmds = requests;
+        inst.requests = requests;
         inst.status = InstanceStatus.PREPARING;
         long initDialogue = System.currentTimeMillis();
         inst.leaderMaintenanceUnit = new DiskLeaderMaintenance(peerSize);
@@ -78,7 +77,7 @@ public class DiskProposer {
     }
 
     private boolean handle(int inst_no, int ack_leaderId, int inst_ballot, long dialogue_no, DiskPaxosMessage.ackRead[] ackReads){
-        PaxosInstance inst = instanceSpace[inst_no];
+        StaticPaxosInstance inst = instanceSpace[inst_no];
 
         /* only when it is a DiskLeaderMaintenance can it proceed disk-paxos procedure */
         //System.out.println("fifi["+(inst.crtLeaderId == serverId)+","+(inst.leaderMaintenanceUnit instanceof DiskLeaderMaintenance)+"]");
@@ -101,16 +100,16 @@ public class DiskProposer {
                 }
                 else{
                     for (DiskPaxosMessage.ackRead ack : ackReads) {
-                        PaxosInstance last_inst = ack.load;
+                        StaticPaxosInstance last_inst = (StaticPaxosInstance) ack.load;
                         if (last_inst.crtLeaderId <= serverId){     // restore case
-                            if (last_inst.cmds != null){     // a meaningful restoration request
+                            if (last_inst.requests != null){     // a meaningful restoration request
                                 diskUnit.historyMaintenanceUnit = HistoryMaintenance.restoreHelper(
                                         diskUnit.historyMaintenanceUnit,
                                         HistoryMaintenance.RESTORE_TYPE.EARLY,
                                         restoredRequestList,
                                         last_inst.crtLeaderId,
                                         last_inst.crtInstBallot,
-                                        last_inst.cmds
+                                        last_inst.requests
                                 );
                             }
                         }
@@ -136,9 +135,9 @@ public class DiskProposer {
 
                     if (diskUnit.historyMaintenanceUnit != null
                             && diskUnit.historyMaintenanceUnit.HOST_RESTORE) { // restore case: exists formal paxos conversation
-                        restoredRequestList.addAll(Arrays.asList(inst.cmds));   // restore local cmds
+                        restoredRequestList.addAll(Arrays.asList(inst.requests));   // restore local requests
 
-                        inst.cmds = diskUnit.historyMaintenanceUnit.reservedCmds;
+                        inst.requests = diskUnit.historyMaintenanceUnit.reservedCmds;
                     }
 
 

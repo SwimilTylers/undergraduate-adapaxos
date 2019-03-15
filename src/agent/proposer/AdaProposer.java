@@ -3,17 +3,19 @@ package agent.proposer;
 import client.ClientRequest;
 import instance.AdaPaxosInstance;
 import instance.InstanceStatus;
-import instance.PaxosInstance;
-import instance.maintenance.DiskLeaderMaintenance;
-import instance.maintenance.LeaderMaintenance;
-import instance.store.InstanceStore;
+import instance.maintenance.HistoryMaintenance;
 import instance.store.RemoteInstanceStore;
+import logger.PaxosLogger;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.sender.PeerMessageSender;
+import utils.AdaAgents;
 
+import java.util.Arrays;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReferenceArray;
+
+import static utils.AdaAgents.broadcastOnDisks;
 
 /**
  * @author : Swimiltylers
@@ -24,7 +26,6 @@ public class AdaProposer implements Proposer{
     private final int peerSize;
 
     private final PeerMessageSender sender;
-    private final InstanceStore localStore;
     private final RemoteInstanceStore remoteStore;
 
     private final AtomicReferenceArray<AdaPaxosInstance> instanceSpace;
@@ -32,29 +33,30 @@ public class AdaProposer implements Proposer{
 
     private final AtomicBoolean forceFsync;
 
+    private final PaxosLogger logger;
+
     public AdaProposer(int serverId, int peerSize,
+                       AtomicBoolean forceFsync,
                        PeerMessageSender sender,
-                       InstanceStore localStore, RemoteInstanceStore remoteStore,
+                       RemoteInstanceStore remoteStore,
                        AtomicReferenceArray<AdaPaxosInstance> instanceSpace,
                        Queue<ClientRequest> restoreRequests,
-                       AtomicBoolean forceFsync) {
+                       PaxosLogger logger) {
         this.serverId = serverId;
         this.peerSize = peerSize;
         this.sender = sender;
-        this.localStore = localStore;
         this.remoteStore = remoteStore;
         this.instanceSpace = instanceSpace;
         this.restoreRequests = restoreRequests;
         this.forceFsync = forceFsync;
+        this.logger = logger;
     }
 
-    public static long newToken(){
-        return System.currentTimeMillis();
-    }
+
 
     @Override
     public void handleRequests(int inst_no, int ballot, ClientRequest[] requests) {
-        long token = newToken();
+        long token = AdaAgents.newToken();
         AdaPaxosInstance inst = AdaPaxosInstance.leaderInst(token, serverId, peerSize, ballot, InstanceStatus.PREPARING, requests);
         instanceSpace.set(inst_no, inst);
 
@@ -62,23 +64,101 @@ public class AdaProposer implements Proposer{
             sender.broadcastPeerMessage(new GenericPaxosMessage.Prepare(inst_no, inst.crtLeaderId, inst.crtInstBallot));
         }
         else {
-            for (int disk_no = 0; disk_no < peerSize; disk_no++) {
-                if (disk_no == serverId){
-                    localStore.store(serverId, inst_no, inst);
-                }
-                else{
-                    remoteStore.launchRemoteStore(token, disk_no, serverId, inst_no, inst);
-                    for (int other_writer = 0; other_writer < peerSize; other_writer++) {
-                        if (other_writer != serverId)
-                            remoteStore.launchRemoteFetch(token, disk_no, other_writer, inst_no);
-                    }
-                }
-            }
+            broadcastOnDisks(token, inst_no, inst, serverId, peerSize, remoteStore);
         }
     }
 
     @Override
-    public void handleAckPrepare(GenericPaxosMessage.ackPrepare ackPrepare) {
+    public void handleAckPrepare(final GenericPaxosMessage.ackPrepare ackPrepare) {
+        AdaPaxosInstance inst = instanceSpace.get(ackPrepare.inst_no);
 
+        if (inst != null  && inst.crtLeaderId == serverId && inst.status == InstanceStatus.PREPARING){   // on this instance, local server works as a leader
+            if (ackPrepare.type == GenericPaxosMessage.ackMessageType.PROCEEDING
+                    || ackPrepare.type == GenericPaxosMessage.ackMessageType.RESTORE){
+                if (ackPrepare.type == GenericPaxosMessage.ackMessageType.PROCEEDING
+                        && ackPrepare.ack_leaderId == serverId
+                        && ackPrepare.inst_ballot == inst.crtInstBallot){  // normal case
+                    inst = instanceSpace.updateAndGet(ackPrepare.inst_no, instance -> {
+                        instance = AdaPaxosInstance.copy(instance);
+                        ++instance.lmu.response;
+                        return instance;
+                    });
+                }
+                else if (ackPrepare.type == GenericPaxosMessage.ackMessageType.RESTORE
+                        && ackPrepare.ack_leaderId == serverId
+                        && ackPrepare.inst_ballot == inst.crtInstBallot){  // restore-early case
+
+                    inst = instanceSpace.updateAndGet(ackPrepare.inst_no, instance -> {
+                        instance = AdaPaxosInstance.copy(instance);
+                        ++instance.lmu.response;
+
+                        if (ackPrepare.load != null){     // a meaningful restoration request
+                            instance.hmu = HistoryMaintenance.restoreHelper(
+                                    instance.hmu,
+                                    HistoryMaintenance.RESTORE_TYPE.EARLY,
+                                    restoreRequests,
+                                    ackPrepare.load.crtLeaderId,
+                                    ackPrepare.load.crtInstBallot,
+                                    ackPrepare.load.requests
+                            );
+                        }
+
+                        return instance;
+                    });
+                }
+
+                /* accumulating until reach Paxos threshold
+                 * BROADCASTING_ACCEPT activated only once in each Paxos period (only in PREPARING status) */
+
+                if (inst.lmu.response > peerSize/2){
+                    inst = instanceSpace.updateAndGet(ackPrepare.inst_no, instance -> {
+                       instance = AdaPaxosInstance.copy(instance);
+                       if (instance.hmu != null && instance.hmu.HOST_RESTORE){ // restore-early case: exists formal paxos conversation
+                            restoreRequests.addAll(Arrays.asList(instance.requests));   // restore local requests
+                            instance.requests = instance.hmu.reservedCmds;
+
+                       }
+                       instance.status = InstanceStatus.PREPARED;
+                       instance.lmu.refresh(AdaAgents.newToken(), serverId);
+                       return instance;
+                    });
+
+                    if (!forceFsync.get()) {
+                        sender.broadcastPeerMessage(new GenericPaxosMessage.Accept(ackPrepare.inst_no, serverId, inst.crtInstBallot, inst.requests));
+                    }
+                    else {
+                        broadcastOnDisks(inst.lmu.token, ackPrepare.inst_no, inst, serverId, peerSize, remoteStore);
+                    }
+                }
+            }
+            else if (ackPrepare.type == GenericPaxosMessage.ackMessageType.RECOVER){
+                // recovery case: check status to avoid broadcasting duplicated COMMIT
+                restoreRequests.addAll(Arrays.asList(inst.requests));
+
+                inst = instanceSpace.updateAndGet(ackPrepare.inst_no, instance -> {
+                    instance = AdaPaxosInstance.copy(instance);
+                    instance.requests = ackPrepare.load.requests;
+                    instance.status = InstanceStatus.COMMITTED;
+                    instance.lmu.refresh(AdaAgents.newToken(), serverId);
+
+                    return instance;
+                });
+
+                if (!forceFsync.get()) {
+                    sender.broadcastPeerMessage(new GenericPaxosMessage.Commit(ackPrepare.inst_no, serverId, inst.crtInstBallot, inst.requests));
+                }
+                else {
+                    broadcastOnDisks(inst.lmu.token, ackPrepare.inst_no, inst, serverId, peerSize, remoteStore);
+                }
+            }
+            else if (ackPrepare.type == GenericPaxosMessage.ackMessageType.ABORT){  // abort case
+                inst = instanceSpace.getAndUpdate(ackPrepare.inst_no, instance -> (AdaPaxosInstance) ackPrepare.load);
+                sender.sendPeerMessage(ackPrepare.load.crtLeaderId, new GenericPaxosMessage.Restore(ackPrepare.inst_no, inst));  // apply for restoration
+
+                /* after this point, this server will no longer play the role of leader in this client.
+                 * ABORT msg will only react once, since control flow will not reach here again.
+                 * There must be only ONE leader in the network ! */
+            }
+        }
     }
 }

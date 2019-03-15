@@ -11,14 +11,8 @@ import java.io.Serializable;
  * @author : Swimiltylers
  * @version : 2019/3/15 12:37
  */
-public class AdaPaxosInstance implements Serializable {
+public class AdaPaxosInstance extends PaxosInstance {
     private static final long serialVersionUID = 3496369406585981372L;
-
-    public int crtLeaderId;
-    public int crtInstBallot;
-    public InstanceStatus status;
-
-    public ClientRequest[] requests;
 
     transient public AdaLeaderMaintenance lmu;
     transient public HistoryMaintenance hmu;
