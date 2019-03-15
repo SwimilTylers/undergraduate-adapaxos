@@ -11,6 +11,7 @@ import network.message.protocols.GenericPaxosMessage;
 import network.service.sender.PeerMessageSender;
 
 import java.util.List;
+import java.util.Queue;
 
 /**
  * @author : Swimiltylers
@@ -24,14 +25,14 @@ public class DiskLearner {
 
     private PaxosInstance[] instanceSpace;
 
-    private List<ClientRequest> restoredRequestList;
+    private Queue<ClientRequest> restoredRequestList;
 
     private PaxosLogger logger;
 
     public DiskLearner(int serverId, int peerSize,
                        @NotNull PaxosInstance[] instanceSpace,
                        @NotNull PeerMessageSender net,
-                       @NotNull List<ClientRequest> restoredRequestList,
+                       @NotNull Queue<ClientRequest> restoredRequestList,
                        @NotNull PaxosLogger logger) {
         this.serverId = serverId;
         this.peerSize = peerSize;

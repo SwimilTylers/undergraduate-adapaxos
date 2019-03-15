@@ -207,30 +207,38 @@ public class demo {
     }
 
     static class Synchronized{
-        public void method1(){
+        public synchronized void method1(){
             System.out.println("Method 1 start");
             try {
-                synchronized (this) {
-                    System.out.println("Method 1 execute");
-                    Thread.sleep(3000);
-                }
+                System.out.println("Method 1 execute");
+                method3();
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             System.out.println("Method 1 end");
         }
 
-        public void method2(){
+        public synchronized void method2(){
             System.out.println("Method 2 start");
             try {
-                synchronized (this) {
-                    System.out.println("Method 2 execute");
-                    Thread.sleep(1000);
-                }
+                System.out.println("Method 2 execute");
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             System.out.println("Method 2 end");
+        }
+
+        public synchronized void method3(){
+            System.out.println("Method 3 start");
+            try {
+                System.out.println("Method 3 execute");
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Method 3 end");
         }
 
         public static void main(String[] args) {
@@ -245,9 +253,9 @@ public class demo {
     public static void main(String[] args) {
         //NetServiceTesting.test2();
         //GenericPaxosSMRTesting.test0();
-        //DiskPaxosSMRTesting.test1();
+        DiskPaxosSMRTesting.test1();
         //OffsetIndexStoreTesting.test4();
-        Synchronized.main(args);
+        //Synchronized.main(args);
         //Date date = new Date();
         //final String format = "[%tF %<tT:%<tL %<tz][p%08d][%s][leaderId=%d, inst_no=%d][\"%s\"]%n";
         //System.out.print(String.format(format, date, 0, "PREPARE", 0, 0, "send"));

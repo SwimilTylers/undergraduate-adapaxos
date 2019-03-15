@@ -12,6 +12,7 @@ import network.service.sender.PeerMessageSender;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * @author : Swimiltylers
@@ -19,7 +20,7 @@ import java.util.List;
  */
 public class DiskProposer {
     private PeerMessageSender net;
-    private List<ClientRequest> restoredRequestList;
+    private Queue<ClientRequest> restoredRequestList;
 
     private int serverId;
     private int peerSize;
@@ -29,7 +30,7 @@ public class DiskProposer {
     public DiskProposer(int serverId, int peerSize,
                         @NotNull PaxosInstance[] instanceSpace,
                         @NotNull PeerMessageSender net,
-                        @NotNull List<ClientRequest> restoredRequestList) {
+                        @NotNull Queue<ClientRequest> restoredRequestList) {
         this.serverId = serverId;
         this.peerSize = peerSize;
         this.instanceSpace = instanceSpace;
@@ -80,7 +81,7 @@ public class DiskProposer {
         PaxosInstance inst = instanceSpace[inst_no];
 
         /* only when it is a DiskLeaderMaintenance can it proceed disk-paxos procedure */
-
+        //System.out.println("fifi["+(inst.crtLeaderId == serverId)+","+(inst.leaderMaintenanceUnit instanceof DiskLeaderMaintenance)+"]");
         if (inst.crtLeaderId == serverId
                 && inst.leaderMaintenanceUnit instanceof DiskLeaderMaintenance) {
             DiskLeaderMaintenance diskUnit = (DiskLeaderMaintenance) inst.leaderMaintenanceUnit;

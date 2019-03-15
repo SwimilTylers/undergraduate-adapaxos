@@ -5,10 +5,7 @@ import com.sun.istack.internal.NotNull;
 import javafx.util.Pair;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author : Swimiltylers
@@ -34,7 +31,7 @@ public class HistoryMaintenance implements Serializable {
     }
 
     /* this initiator is designed for restore-late case */
-    private HistoryMaintenance(@NotNull List<ClientRequest> restoredProposals, int initLeaderId, int initInstBallot, ClientRequest[] initCmds){
+    private HistoryMaintenance(@NotNull Queue<ClientRequest> restoredProposals, int initLeaderId, int initInstBallot, ClientRequest[] initCmds){
         maxRecvLeaderId = -1;
         maxRecvInstBallot = -1;
         reservedCmds = null;
@@ -48,7 +45,7 @@ public class HistoryMaintenance implements Serializable {
         received.add(new Pair<>(initLeaderId, initInstBallot));
     }
 
-    private void record(@NotNull List<ClientRequest> restoredProposals, int leaderId, int instBallot, ClientRequest[] cmds){
+    private void record(@NotNull Queue<ClientRequest> restoredProposals, int leaderId, int instBallot, ClientRequest[] cmds){
         if (!received.contains(new Pair<>(leaderId, instBallot))){
             received.add(new Pair<>(leaderId, instBallot));
 
@@ -70,7 +67,7 @@ public class HistoryMaintenance implements Serializable {
 
     }
 
-    private void restore(@NotNull List<ClientRequest> restoredProposals, int leaderId, int instBallot, ClientRequest[] cmds){
+    private void restore(@NotNull Queue<ClientRequest> restoredProposals, int leaderId, int instBallot, ClientRequest[] cmds){
         if (!received.contains(new Pair<>(leaderId, instBallot))){
             received.add(new Pair<>(leaderId, instBallot));
 
@@ -84,7 +81,7 @@ public class HistoryMaintenance implements Serializable {
     }
 
     public static HistoryMaintenance restoreHelper(HistoryMaintenance oldUnit, RESTORE_TYPE type,
-                                                   @NotNull List<ClientRequest> restoredProposals,
+                                                   @NotNull Queue<ClientRequest> restoredProposals,
                                                    int leaderId, int instBallot, ClientRequest[] cmds){
 
         if (type == RESTORE_TYPE.EARLY){

@@ -27,6 +27,7 @@ abstract public class GenericPaxosSMR implements Runnable{
     public static final int DEFAULT_COMPACT_INTERVAL = 5000;
     public static final int DEFAULT_CLIENT_COM_WAITING = 50;
     public static final int DEFAULT_PEER_COM_WAITING = 50;
+    public static final int DEFAULT_BATCH_CHAN_SIZE = 1;
 
     protected GenericNetService net;
     private String[] peerAddr;
@@ -54,7 +55,7 @@ abstract public class GenericPaxosSMR implements Runnable{
 
     protected PaxosLogger logger;
 
-    protected List<ClientRequest> restoredRequestList;
+    protected Queue<ClientRequest> restoredRequestList;
 
     public GenericPaxosSMR(int id, @NotNull String[] addr, int[] port){
         assert addr.length == port.length;
@@ -64,7 +65,7 @@ abstract public class GenericPaxosSMR implements Runnable{
         peerSize = addr.length;
         serverId = id;
 
-        compactChan = new ArrayBlockingQueue<>(1);
+        compactChan = new ArrayBlockingQueue<>(DEFAULT_BATCH_CHAN_SIZE);
 
         compactInterval = DEFAULT_COMPACT_INTERVAL;
         clientComWaiting = DEFAULT_CLIENT_COM_WAITING;
@@ -79,7 +80,7 @@ abstract public class GenericPaxosSMR implements Runnable{
         logger = new NaiveLogger(id);
         net = new GenericNetService(id, GenericNetService.DEFAULT_TO_CLIENT_PORT, cMessages, pMessage, logger);
 
-        restoredRequestList = new ArrayList<>();
+        restoredRequestList = new ConcurrentLinkedQueue<>();
     }
 
     public GenericPaxosSMR(int id, @NotNull String[] addr, int[] port, PaxosLogger logger){
@@ -90,7 +91,7 @@ abstract public class GenericPaxosSMR implements Runnable{
         peerSize = addr.length;
         serverId = id;
 
-        compactChan = new ArrayBlockingQueue<>(1);
+        compactChan = new ArrayBlockingQueue<>(DEFAULT_BATCH_CHAN_SIZE);
 
         compactInterval = DEFAULT_COMPACT_INTERVAL;
         clientComWaiting = DEFAULT_CLIENT_COM_WAITING;
@@ -104,7 +105,7 @@ abstract public class GenericPaxosSMR implements Runnable{
         this.logger = logger;
         net = new GenericNetService(id, GenericNetService.DEFAULT_TO_CLIENT_PORT, cMessages, pMessage, logger);
 
-        restoredRequestList = new ArrayList<>();
+        restoredRequestList = new ConcurrentLinkedQueue<>();
     }
 
     protected boolean isLeader(int inst_no){
@@ -148,29 +149,33 @@ abstract public class GenericPaxosSMR implements Runnable{
     private void compact(){
         while (true){
             int cMessageSize = cMessages.size();
+            List<ClientRequest> requestList = new ArrayList<>();
+
+            cMessageSize = Integer.min(cMessageSize, DEFAULT_REQUEST_COMPACTING_SIZE);
 
             for (int i = 0; i < cMessageSize; i++) {
                 try {
-                    restoredRequestList.add(cMessages.take());
-                } catch (InterruptedException ignored) {}
+                    requestList.add(cMessages.take());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
 
-            if (!restoredRequestList.isEmpty()) {
-                Collections.shuffle(restoredRequestList);
-                int compactSize = restoredRequestList.size() < DEFAULT_REQUEST_COMPACTING_SIZE
-                        ? restoredRequestList.size()
-                        : DEFAULT_INSTANCE_SIZE;
 
-                ClientRequest[] requests = restoredRequestList.subList(0, compactSize).toArray(new ClientRequest[compactSize]);
+            int count = cMessageSize;
+            ClientRequest recv = restoredRequestList.poll();
+            while(count < DEFAULT_REQUEST_COMPACTING_SIZE && recv != null){
+                requestList.add(recv);
+                recv = restoredRequestList.poll();
+                ++count;
+            }
 
-                if (restoredRequestList.size() == compactSize)
-                    restoredRequestList.clear();
-                else
-                    restoredRequestList = restoredRequestList.subList(compactSize, restoredRequestList.size());
 
+            ClientRequest[] requests = requestList.toArray(new ClientRequest[0]);
+            if (requests.length != 0) {
+                //logger.log(true, "tete="+requests.length+"\n");
                 try {
-                    compactChan.put(requests); // slow down if congestion happens
-
+                    compactChan.put(requests);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

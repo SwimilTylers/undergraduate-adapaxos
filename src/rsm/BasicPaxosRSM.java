@@ -10,6 +10,7 @@ import client.ClientRequest;
 import logger.PaxosLogger;
 import network.message.protocols.GenericPaxosMessage;
 
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -53,10 +54,12 @@ public class BasicPaxosRSM extends GenericPaxosSMR{
         ClientRequest[] compact = null;
         try {
             compact = compactChan.poll(clientComWaiting, TimeUnit.MILLISECONDS);
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         if (compact != null) {
+            //logger.log(true, "wuwu="+Arrays.toString(compact)+"\n");
             proposer.handleRequests(maxInstance.getAndIncrement(), crtBallot.getAndIncrement(), compact);
         }
     }

@@ -14,6 +14,7 @@ import network.service.SimulatedNetService;
 import network.service.module.simulator.CrushedSimulator;
 import network.service.module.simulator.DelayedSimulator;
 
+import java.util.Arrays;
 import java.util.concurrent.*;
 
 /**
@@ -99,9 +100,9 @@ public class DiskPaxosRSM extends GenericPaxosSMR{
                 DiskPaxosMessage.PackedMessage cast = (DiskPaxosMessage.PackedMessage) msg;
                 // logger.logPrepare(cast.inst_no, cast, "handle");
                 if (cast.desc.equals(DiskPaxosMessage.IRW_HEADER) || cast.desc.equals(DiskPaxosMessage.IR_HEADER)) {
-                    logger.logFormatted(true, "DISK-PAXOS", cast.desc, "handle");
+                    logger.logFormatted(true, "DISK-PAXOS", cast.desc, "acceptor-"+serverId, "handle");
                     dAcceptor.handlePacked(cast);
-                    logger.logFormatted(true, "DISK-PAXOS", cast.desc, "exit handle");
+                    logger.logFormatted(true, "DISK-PAXOS", cast.desc, "acceptor-"+serverId, "exit handle");
                 }
                 else if (cast.desc.equals(DiskPaxosMessage.IRW_ACK_HEADER) || cast.desc.equals(DiskPaxosMessage.IR_ACK_HEADER)){
                     /* we cannot distinguish which step the message involves in,
@@ -111,14 +112,14 @@ public class DiskPaxosRSM extends GenericPaxosSMR{
                      *   - PREPARING ---> PREPARED: risk of duplicated-trial
                      *   - COMMITTED -x-> PREPARING: NO such risk */
 
-                    logger.logFormatted(true, "DISK-PAXOS", cast.desc, "learner", "trial", "handle");
+                    logger.logFormatted(true, "DISK-PAXOS", cast.desc, "learner-"+serverId, "trial", "handle");
                     boolean isProcessed = dLearner.handlePacked(cast);
-                    logger.logFormatted(true, "DISK-PAXOS", cast.desc, "learner", "processed="+isProcessed, "exit handle");
+                    logger.logFormatted(true, "DISK-PAXOS", cast.desc, "learner-"+serverId, "processed="+isProcessed, "exit handle");
 
                     if (!isProcessed) {
-                        logger.logFormatted(true, "DISK-PAXOS", cast.desc, "learner", "trial", "handle");
+                        logger.logFormatted(true, "DISK-PAXOS", cast.desc, "proposer-"+serverId, "trial", "handle");
                         isProcessed =dProposer.handlePacked(cast);
-                        logger.logFormatted(true, "DISK-PAXOS", cast.desc, "learner", "processed="+isProcessed, "exit handle");
+                        logger.logFormatted(true, "DISK-PAXOS", cast.desc, "proposer-"+serverId, "processed="+isProcessed, "exit handle");
                     }
                 }
             }
@@ -141,7 +142,9 @@ public class DiskPaxosRSM extends GenericPaxosSMR{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if (compact != null)
+        if (compact != null) {
+            logger.log(true, "xixi "+ Arrays.toString(compact)+"\n");
             dProposer.handleRequests(maxInstance.getAndIncrement(), crtBallot.getAndIncrement(), compact);
+        }
     }
 }

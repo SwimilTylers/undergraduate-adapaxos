@@ -1,6 +1,13 @@
 package rsm;
 
+import agent.acceptor.Acceptor;
+import agent.learner.DiskLearner;
+import agent.learner.Learner;
+import agent.proposer.DiskProposer;
+import agent.proposer.GenericProposer;
+import agent.proposer.Proposer;
 import client.ClientRequest;
+import instance.AdaPaxosInstance;
 import instance.InstanceStatus;
 import instance.PaxosInstance;
 import instance.store.InstanceStore;
@@ -16,6 +23,7 @@ import network.message.protocols.GenericPaxosMessage;
 import network.service.GenericNetService;
 import network.service.module.ConnectionModule;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -27,30 +35,32 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
  * @author : Swimiltylers
  * @version : 2019/3/14 18:19
  */
-public class AdaPaxosRSM {
+public class AdaPaxosRSM implements Serializable{
+    private static final long serialVersionUID = -1904538218951667113L;
+
     /* unique identity */
     protected int serverId;
-    protected boolean asLeader;
+    transient protected boolean asLeader;
 
 
     /* net and connect */
     protected int peerSize;
-    protected GenericNetService net;
-    protected ConnectionModule conn;
+    transient protected GenericNetService net;
+    transient protected ConnectionModule conn;
 
     /* channels */
-    protected BlockingQueue<ClientRequest[]> batchedRequestChan;
-    protected Queue<ClientRequest> restoredQueue;
+    transient protected BlockingQueue<ClientRequest[]> batchedRequestChan;
+    transient protected Queue<ClientRequest> restoredQueue;
 
-    protected BlockingQueue<ClientRequest> cMessages;
-    protected BlockingQueue<GenericPaxosMessage> pMessages;
-    protected BlockingQueue<DiskPaxosMessage> dMessages;
-    protected BlockingQueue<AdaPaxosMessage> aMessages;
-    protected List<Pair<Distinguishable, BlockingQueue>> customizedChannels;
+    transient protected BlockingQueue<ClientRequest> cMessages;
+    transient protected BlockingQueue<GenericPaxosMessage> pMessages;
+    transient protected BlockingQueue<DiskPaxosMessage> dMessages;
+    transient protected BlockingQueue<AdaPaxosMessage> aMessages;
+    transient protected List<Pair<Distinguishable, BlockingQueue>> customizedChannels;
 
 
     /* instance and storage */
-    protected AtomicReferenceArray<PaxosInstance> instanceSpace;
+    transient protected AtomicReferenceArray<AdaPaxosInstance> instanceSpace;
     protected AtomicInteger crtInstBallot;
     protected AtomicInteger maxReceivedInstance;
     protected AtomicInteger maxSendInstance;
@@ -58,16 +68,19 @@ public class AdaPaxosRSM {
     protected AtomicInteger consecutiveCommit;
     protected AtomicInteger fsyncInitInstance;
 
-    protected InstanceStore localStore;
-    protected RemoteInstanceStore remoteStore;
+    transient protected InstanceStore localStore;
+    transient protected RemoteInstanceStore remoteStore;
     protected AtomicBoolean forceFsync;
-    protected int fsyncItv;
-    protected AtomicIntegerArray fsyncSignature;
+    transient protected AtomicIntegerArray fsyncSignature;
 
+    /* agents */
+    transient protected Proposer proposer;
+    transient protected Learner learner;
+    transient protected Acceptor acceptor;
 
     /* misc */
-    protected PaxosLogger logger;
-    protected AtomicBoolean routineOnRunning;
+    transient protected PaxosLogger logger;
+    transient protected AtomicBoolean routineOnRunning;
 
 
     protected AdaPaxosRSM(final int serverId,
@@ -115,13 +128,11 @@ public class AdaPaxosRSM {
 
     protected AdaPaxosRSM instanceStorageBuild(InstanceStore localStore,
                                         RemoteInstanceStore remoteStore,
-                                        boolean initFsync,
-                                        final int fsyncItv){
+                                        boolean initFsync){
 
         this.localStore = localStore;
         this.remoteStore = remoteStore;
         forceFsync = new AtomicBoolean(initFsync);
-        this.fsyncItv = fsyncItv;
         fsyncSignature = new AtomicIntegerArray(instanceSpace.length());
 
         return this;
@@ -150,9 +161,9 @@ public class AdaPaxosRSM {
     public static AdaPaxosRSM makeInstance(final int id, final int epoch, final int peerSize, GenericNetService net, boolean initAsLeader){
         AdaPaxosRSM rsm = new AdaPaxosRSM(id, initAsLeader, new NaiveLogger(id));
         rsm.netConnectionBuild(net, net.getConnectionModule(), peerSize)
-           .batchBuild(1)
+           .batchBuild(GenericPaxosSMR.DEFAULT_BATCH_CHAN_SIZE)
            .instanceSpaceBuild(GenericPaxosSMR.DEFAULT_INSTANCE_SIZE, epoch << 16 + id, 0)
-           .instanceStorageBuild(new OffsetIndexStore(DiskPaxosRSM.LOCAL_STORAGE_PREFIX+id), null, false, PseudoAdaPaxosRSM.DEFAULT_FSYNC_WIN)
+           .instanceStorageBuild(new OffsetIndexStore(DiskPaxosRSM.LOCAL_STORAGE_PREFIX+id), null, false)
            .messageChanBuild(GenericPaxosSMR.DEFAULT_MESSAGE_SIZE, GenericPaxosSMR.DEFAULT_MESSAGE_SIZE, GenericPaxosSMR.DEFAULT_MESSAGE_SIZE, GenericPaxosSMR.DEFAULT_INSTANCE_SIZE);
         return rsm;
     }
@@ -219,15 +230,17 @@ public class AdaPaxosRSM {
             ClientRequest recv = restoredQueue.poll();
             while(count < batchSize && recv != null){
                 requestList.add(recv);
-                recv = restoredQueue.poll();
                 ++count;
+                recv = restoredQueue.poll();
             }
 
-            try {
-                batchedRequestChan.put(requestList.toArray(new ClientRequest[0]));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return;
+            if (!requestList.isEmpty()) {
+                try {
+                    batchedRequestChan.put(requestList.toArray(new ClientRequest[0]));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    return;
+                }
             }
 
             try {
@@ -302,7 +315,7 @@ public class AdaPaxosRSM {
 
             if (msg != null) {
                 Pair<Integer, Object> retention = null;
-                maxReceivedInstance.updateAndGet(i->i=Integer.max(i, 0));   // TODO: inst_no ?
+                maxReceivedInstance.updateAndGet(i->i=Integer.max(i, msg.inst_no));
 
                 if (msg instanceof GenericPaxosMessage.Prepare) {
                     GenericPaxosMessage.Prepare cast = (GenericPaxosMessage.Prepare) msg;
@@ -326,7 +339,7 @@ public class AdaPaxosRSM {
                 }
 
                 if (forceFsync.get())
-                    fileSynchronize(0); // TODO: inst_no ?
+                    fileSynchronize(msg.inst_no);
                 else if (retention != null){    // in case of retention
                     if (retention.getKey() == null) {
                         net.getPeerMessageSender().broadcastPeerMessage(retention.getValue());
@@ -392,7 +405,7 @@ public class AdaPaxosRSM {
     protected void updateConsecutiveCommit(){
         int iter = consecutiveCommit.get();
         while (iter < Integer.max(maxReceivedInstance.get(), maxSendInstance.get())){
-            PaxosInstance inst = instanceSpace.get(iter);
+            AdaPaxosInstance inst = instanceSpace.get(iter);
             if (inst != null && inst.status == InstanceStatus.COMMITTED)
                 ++iter;
         }

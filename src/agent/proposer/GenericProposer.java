@@ -11,6 +11,7 @@ import network.service.sender.PeerMessageSender;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * @author : Swimiltylers
@@ -18,7 +19,7 @@ import java.util.List;
  */
 public class GenericProposer implements Proposer {
     private PeerMessageSender net;
-    private List<ClientRequest> restoredRequestList;
+    private Queue<ClientRequest> restoredRequestList;
 
     private int serverId;
     private int peerSize;
@@ -28,7 +29,7 @@ public class GenericProposer implements Proposer {
     public GenericProposer(int serverId, int peerSize,
                            @NotNull PaxosInstance[] instanceSpace,
                            @NotNull PeerMessageSender net,
-                           @NotNull List<ClientRequest> restoredRequestList) {
+                           @NotNull Queue<ClientRequest> restoredRequestList) {
         this.serverId = serverId;
         this.peerSize = peerSize;
         this.instanceSpace = instanceSpace;
@@ -47,6 +48,7 @@ public class GenericProposer implements Proposer {
         inst.leaderMaintenanceUnit = new LeaderMaintenance();
 
         instanceSpace[inst_no] = inst;
+        //System.out.println("eueu="+Arrays.toString(inst.cmds));
 
         net.broadcastPeerMessage(new GenericPaxosMessage.Prepare(inst_no, inst.crtLeaderId, inst.crtInstBallot));
     }

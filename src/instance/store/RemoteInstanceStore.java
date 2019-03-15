@@ -8,6 +8,6 @@ import instance.PaxosInstance;
  */
 public interface RemoteInstanceStore {
     void connect();
-    void launchRemoteStore(int disk_no, int access_id, int inst_id, PaxosInstance instance);
-    void launchRemoteFetch(int disk_no, int access_id, int inst_id);
+    void launchRemoteStore(long token, int disk_no, int access_id, int inst_id, PaxosInstance instance);
+    void launchRemoteFetch(long token, int disk_no, int access_id, int inst_id);
 }

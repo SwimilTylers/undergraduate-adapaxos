@@ -2,6 +2,7 @@ package network.service.sender;
 
 import com.sun.istack.internal.NotNull;
 import logger.PaxosLogger;
+import network.message.protocols.GenericConnectionMessage;
 import network.service.module.ConnectionModule;
 
 import java.io.IOException;
@@ -34,6 +35,7 @@ public class BasicPeerMessageSender implements PeerMessageSender {
     synchronized public void sendPeerMessage(int toId, @NotNull Object msg){
         if (toId < peerSize){
             try {
+                //if (! (msg instanceof GenericConnectionMessage.Beacon) && ! (msg instanceof GenericConnectionMessage.ackBeacon))
                 logger.logPeerNet(netServiceId, toId, msg.toString());
                 OutputStream socketStream = peers[toId].getOutputStream();
                 ObjectOutputStream ostream = new ObjectOutputStream(socketStream);
