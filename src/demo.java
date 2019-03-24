@@ -6,6 +6,7 @@ import logger.NaiveLogger;
 import network.service.GenericNetService;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+import rsm.AdaPaxosRSM;
 import rsm.BasicPaxosRSM;
 import rsm.DiskPaxosRSM;
 import rsm.GenericPaxosSMR;
@@ -250,10 +251,39 @@ public class demo {
         }
     }
 
+    public static class AdaPaxosRSMTesting{
+        static void test0(){
+            ExecutorService service = Executors.newCachedThreadPool();
+            for (int i = 0; i < 5; i++) {
+                int serverId = i;
+                service.execute(() -> {
+                    try {
+                        AdaPaxosRSM rsm = AdaPaxosRSM.makeInstance(serverId, 0, 5,
+                                new GenericNetService(serverId), serverId == 0);
+                        rsm.link(NetServiceTesting.addr, NetServiceTesting.port, 4470+serverId*2);
+                        rsm.agent();
+                        rsm.routine();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+
+            FileIteratorClient client = new FileIteratorClient("tic");
+            try {
+                client.connect("localhost", 4470);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            service.execute(client);
+        }
+    }
+
     public static void main(String[] args) {
         //NetServiceTesting.test2();
         //GenericPaxosSMRTesting.test0();
-        DiskPaxosSMRTesting.test1();
+        //DiskPaxosSMRTesting.test1();
+        AdaPaxosRSMTesting.test0();
         //OffsetIndexStoreTesting.test4();
         //Synchronized.main(args);
         //Date date = new Date();

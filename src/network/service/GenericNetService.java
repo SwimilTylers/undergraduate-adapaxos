@@ -67,9 +67,9 @@ public class GenericNetService {
         this.logger = logger;
     }
 
-    public GenericNetService(int thisId, int toClientPort){
+    public GenericNetService(int thisId){
         netServiceId = thisId;
-        this.toClientPort = toClientPort;
+        this.toClientPort = DEFAULT_TO_CLIENT_PORT;
         onRunning = false;
         channels = new ArrayList<>();
     }
@@ -241,6 +241,7 @@ public class GenericNetService {
         }
     }
 
+    @Deprecated
     public void watch(){
         if (onRunning){
             ServerSocket server = null;
@@ -262,6 +263,20 @@ public class GenericNetService {
                 listenService.execute(() -> listenToClient(client));
             }
         }
+    }
+
+    public void openClientListener(final int port){
+        listenService.execute(() -> {
+            try {
+                ServerSocket server = new ServerSocket(port);
+                while (onRunning){
+                    Socket client = server.accept();
+                    listenService.execute(() -> listenToClient(client));
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private void listenToClient(@NotNull Socket socket){

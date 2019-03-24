@@ -1,6 +1,7 @@
 package rsm;
 
 import agent.acceptor.Acceptor;
+import agent.acceptor.AdaAcceptor;
 import agent.learner.AdaLearner;
 import agent.learner.Learner;
 import agent.proposer.AdaProposer;
@@ -20,6 +21,7 @@ import network.message.protocols.Distinguishable;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.GenericNetService;
 import network.service.module.ConnectionModule;
+import utils.AdaPaxosConfiguration;
 
 import java.io.Serializable;
 import java.util.*;
@@ -147,6 +149,8 @@ public class AdaPaxosRSM implements Serializable{
         dMessages = new ArrayBlockingQueue<>(sizeDMessage);
         aMessages = new ArrayBlockingQueue<>(sizeAMessage);
 
+        customizedChannels = new ArrayList<>();
+
         if (supplement != null && supplement.length != 0) {
             customizedChannels = new ArrayList<>();
             customizedChannels.addAll(Arrays.asList(supplement));
@@ -159,17 +163,17 @@ public class AdaPaxosRSM implements Serializable{
     public static AdaPaxosRSM makeInstance(final int id, final int epoch, final int peerSize, GenericNetService net, boolean initAsLeader){
         AdaPaxosRSM rsm = new AdaPaxosRSM(id, initAsLeader, new NaiveLogger(id));
         rsm.netConnectionBuild(net, net.getConnectionModule(), peerSize)
-           .batchBuild(GenericPaxosSMR.DEFAULT_BATCH_CHAN_SIZE)
-           .instanceSpaceBuild(GenericPaxosSMR.DEFAULT_INSTANCE_SIZE, epoch << 16 + id, 0)
-           .instanceStorageBuild(new OffsetIndexStore(DiskPaxosRSM.LOCAL_STORAGE_PREFIX+id), null, false)
-           .messageChanBuild(GenericPaxosSMR.DEFAULT_MESSAGE_SIZE, GenericPaxosSMR.DEFAULT_MESSAGE_SIZE, GenericPaxosSMR.DEFAULT_MESSAGE_SIZE, GenericPaxosSMR.DEFAULT_INSTANCE_SIZE);
+           .batchBuild(AdaPaxosConfiguration.RSM.DEFAULT_BATCH_CHAN_SIZE)
+           .instanceSpaceBuild(AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE, epoch << 16 + id, 0)
+           .instanceStorageBuild(new OffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+id), null, false)
+           .messageChanBuild(AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE);
         return rsm;
     }
 
     /* public-access deployment func, including:
     * - link: connection establishment of both net and remote-disk */
 
-    public void link(String[] peerAddr, int[] peerPort) throws InterruptedException {
+    public void link(String[] peerAddr, int[] peerPort, final int clientPort) throws InterruptedException {
         assert peerAddr.length == peerPort.length && peerAddr.length == peerSize;
 
         net.setClientChan(cMessages);
@@ -181,16 +185,22 @@ public class AdaPaxosRSM implements Serializable{
         }
 
         net.connect(peerAddr, peerPort);
-        remoteStore.connect();
+        net.openClientListener(clientPort);
+
+        // TODO: 2019/3/24 REMOTESTORE
+        //remoteStore.connect();
     }
 
     public void agent(){
-
+        proposer = new AdaProposer(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
+        acceptor = new AdaAcceptor(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
+        learner = new AdaLearner(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
     }
 
     public void routine(Runnable... supplement){
+        routineOnRunning = new AtomicBoolean(true);
         ExecutorService routines = Executors.newCachedThreadPool();
-        routines.execute(()-> routine_batch(GenericPaxosSMR.DEFAULT_COMPACT_INTERVAL, GenericPaxosSMR.DEFAULT_REQUEST_COMPACTING_SIZE));
+        routines.execute(()-> routine_batch(5000, GenericPaxosSMR.DEFAULT_REQUEST_COMPACTING_SIZE));
         routines.execute(()-> routine_propose(GenericPaxosSMR.DEFAULT_COMPACT_INTERVAL));
         routines.execute(this::routine_response);
         if (supplement != null && supplement.length != 0)
@@ -254,7 +264,8 @@ public class AdaPaxosRSM implements Serializable{
         while (routineOnRunning.get()){
             ClientRequest[] cmd = batchedRequestChan.poll();
             if (cmd != null){
-                // TODO: aProposer
+                proposer.handleRequests(maxReceivedInstance.getAndIncrement(), crtInstBallot.get(), cmd);
+                logger.log(true, "init a proposal\n");
             }
 
             try {
@@ -296,13 +307,13 @@ public class AdaPaxosRSM implements Serializable{
                         memorySynchronize();
                     }
                 }
-            }
 
-            try {
-                Thread.sleep(monitorItv); // drop the refreshing frequency of 'monitor'
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return;
+                try {
+                    Thread.sleep(monitorItv); // drop the refreshing frequency of 'monitor'
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    return;
+                }
             }
         }
     }
@@ -310,26 +321,27 @@ public class AdaPaxosRSM implements Serializable{
     protected void routine_response(){
         while (routineOnRunning.get()){
             GenericPaxosMessage msg = pMessages.poll();
-
             if (msg != null) {
+                logger.log(true, "receive "+msg.toString()+"\n");
+
                 Pair<Integer, Object> retention = null;
                 maxReceivedInstance.updateAndGet(i->i=Integer.max(i, msg.inst_no));
 
                 if (msg instanceof GenericPaxosMessage.Prepare) {
                     GenericPaxosMessage.Prepare cast = (GenericPaxosMessage.Prepare) msg;
-                    //acceptor.handlePrepare(cast);
+                    acceptor.handlePrepare(cast);
                 } else if (msg instanceof GenericPaxosMessage.ackPrepare) {
                     GenericPaxosMessage.ackPrepare cast = (GenericPaxosMessage.ackPrepare) msg;
-                    //proposer.handleAckPrepare(cast);
+                    proposer.handleAckPrepare(cast);
                 } else if (msg instanceof GenericPaxosMessage.Accept) {
                     GenericPaxosMessage.Accept cast = (GenericPaxosMessage.Accept) msg;
-                    //acceptor.handleAccept(cast);
+                    acceptor.handleAccept(cast);
                 } else if (msg instanceof GenericPaxosMessage.ackAccept) {
                     GenericPaxosMessage.ackAccept cast = (GenericPaxosMessage.ackAccept) msg;
-                    //learner.handleAckAccept(cast);
+                    learner.handleAckAccept(cast);
                 } else if (msg instanceof GenericPaxosMessage.Commit) {
                     GenericPaxosMessage.Commit cast = (GenericPaxosMessage.Commit) msg;
-                    //learner.handleCommit(cast);
+                    learner.handleCommit(cast);
                     updateConsecutiveCommit();
                 } else if (msg instanceof GenericPaxosMessage.Restore) {
                     GenericPaxosMessage.Restore cast = (GenericPaxosMessage.Restore) msg;
