@@ -230,7 +230,7 @@ public class GenericNetService {
 
     private void beacon(){
         while (onRunning){
-            logger.log(false, cModule.toString());
+            logger.record(false, "hb", cModule.toString());
             sender.broadcastPeerMessage(cModule.makeBeacon(System.currentTimeMillis()));
             try {
                 Thread.sleep(beaconItv);

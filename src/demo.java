@@ -2,6 +2,7 @@ import client.FileIteratorClient;
 import instance.StaticPaxosInstance;
 import instance.store.InstanceStore;
 import instance.store.OffsetIndexStore;
+import instance.store.PseudoRemoteInstanceStore;
 import logger.NaiveLogger;
 import network.service.GenericNetService;
 import org.apache.log4j.BasicConfigurator;
@@ -10,6 +11,7 @@ import rsm.AdaPaxosRSM;
 import rsm.BasicPaxosRSM;
 import rsm.DiskPaxosRSM;
 import rsm.GenericPaxosSMR;
+import utils.AdaPaxosConfiguration;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -252,6 +254,15 @@ public class demo {
     }
 
     public static class AdaPaxosRSMTesting{
+        static InstanceStore[] stores = new InstanceStore[]{
+                new OffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+0),
+                new OffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+1),
+                new OffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+2),
+                new OffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+3),
+                new OffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+4)
+        };
+
+
         static void test0(){
             ExecutorService service = Executors.newCachedThreadPool();
             for (int i = 0; i < 5; i++) {
@@ -259,7 +270,11 @@ public class demo {
                 service.execute(() -> {
                     try {
                         AdaPaxosRSM rsm = AdaPaxosRSM.makeInstance(serverId, 0, 5,
-                                new GenericNetService(serverId), serverId == 0);
+                                stores[serverId],
+                                new PseudoRemoteInstanceStore(serverId, stores),
+                                new GenericNetService(serverId),
+                                serverId == 0
+                        );
                         rsm.link(NetServiceTesting.addr, NetServiceTesting.port, 4470+serverId*2);
                         rsm.agent();
                         rsm.routine();

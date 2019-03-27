@@ -1,13 +1,13 @@
 package agent.learner;
 
-import agent.proposer.AdaProposer;
+import agent.DiskResponder;
 import client.ClientRequest;
 import instance.AdaPaxosInstance;
 import instance.InstanceStatus;
-import instance.StaticPaxosInstance;
 import instance.maintenance.HistoryMaintenance;
 import instance.store.RemoteInstanceStore;
 import logger.PaxosLogger;
+import network.message.protocols.DiskPaxosMessage;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.sender.PeerMessageSender;
 import utils.AdaAgents;
@@ -22,7 +22,7 @@ import static utils.AdaAgents.broadcastOnDisks;
  * @author : Swimiltylers
  * @version : 2019/3/15 17:31
  */
-public class AdaLearner implements Learner{
+public class AdaLearner implements Learner, DiskResponder {
     private final int serverId;
     private final int peerSize;
 
@@ -92,25 +92,8 @@ public class AdaLearner implements Learner{
                     });
                 }
 
-                if (inst.lmu.response > peerSize/2){
-                    inst = instanceSpace.updateAndGet(ackAccept.inst_no, instance -> {
-                        instance = AdaPaxosInstance.copy(instance);
-                        instance.status = InstanceStatus.COMMITTED;
-                        instance.lmu.refresh(AdaAgents.newToken(), serverId);
-
-                        return instance;
-                    });
-
-                    GenericPaxosMessage.Commit sendOut = new GenericPaxosMessage.Commit(ackAccept.inst_no, serverId, inst.crtInstBallot, inst.requests);
-                    logger.logCommit(ackAccept.inst_no, sendOut, "settled");
-
-                    if (!forceFsync.get()) {
-                        sender.broadcastPeerMessage(sendOut);
-                    }
-                    else {
-                        broadcastOnDisks(inst.lmu.token, ackAccept.inst_no, inst, serverId, peerSize, remoteStore);
-                    }
-                }
+                if (inst.lmu.response > peerSize/2)
+                    furtherStep(ackAccept.inst_no);
             }
             else if (ackAccept.type == GenericPaxosMessage.ackMessageType.RECOVER){ // recovery case
                 /* vacant, due to the property mentioned in handleAccept.[recovery case] */
@@ -156,6 +139,91 @@ public class AdaLearner implements Learner{
             }
 
             /* otherwise, drop the message, which is expired */
+        }
+    }
+
+    @Override
+    public boolean isValidMessage(int inst_no, long token) {
+        AdaPaxosInstance inst = instanceSpace.get(inst_no);
+        if (inst != null){
+            return inst.lmu.token == token && inst.status == InstanceStatus.PREPARED;
+        }
+        else
+            return false;
+    }
+
+    @Override
+    public void respond_ackWrite(DiskPaxosMessage.ackWrite ackWrite) {
+        if (isValidMessage(ackWrite.inst_no, ackWrite.dialog_no)){
+            AdaPaxosInstance inst = instanceSpace.updateAndGet(ackWrite.inst_no, instance -> {
+                instance = AdaPaxosInstance.copy(instance);
+                boolean check = ackWrite.status == DiskPaxosMessage.DiskStatus.WRITE_SUCCESS;
+                instance.lmu.writeSign[ackWrite.disk_no] = check;
+                if (check && instance.lmu.readCount[ackWrite.disk_no] == peerSize-1){
+                    ++instance.lmu.response;
+                }
+                return instance;
+            });
+
+            /* accumulating until reach Paxos threshold
+             * BROADCASTING_ACCEPT activated only once in each Paxos period (only in PREPARING status) */
+
+            if (inst.lmu.response > peerSize/2)
+                furtherStep(ackWrite.inst_no);
+        }
+    }
+
+    @Override
+    public void respond_ackRead(DiskPaxosMessage.ackRead ackRead) {
+        if (isValidMessage(ackRead.inst_no, ackRead.dialog_no)){
+            if (ackRead.status == DiskPaxosMessage.DiskStatus.READ_NO_SUCH_FILE) {
+                AdaPaxosInstance inst = instanceSpace.updateAndGet(ackRead.inst_no, instance -> {
+                    instance = AdaPaxosInstance.copy(instance);
+
+                    ++instance.lmu.readCount[ackRead.disk_no];
+                    if (instance.lmu.writeSign[ackRead.disk_no]
+                            && instance.lmu.readCount[ackRead.disk_no] == peerSize - 1) {
+                        ++instance.lmu.response;
+                    }
+                    return instance;
+                });
+
+                /* accumulating until reach Paxos threshold
+                 * BROADCASTING_ACCEPT activated only once in each Paxos period (only in PREPARING status) */
+                if (inst.lmu.response > peerSize/2)
+                    furtherStep(ackRead.inst_no);
+            }
+            else if (ackRead.status == DiskPaxosMessage.DiskStatus.READ_SUCCESS && ackRead.accessId != serverId){
+                AdaPaxosInstance inst = instanceSpace.get(ackRead.inst_no);
+                if (ackRead.load.crtInstBallot > inst.crtInstBallot){   // abort case
+                    inst = instanceSpace.getAndUpdate(ackRead.inst_no, instance -> (AdaPaxosInstance) ackRead.load);
+                    sender.sendPeerMessage(ackRead.load.crtLeaderId, new GenericPaxosMessage.Restore(ackRead.inst_no, inst));  // apply for restoration
+
+                    /* after this point, this server will no longer play the role of leader in this client.
+                     * ABORT msg will only react once, since control flow will not reach here again.
+                     * There must be only ONE leader in the network ! */
+                }
+            }
+        }
+    }
+
+    private void furtherStep(int inst_no) {
+        AdaPaxosInstance inst = instanceSpace.updateAndGet(inst_no, instance -> {
+            instance = AdaPaxosInstance.copy(instance);
+            instance.status = InstanceStatus.COMMITTED;
+            instance.lmu.refresh(AdaAgents.newToken(), serverId);
+
+            return instance;
+        });
+
+        GenericPaxosMessage.Commit sendOut = new GenericPaxosMessage.Commit(inst_no, serverId, inst.crtInstBallot, inst.requests);
+        logger.logCommit(inst_no, sendOut, "settled");
+
+        if (!forceFsync.get()) {
+            sender.broadcastPeerMessage(sendOut);
+        }
+        else {
+            broadcastOnDisks(inst.lmu.token, inst_no, inst, serverId, peerSize, remoteStore);
         }
     }
 }

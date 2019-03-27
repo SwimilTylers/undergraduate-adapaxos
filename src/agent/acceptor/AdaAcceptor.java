@@ -62,6 +62,8 @@ public class AdaAcceptor implements Acceptor{
     @Override
     public void handlePrepare(GenericPaxosMessage.Prepare prepare) {
         AdaPaxosInstance inst = instanceSpace.get(prepare.inst_no);
+        UnaryOperator<AdaPaxosInstance> updating = instance -> AdaPaxosInstance.subInst(prepare.leaderId, prepare.inst_ballot, InstanceStatus.PREPARING, null);
+
 
         if (inst == null){    // normal case
             inst = AdaPaxosInstance.subInst(prepare.leaderId, prepare.inst_ballot, InstanceStatus.PREPARING, null);
@@ -77,9 +79,8 @@ public class AdaAcceptor implements Acceptor{
                     )
             );
         }
-        else {
-            UnaryOperator<AdaPaxosInstance> updating = instance -> AdaPaxosInstance.subInst(prepare.leaderId, prepare.inst_ballot, InstanceStatus.PREPARING, null);
-            if (inst.crtLeaderId < prepare.leaderId){
+        else if (inst.crtInstBallot < prepare.inst_ballot){
+            if (inst.crtLeaderId != prepare.leaderId){
                 if (fitRestoreCase(inst)){      // restore-early case
                     inst = instanceSpace.getAndUpdate(prepare.inst_no, updating);
 
@@ -117,59 +118,28 @@ public class AdaAcceptor implements Acceptor{
                     );
                 }
             }
-            else if (inst.crtLeaderId == prepare.leaderId){
-                if (inst.crtInstBallot < prepare.inst_ballot){
-                    if (fitRestoreCase(inst)){  // restore-back-online case: catch up with current situation
-                        instanceSpace.updateAndGet(prepare.inst_no, updating);
+            else {      // overwrite case
+                instanceSpace.updateAndGet(prepare.inst_no, updating);
 
-                        sender.sendPeerMessage(
-                                prepare.leaderId,
-                                new GenericPaxosMessage.ackPrepare(
-                                        prepare.inst_no,
-                                        GenericPaxosMessage.ackMessageType.PROCEEDING,
-                                        prepare.leaderId,
-                                        prepare.inst_ballot, null
-                                )
-                        );
-                    }
-                    else if (fitRecoveryCase(inst)){     // recovery case
-                        inst = instanceSpace.getAndUpdate(prepare.inst_no, instance -> {
-                            instance = AdaPaxosInstance.copy(instance);
-                            instance.crtInstBallot = prepare.inst_ballot;
-                            instance.status = InstanceStatus.COMMITTED;
-                            instance.lmu = null;
-                            return instance;
-                        });
-
-                        sender.sendPeerMessage(prepare.leaderId, new GenericPaxosMessage.ackPrepare(
+                sender.sendPeerMessage(
+                        prepare.leaderId,
+                        new GenericPaxosMessage.ackPrepare(
                                 prepare.inst_no,
-                                GenericPaxosMessage.ackMessageType.RECOVER,
+                                GenericPaxosMessage.ackMessageType.PROCEEDING,
                                 prepare.leaderId,
-                                prepare.inst_ballot,
-                                inst
-                        ));
-                    }
-                    else{   // overwrite case
-                        instanceSpace.updateAndGet(prepare.inst_no, updating);
-
-                        sender.sendPeerMessage(
-                                prepare.leaderId,
-                                new GenericPaxosMessage.ackPrepare(
-                                        prepare.inst_no,
-                                        GenericPaxosMessage.ackMessageType.PROCEEDING,
-                                        prepare.leaderId,
-                                        prepare.inst_ballot, null
-                                )
-                        );
-                    }
-                }
-
-                /* otherwise, drop the message, which is expired */
+                                prepare.inst_ballot, null
+                        )
+                );
             }
-            else{   // abort case
-                inst = instanceSpace.getAndUpdate(prepare.inst_no, updating);
-                sender.sendPeerMessage(prepare.leaderId, inst);
-            }
+        } else {
+            inst = instanceSpace.getAndUpdate(prepare.inst_no, updating);
+            sender.sendPeerMessage(prepare.leaderId, new GenericPaxosMessage.ackPrepare(
+                    prepare.inst_no,
+                    GenericPaxosMessage.ackMessageType.ABORT,
+                    prepare.leaderId,
+                    prepare.inst_ballot,
+                    inst
+            ));
         }
     }
 
@@ -198,7 +168,8 @@ public class AdaAcceptor implements Acceptor{
                                 GenericPaxosMessage.ackMessageType.PROCEEDING,
                                 accept.leaderId,
                                 accept.inst_ballot, null,
-                                inst.requests)
+                                inst.requests
+                        )
                 );
             }
             else if (inst.crtInstBallot < accept.inst_ballot){  // back-online case: catch up with current situation
@@ -207,7 +178,7 @@ public class AdaAcceptor implements Acceptor{
 
             /* otherwise, drop the message, which is expired */
         }
-        else if (inst.crtLeaderId < accept.leaderId){
+        else if (inst.crtInstBallot < accept.inst_ballot){
             if (fitRestoreCase(inst)){ // restore-late case
                 inst = instanceSpace.getAndUpdate(accept.inst_no, updating);
 
@@ -233,13 +204,18 @@ public class AdaAcceptor implements Acceptor{
         }
         else {  // abort case
             inst = instanceSpace.getAndUpdate(accept.inst_no, updating);
-            sender.sendPeerMessage(accept.leaderId, inst);
+            sender.sendPeerMessage(accept.leaderId, new GenericPaxosMessage.ackPrepare(
+                    accept.inst_no,
+                    GenericPaxosMessage.ackMessageType.ABORT,
+                    accept.leaderId,
+                    accept.inst_ballot,
+                    inst
+            ));
         }
     }
 
     private void handleAccept_replaceInternal(GenericPaxosMessage.Accept accept, UnaryOperator<AdaPaxosInstance> updating) {
-        AdaPaxosInstance inst;
-        inst = instanceSpace.updateAndGet(accept.inst_no, updating);
+        AdaPaxosInstance inst = instanceSpace.updateAndGet(accept.inst_no, updating);
         sender.sendPeerMessage(
                 accept.leaderId,
                 new GenericPaxosMessage.ackAccept(

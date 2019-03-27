@@ -2,11 +2,16 @@ package logger;
 
 import client.ClientRequest;
 import com.sun.istack.internal.NotNull;
+import javafx.util.Pair;
 import network.message.protocols.GenericPaxosMessage;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author : Swimiltylers
@@ -31,6 +36,10 @@ public class NaiveLogger implements PaxosLogger {
     /* nWriter works for: */
     private FileWriter nWriter;
 
+    private FileWriter connWriter;
+
+    private FileWriter diagWriter;
+
     public NaiveLogger(int serverId) {
         id = serverId;
         try {
@@ -38,6 +47,8 @@ public class NaiveLogger implements PaxosLogger {
             pWriter = new FileWriter("logs/server-"+id+".paxos.log", false);
             lWriter = new FileWriter("logs/server-"+id+".log", false);
             nWriter = new FileWriter("logs/server-"+id+".net.log", false);
+            connWriter = new FileWriter("logs/server-"+id+".heartbeat", false);
+            diagWriter = new FileWriter("logs/server-"+id+".diagnosis", false);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,6 +71,16 @@ public class NaiveLogger implements PaxosLogger {
     @Override
     public void warn(String warn) {
         System.out.println(warn);
+    }
+
+    @Override
+    public void record(boolean isOnScreen, String suffix, String record) {
+        if (isOnScreen)
+            System.out.print(record);
+        if (suffix.equals("hb"))
+            imm_toFile(connWriter, record);
+        else if (suffix.equals("diag"))
+            imm_toFile(diagWriter, record);
     }
 
     @Override

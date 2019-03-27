@@ -40,7 +40,7 @@ public class AdaPaxosRSM implements Serializable{
 
     /* unique identity */
     protected int serverId;
-    transient protected boolean asLeader;
+    transient protected AtomicBoolean asLeader;
 
 
     /* net and connect */
@@ -88,7 +88,7 @@ public class AdaPaxosRSM implements Serializable{
                        PaxosLogger logger) {
 
         this.serverId = serverId;
-        this.asLeader = initAsLeader;
+        this.asLeader = new AtomicBoolean(initAsLeader);
         this.logger = logger;
     }
 
@@ -160,13 +160,13 @@ public class AdaPaxosRSM implements Serializable{
     }
 
     @SuppressWarnings("unchecked")
-    public static AdaPaxosRSM makeInstance(final int id, final int epoch, final int peerSize, GenericNetService net, boolean initAsLeader){
+    public static AdaPaxosRSM makeInstance(final int id, final int epoch, final int peerSize, InstanceStore localStore, RemoteInstanceStore remoteStore, GenericNetService net, boolean initAsLeader){
         AdaPaxosRSM rsm = new AdaPaxosRSM(id, initAsLeader, new NaiveLogger(id));
         rsm.netConnectionBuild(net, net.getConnectionModule(), peerSize)
-           .batchBuild(AdaPaxosConfiguration.RSM.DEFAULT_BATCH_CHAN_SIZE)
-           .instanceSpaceBuild(AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE, epoch << 16 + id, 0)
-           .instanceStorageBuild(new OffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+id), null, false)
-           .messageChanBuild(AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE);
+                .batchBuild(AdaPaxosConfiguration.RSM.DEFAULT_BATCH_CHAN_SIZE)
+                .instanceSpaceBuild(AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE, epoch << 16, 0)
+                .instanceStorageBuild(localStore, remoteStore, true)
+                .messageChanBuild(AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE);
         return rsm;
     }
 
@@ -185,10 +185,10 @@ public class AdaPaxosRSM implements Serializable{
         }
 
         net.connect(peerAddr, peerPort);
+        conn = net.getConnectionModule();
         net.openClientListener(clientPort);
 
-        // TODO: 2019/3/24 REMOTESTORE
-        //remoteStore.connect();
+        remoteStore.connect(dMessages);
     }
 
     public void agent(){
@@ -202,11 +202,12 @@ public class AdaPaxosRSM implements Serializable{
         ExecutorService routines = Executors.newCachedThreadPool();
         routines.execute(()-> routine_batch(5000, GenericPaxosSMR.DEFAULT_REQUEST_COMPACTING_SIZE));
         routines.execute(()-> routine_propose(GenericPaxosSMR.DEFAULT_COMPACT_INTERVAL));
+        routines.execute(() -> routine_monitor(25, 50, 10));
         routines.execute(this::routine_response);
-        if (supplement != null && supplement.length != 0)
-            for (Runnable r : supplement) {
+        if (supplement != null && supplement.length != 0) {
+            for (Runnable r : supplement)
                 routines.execute(r);
-            }
+        }
         routines.shutdown();
     }
 
@@ -263,7 +264,7 @@ public class AdaPaxosRSM implements Serializable{
     protected void routine_propose(final int proposeItv){
         while (routineOnRunning.get()){
             ClientRequest[] cmd = batchedRequestChan.poll();
-            if (cmd != null){
+            if (cmd != null && asLeader.get()){
                 proposer.handleRequests(maxReceivedInstance.getAndIncrement(), crtInstBallot.get(), cmd);
                 logger.log(true, "init a proposal\n");
             }
@@ -293,8 +294,10 @@ public class AdaPaxosRSM implements Serializable{
                     memorySynchronize();
                 }
             }
-            else if (asLeader){
+            else if (asLeader.get()){
                 int[] crushed = conn.filter(expire);
+                logger.record(false, "diag", Arrays.toString(crushed)+"\n");
+                /*
                 if (crushed.length <= bare_majority){
                     stableConnCount = 0;
                     forceFsync.set(true);
@@ -307,6 +310,7 @@ public class AdaPaxosRSM implements Serializable{
                         memorySynchronize();
                     }
                 }
+                */
 
                 try {
                     Thread.sleep(monitorItv); // drop the refreshing frequency of 'monitor'
@@ -324,7 +328,6 @@ public class AdaPaxosRSM implements Serializable{
             if (msg != null) {
                 logger.log(true, "receive "+msg.toString()+"\n");
 
-                Pair<Integer, Object> retention = null;
                 maxReceivedInstance.updateAndGet(i->i=Integer.max(i, msg.inst_no));
 
                 if (msg instanceof GenericPaxosMessage.Prepare) {
@@ -350,12 +353,30 @@ public class AdaPaxosRSM implements Serializable{
 
                 if (forceFsync.get())
                     fileSynchronize(msg.inst_no);
-                else if (retention != null){    // in case of retention
-                    if (retention.getKey() == null) {
-                        net.getPeerMessageSender().broadcastPeerMessage(retention.getValue());
-                    } else {
-                        net.getPeerMessageSender().sendPeerMessage(retention.getKey(), retention.getValue());
+            }
+
+            if (asLeader.get()) {
+                DiskPaxosMessage dmsg = dMessages.poll();
+                if (dmsg != null){
+                    logger.log(true, "receive "+dmsg.toString()+"\n");
+
+                    maxReceivedInstance.updateAndGet(i->i=Integer.max(i, dmsg.inst_no));
+
+                    if (proposer.isValidMessage(dmsg.inst_no, dmsg.dialog_no)){
+                        if (dmsg instanceof DiskPaxosMessage.ackWrite)
+                            proposer.respond_ackWrite((DiskPaxosMessage.ackWrite) dmsg);
+                        else if (dmsg instanceof DiskPaxosMessage.ackRead)
+                            proposer.respond_ackRead((DiskPaxosMessage.ackRead) dmsg);
                     }
+                    else if (learner.isValidMessage(dmsg.inst_no, dmsg.dialog_no)) {
+                        if (dmsg instanceof DiskPaxosMessage.ackWrite)
+                            learner.respond_ackWrite((DiskPaxosMessage.ackWrite) dmsg);
+                        else if (dmsg instanceof DiskPaxosMessage.ackRead)
+                            learner.respond_ackRead((DiskPaxosMessage.ackRead) dmsg);
+                    }
+
+                    if (forceFsync.get())
+                        fileSynchronize(dmsg.inst_no);
                 }
             }
         }
