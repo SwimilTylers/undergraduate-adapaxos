@@ -16,4 +16,5 @@ public interface ConnectionModule {
     void init(int toId);
 
     int[] filter(long threshold);
+    int filterCount(long threshold);
 }

@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
  * @author : Swimiltylers
@@ -23,50 +25,19 @@ public class HeartBeatModule implements ConnectionModule{
         private long lst_rndRecv = 0;
         private long rnd = Long.MAX_VALUE;
 
-        private void updateBeacon(long sndTs){
-            synchronized (this) {lst_srv = Long.max(lst_srv, sndTs);}
-        }
-
-        private void updateRound(long initTs, long sndTs, long arrTs){
-            synchronized (this) {
-                lst_srv = Long.max(lst_srv, sndTs);
-
-                if (sndTs > lst_rndSrv) {
-                    lst_rndSrv = sndTs;
-
-                    lst_rndInit = initTs;
-                    lst_rndRecv = arrTs;
-                    rnd = lst_rndRecv - lst_rndInit;
-                }
-            }
-        }
-
-        private boolean testSrv(long threshold){
-            synchronized (this){
-                isConn = System.currentTimeMillis() - lst_srv <= threshold;
-                return isConn;
-            }
-        }
-
         @Override
         public String toString() {
-            synchronized (this) {
-                return isConn + " | " +
-                        lst_srv + " | " +
-                        lst_rndSrv + " | " +
-                        "<" + lst_rndInit + ", " + lst_rndRecv + ">" + " | " +
-                        (rnd == Long.MAX_VALUE ? "INF" : rnd) + "\n";
-            }
+            return isConn + " | " + lst_srv + " | " + lst_rndSrv + " | " + "<" + lst_rndInit + ", " + lst_rndRecv + ">" + " | " + (rnd == Long.MAX_VALUE ? "INF" : rnd) + "\n";
         }
     }
 
     private int moduleId;
-    private NodeMonitor[] nodes;
+    private AtomicReferenceArray<NodeMonitor> nodes;
 
     public HeartBeatModule(int moduleId, int totalSize) {
         this.moduleId = moduleId;
-        nodes = new NodeMonitor[totalSize];
-        nodes[moduleId] = new NodeMonitor();
+        nodes = new AtomicReferenceArray<>(totalSize);
+        nodes.set(moduleId, new NodeMonitor());
     }
 
     @Override
@@ -81,29 +52,54 @@ public class HeartBeatModule implements ConnectionModule{
 
     @Override
     public void updateByBeacon(long recvTs, GenericConnectionMessage.Beacon beacon) {
-        if (nodes[beacon.fromId] != null){
-            nodes[beacon.fromId].updateBeacon(beacon.timestamp);
-        }
+        nodes.updateAndGet(beacon.fromId, nodeMonitor -> {
+            if (nodeMonitor != null)
+                nodeMonitor.lst_srv = Long.max(nodeMonitor.lst_srv, beacon.timestamp);
+
+            return nodeMonitor;
+        });
+
     }
 
     @Override
     public void updateByAckBeacon(long recvTs, GenericConnectionMessage.ackBeacon ackBeacon) {
-        if (nodes[ackBeacon.fromId] != null){
-            nodes[ackBeacon.fromId].updateRound(ackBeacon.beacon.timestamp, ackBeacon.timestamp, recvTs);
-        }
+        nodes.updateAndGet(ackBeacon.fromId, nodeMonitor -> {
+            if (nodeMonitor != null) {
+                nodeMonitor.lst_srv = Long.max(nodeMonitor.lst_srv, ackBeacon.timestamp);
+
+                if (ackBeacon.timestamp > nodeMonitor.lst_rndSrv) {
+                    nodeMonitor.lst_rndSrv = ackBeacon.timestamp;
+
+                    nodeMonitor.lst_rndInit = ackBeacon.beacon.timestamp;
+                    nodeMonitor.lst_rndRecv = recvTs;
+                    nodeMonitor.rnd = nodeMonitor.lst_rndRecv - nodeMonitor.lst_rndInit;
+                }
+            }
+
+            return nodeMonitor;
+        });
     }
 
     @Override
     public void init(int toId) {
-        nodes[toId] = new NodeMonitor();
+        nodes.set(toId, new NodeMonitor());
     }
 
     @Override
     public int[] filter(long threshold) {
         List<Integer> lost = new ArrayList<>();
-        for (int i = 0; i < nodes.length; i++) {
-            if (i != moduleId && !nodes[i].testSrv(threshold))
-                lost.add(i);
+        long crtTime = System.currentTimeMillis();
+
+        for (int i = 0; i < nodes.length(); i++) {
+            if (i != moduleId) {
+                int id = i;
+                nodes.updateAndGet(i, nodeMonitor -> {
+                    nodeMonitor.isConn = crtTime - nodeMonitor.lst_srv <= threshold;
+                    if (!nodeMonitor.isConn)
+                        lost.add(id);
+                    return nodeMonitor;
+                });
+            }
         }
 
         if (lost.isEmpty())
@@ -118,17 +114,41 @@ public class HeartBeatModule implements ConnectionModule{
     }
 
     @Override
+    public int filterCount(long threshold) {
+        AtomicInteger count = new AtomicInteger(0);
+        long crtTime = System.currentTimeMillis();
+
+        for (int i = 0; i < nodes.length(); i++) {
+            if (i != moduleId) {
+                int id = i;
+                nodes.updateAndGet(id, nodeMonitor -> {
+                    if (nodeMonitor != null){
+                        nodeMonitor.isConn = crtTime - nodeMonitor.lst_srv <= threshold;
+                        if (!nodeMonitor.isConn)
+                            count.incrementAndGet();
+                    }
+                    return nodeMonitor;
+                });
+            }
+        }
+
+        return count.get();
+    }
+
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("[module:").append(moduleId).append("]\n").append("\t id | isConn | lst_srv | lst_rndSrv | lst_rnd <INIT, ARR> | rnd \n");
-        int i = 0;
-        for (NodeMonitor node :
-                nodes) {
-            if (node != null) {
-                builder.append("\t ").append(i).append(" | ").append(node);
-            }
-            ++i;
+
+        for (int i = 0; i < nodes.length(); i++) {
+            int id = i;
+            nodes.updateAndGet(id, nodeMonitor -> {
+                if (nodeMonitor != null)
+                    builder.append("\t ").append(id).append(" | ").append(nodeMonitor.toString());
+                return nodeMonitor;
+            });
         }
+
         return builder.toString();
     }
 }

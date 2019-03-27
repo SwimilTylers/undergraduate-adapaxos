@@ -2,20 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/agent/DiskResponder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/instance/store/PseudoRemoteInstanceStore.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/instance/store/TaggedOffsetIndexStore.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/agent/acceptor/AdaAcceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/acceptor/AdaAcceptor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/agent/learner/AdaLearner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/learner/AdaLearner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/agent/proposer/AdaProposer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/proposer/AdaProposer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/demo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/demo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/instance/store/RemoteInstanceStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/instance/store/RemoteInstanceStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/logger/NaiveLogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/logger/NaiveLogger.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/logger/PaxosLogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/logger/PaxosLogger.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/message/protocols/DiskPaxosMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/message/protocols/DiskPaxosMessage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/service/GenericNetService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/GenericNetService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/network/service/module/ConnectionModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/module/ConnectionModule.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/network/service/module/HeartBeatModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/module/HeartBeatModule.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -43,7 +32,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/logs/server-0.diagnosis">
           <provider selected="true" editor-type-id="text-editor" />
         </entry>
@@ -69,11 +58,15 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/network/service/module/HeartBeatModule.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1498">
-              <caret line="117" column="5" selection-start-line="117" selection-start-column="5" selection-end-line="117" selection-end-column="5" />
+            <state relative-caret-position="247">
+              <caret line="132" column="9" lean-forward="true" selection-start-line="132" selection-start-column="9" selection-end-line="132" selection-end-column="9" />
+              <folding>
+                <element signature="e#2902#2903#0" expanded="true" />
+                <element signature="e#2952#2953#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -81,8 +74,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/network/service/module/ConnectionModule.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="112">
-              <caret line="8" column="17" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
+            <state relative-caret-position="252">
+              <caret line="18" column="4" lean-forward="true" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="36" />
             </state>
           </provider>
         </entry>
@@ -192,10 +185,8 @@
         <option value="$PROJECT_DIR$/src/instance/store/log.java" />
         <option value="$PROJECT_DIR$/src/instance/store/SequentialStore.java" />
         <option value="$PROJECT_DIR$/src/client/FileIteratorClient.java" />
-        <option value="$PROJECT_DIR$/src/network/service/module/ConnectionModule.java" />
         <option value="$PROJECT_DIR$/src/network/service/receiver/PeerMessageReceiver.java" />
         <option value="$PROJECT_DIR$/src/network/service/receiver/BasicPeerMessageReceiver.java" />
-        <option value="$PROJECT_DIR$/src/network/service/module/HeartBeatModule.java" />
         <option value="$PROJECT_DIR$/src/rsm/monitor/InstanceUpdateMonitor.java" />
         <option value="$PROJECT_DIR$/src/network/message/protocols/AdaPaxosMessage.java" />
         <option value="$PROJECT_DIR$/src/agent/proposer/Proposer.java" />
@@ -235,6 +226,8 @@
         <option value="$PROJECT_DIR$/src/logger/NaiveLogger.java" />
         <option value="$PROJECT_DIR$/src/network/service/GenericNetService.java" />
         <option value="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" />
+        <option value="$PROJECT_DIR$/src/network/service/module/ConnectionModule.java" />
+        <option value="$PROJECT_DIR$/src/network/service/module/HeartBeatModule.java" />
       </list>
     </option>
   </component>
@@ -500,7 +493,7 @@
       <workItem from="1553395583084" duration="23915000" />
       <workItem from="1553667466102" duration="12370000" />
       <workItem from="1553688526614" duration="178000" />
-      <workItem from="1553688757363" duration="240000" />
+      <workItem from="1553688757363" duration="2191000" />
     </task>
     <task id="LOCAL-00001" summary="modify README.md">
       <created>1545406849881</created>
@@ -775,11 +768,18 @@
       <option name="project" value="LOCAL" />
       <updated>1553414222448</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="Status: AdaPaxosRSM on running &#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR">
+      <created>1553689022992</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1553689022992</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="550241000" />
+    <option name="totallyTimeSpent" value="552192000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1269,20 +1269,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/module/HeartBeatModule.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1498">
-          <caret line="117" column="5" selection-start-line="117" selection-start-column="5" selection-end-line="117" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/module/ConnectionModule.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="112">
-          <caret line="8" column="17" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/logger/NaiveLogger.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="266">
@@ -1322,6 +1308,24 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-0.diagnosis">
       <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/module/ConnectionModule.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="252">
+          <caret line="18" column="4" lean-forward="true" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/module/HeartBeatModule.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="132" column="9" lean-forward="true" selection-start-line="132" selection-start-column="9" selection-end-line="132" selection-end-column="9" />
+          <folding>
+            <element signature="e#2902#2903#0" expanded="true" />
+            <element signature="e#2952#2953#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
     </entry>
   </component>
   <component name="masterDetails">
