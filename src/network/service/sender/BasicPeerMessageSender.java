@@ -3,6 +3,7 @@ package network.service.sender;
 import com.sun.istack.internal.NotNull;
 import logger.PaxosLogger;
 import network.message.protocols.GenericConnectionMessage;
+import network.message.protocols.TaggedMessage;
 import network.service.module.ConnectionModule;
 
 import java.io.IOException;
@@ -39,7 +40,7 @@ public class BasicPeerMessageSender implements PeerMessageSender {
                 logger.logPeerNet(netServiceId, toId, msg.toString());
                 OutputStream socketStream = peers[toId].getOutputStream();
                 ObjectOutputStream ostream = new ObjectOutputStream(socketStream);
-                ostream.writeObject(msg);
+                ostream.writeObject(new TaggedMessage(System.currentTimeMillis(), msg));
                 ostream.flush();
                 socketStream.flush();
             } catch (IOException e) {

@@ -26,7 +26,7 @@ public class TaggedOffsetIndexStore extends OffsetIndexStore{
             tags.put(key, inst_ballot);
             return super.store(access_id, inst_id, instance);
         }
-        else if (tags.get(key) < inst_ballot){
+        else if (tags.get(key) <= inst_ballot){
             tags.replace(key, inst_ballot);
             return super.store(access_id, inst_id, instance);
         }

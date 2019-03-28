@@ -13,6 +13,7 @@ import instance.store.InstanceStore;
 import instance.store.OffsetIndexStore;
 import instance.store.RemoteInstanceStore;
 import javafx.util.Pair;
+import logger.DummyLogger;
 import logger.NaiveLogger;
 import logger.PaxosLogger;
 import network.message.protocols.AdaPaxosMessage;
@@ -49,7 +50,6 @@ public class AdaPaxosRSM implements Serializable{
     transient protected ConnectionModule conn;
 
     /* channels */
-    transient protected BlockingQueue<ClientRequest[]> batchedRequestChan;
     transient protected Queue<ClientRequest> restoredQueue;
 
     transient protected BlockingQueue<ClientRequest> cMessages;
@@ -90,6 +90,8 @@ public class AdaPaxosRSM implements Serializable{
         this.serverId = serverId;
         this.asLeader = new AtomicBoolean(initAsLeader);
         this.logger = logger;
+
+        this.restoredQueue = new ConcurrentLinkedQueue<>();
     }
 
     /* protected-access build func */
@@ -100,13 +102,6 @@ public class AdaPaxosRSM implements Serializable{
         this.conn = conn;
 
         net.setLogger(logger);
-
-        return this;
-    }
-
-    protected AdaPaxosRSM batchBuild(final int sizeBatchChan){
-        batchedRequestChan = new ArrayBlockingQueue<>(sizeBatchChan);
-        restoredQueue = new ConcurrentLinkedQueue<>();
 
         return this;
     }
@@ -163,7 +158,6 @@ public class AdaPaxosRSM implements Serializable{
     public static AdaPaxosRSM makeInstance(final int id, final int epoch, final int peerSize, InstanceStore localStore, RemoteInstanceStore remoteStore, GenericNetService net, boolean initAsLeader){
         AdaPaxosRSM rsm = new AdaPaxosRSM(id, initAsLeader, new NaiveLogger(id));
         rsm.netConnectionBuild(net, net.getConnectionModule(), peerSize)
-                .batchBuild(AdaPaxosConfiguration.RSM.DEFAULT_BATCH_CHAN_SIZE)
                 .instanceSpaceBuild(AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE, epoch << 16, 0)
                 .instanceStorageBuild(localStore, remoteStore, true)
                 .messageChanBuild(AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE);
@@ -174,6 +168,10 @@ public class AdaPaxosRSM implements Serializable{
     * - link: connection establishment of both net and remote-disk */
 
     public void link(String[] peerAddr, int[] peerPort, final int clientPort) throws InterruptedException {
+        link(peerAddr, peerPort, clientPort, AdaPaxosConfiguration.RSM.DEFAULT_LINK_STABLE_WAITING);
+    }
+
+    public void link(String[] peerAddr, int[] peerPort, final int clientPort, int wait) throws InterruptedException {
         assert peerAddr.length == peerPort.length && peerAddr.length == peerSize;
 
         net.setClientChan(cMessages);
@@ -189,6 +187,10 @@ public class AdaPaxosRSM implements Serializable{
         net.openClientListener(clientPort);
 
         remoteStore.connect(dMessages);
+
+        Thread.sleep(wait);
+
+        logger.record(false, "hb", "finish link\n");
     }
 
     public void agent(){
@@ -201,8 +203,7 @@ public class AdaPaxosRSM implements Serializable{
         routineOnRunning = new AtomicBoolean(true);
         ExecutorService routines = Executors.newCachedThreadPool();
         routines.execute(()-> routine_batch(5000, GenericPaxosSMR.DEFAULT_REQUEST_COMPACTING_SIZE));
-        routines.execute(()-> routine_propose(GenericPaxosSMR.DEFAULT_COMPACT_INTERVAL));
-        routines.execute(() -> routine_monitor(25, 50, 10));
+        routines.execute(() -> routine_monitor(160, 80, 10));
         routines.execute(this::routine_response);
         if (supplement != null && supplement.length != 0) {
             for (Runnable r : supplement)
@@ -212,8 +213,7 @@ public class AdaPaxosRSM implements Serializable{
     }
 
     /* protected-access routine func, including:
-    * - batch: batch up requests from both clients or restoredQueue
-    * - propose: initiate proposal on batched requests
+    * - batch: batch up requests from both clients or restoredQueue and initiate proposal on batched requests
     * - monitor: check out network status and shift between slow- and fast-mode accordingly
     * - response: response peers due to paxos mechanics
     * - backup: backup on-memory instance if necessary
@@ -244,11 +244,10 @@ public class AdaPaxosRSM implements Serializable{
             }
 
             if (!requestList.isEmpty()) {
-                try {
-                    batchedRequestChan.put(requestList.toArray(new ClientRequest[0]));
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    return;
+                ClientRequest[] cmd = requestList.toArray(new ClientRequest[0]);
+                if (asLeader.get()){
+                    proposer.handleRequests(maxReceivedInstance.getAndIncrement(), crtInstBallot.get(), cmd);
+                    logger.log(true, "init a proposal\n");
                 }
             }
 
@@ -261,56 +260,55 @@ public class AdaPaxosRSM implements Serializable{
         }
     }
 
-    protected void routine_propose(final int proposeItv){
-        while (routineOnRunning.get()){
-            ClientRequest[] cmd = batchedRequestChan.poll();
-            if (cmd != null && asLeader.get()){
-                proposer.handleRequests(maxReceivedInstance.getAndIncrement(), crtInstBallot.get(), cmd);
-                logger.log(true, "init a proposal\n");
-            }
-
-            try {
-                Thread.sleep(proposeItv); // drop the refreshing frequency of 'propose'
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return;
-            }
-        }
-    }
-
     protected void routine_monitor(final int monitorItv, final int expire, final int stability){
-        final int bare_majority = (peerSize+1)/2 + 1;
+        final int bare_majority = (peerSize+1)/2;
+        final int bare_minority = peerSize - bare_majority;
+
         int stableConnCount = 0;
 
         while (routineOnRunning.get()){
-            AdaPaxosMessage message = aMessages.poll();
-            if (message != null){
-                if (message.fsync){
-                    forceFsync.set(true);
-                    fileSynchronize();
-                }
-                else {
-                    forceFsync.set(false);
-                    memorySynchronize();
-                }
-            }
-            else if (asLeader.get()){
-                int[] crushed = conn.filter(expire);
-                logger.record(false, "diag", Arrays.toString(crushed)+"\n");
-                /*
-                if (crushed.length <= bare_majority){
-                    stableConnCount = 0;
-                    forceFsync.set(true);
-                    fileSynchronize();
-                }
-                else {
-                    ++stableConnCount;
-                    if (stableConnCount >= stability){
+            if (!asLeader.get()) {
+                AdaPaxosMessage message = aMessages.poll();
+                if (message != null) {
+                    if (message.fsync) {
+                        forceFsync.set(true);
+                        fileSynchronize();
+                        logger.record(false, "diag","["+System.currentTimeMillis()+"]"+"[FSYNC=true]\n");
+                    } else {
                         forceFsync.set(false);
                         memorySynchronize();
+                        logger.record(false, "diag","["+System.currentTimeMillis()+"]"+"[FSYNC=false]\n");
                     }
                 }
-                */
+            }
+            else {
+                int[] crushed = conn.filter(expire);
+
+                if (crushed != null) {
+                    logger.record(false, "diag", "["+System.currentTimeMillis()+"]"+Arrays.toString(crushed) + "\n");
+                    if (crushed.length >= bare_minority && !forceFsync.get()){
+                        stableConnCount = 0;
+                        //forceFsync.set(true);
+                        //fileSynchronize();
+                        logger.record(false, "diag","["+System.currentTimeMillis()+"]"+"[FSYNC=true]\n");
+                    }
+                    else if (crushed.length < bare_minority && forceFsync.get()){
+                        ++stableConnCount;
+                        if (stableConnCount >= stability){
+                            //forceFsync.set(false);
+                            //memorySynchronize();
+                            logger.record(false, "diag","["+System.currentTimeMillis()+"]"+"[FSYNC=false]\n");
+                        }
+                    }
+                }
+                else if (forceFsync.get()){ // no crash
+                    ++stableConnCount;
+                    if (stableConnCount >= stability){
+                        //forceFsync.set(false);
+                        //memorySynchronize();
+                        logger.record(false, "diag","["+System.currentTimeMillis()+"]"+"[FSYNC=false]\n");
+                    }
+                }
 
                 try {
                     Thread.sleep(monitorItv); // drop the refreshing frequency of 'monitor'
@@ -385,7 +383,7 @@ public class AdaPaxosRSM implements Serializable{
     protected void routine_backup(final int backupItv){
         while(routineOnRunning.get()){
             if (!forceFsync.get())
-                fileSynchronize();
+                fileSynchronize(true);
 
             try {
                 Thread.sleep(backupItv); // drop the refreshing frequency of 'backup'
@@ -402,15 +400,19 @@ public class AdaPaxosRSM implements Serializable{
 
     /* protected-access file2mem-mem2file func */
 
-    synchronized protected void fileSynchronize(){
+    protected void fileSynchronize(){
+        fileSynchronize(false);
+    }
+
+    protected void fileSynchronize(boolean immediate){
 
     }
 
-    synchronized protected void memorySynchronize(){
+    protected void memorySynchronize(){
 
     }
 
-    synchronized protected void fileSynchronize(final int specific){
+    protected void fileSynchronize(final int specific){
 
     }
 

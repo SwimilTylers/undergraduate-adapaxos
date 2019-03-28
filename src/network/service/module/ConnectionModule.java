@@ -10,8 +10,8 @@ public interface ConnectionModule {
     GenericConnectionMessage.Beacon makeBeacon(long ts);
     GenericConnectionMessage.ackBeacon makeAck(long recvTs, GenericConnectionMessage.Beacon beacon);
 
-    void updateByBeacon(long recvTs, GenericConnectionMessage.Beacon beacon);
-    void updateByAckBeacon(long recvTs, GenericConnectionMessage.ackBeacon ackBeacon);
+    void update(int fromId, long timestamp);
+    void updateRound(long recvTs, GenericConnectionMessage.ackBeacon ackBeacon);
 
     void init(int toId);
 

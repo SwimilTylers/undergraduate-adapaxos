@@ -3,6 +3,7 @@ import instance.StaticPaxosInstance;
 import instance.store.InstanceStore;
 import instance.store.OffsetIndexStore;
 import instance.store.PseudoRemoteInstanceStore;
+import instance.store.TaggedOffsetIndexStore;
 import logger.NaiveLogger;
 import network.service.GenericNetService;
 import org.apache.log4j.BasicConfigurator;
@@ -255,11 +256,11 @@ public class demo {
 
     public static class AdaPaxosRSMTesting{
         static InstanceStore[] stores = new InstanceStore[]{
-                new OffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+0),
-                new OffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+1),
-                new OffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+2),
-                new OffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+3),
-                new OffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+4)
+                new TaggedOffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+0),
+                new TaggedOffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+1),
+                new TaggedOffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+2),
+                new TaggedOffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+3),
+                new TaggedOffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+4)
         };
 
 
@@ -292,6 +293,28 @@ public class demo {
             }
             service.execute(client);
         }
+
+        static void test1(int totalNum){
+            ExecutorService service = Executors.newCachedThreadPool();
+            for (int i = 0; i < totalNum; i++) {
+                int serverId = i;
+                service.execute(() -> {
+                    try {
+                        AdaPaxosRSM rsm = AdaPaxosRSM.makeInstance(serverId, 0, 5,
+                                stores[serverId],
+                                new PseudoRemoteInstanceStore(serverId, stores),
+                                new GenericNetService(serverId),
+                                serverId == 0
+                        );
+                        rsm.link(Arrays.copyOfRange(NetServiceTesting.addr, 0, totalNum), Arrays.copyOfRange(NetServiceTesting.port, 0, totalNum), 4470+serverId*2);
+                        rsm.agent();
+                        rsm.routine();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+        }
     }
 
     public static void main(String[] args) {
@@ -299,6 +322,7 @@ public class demo {
         //GenericPaxosSMRTesting.test0();
         //DiskPaxosSMRTesting.test1();
         AdaPaxosRSMTesting.test0();
+        //AdaPaxosRSMTesting.test1(5);
         //OffsetIndexStoreTesting.test4();
         //Synchronized.main(args);
         //Date date = new Date();

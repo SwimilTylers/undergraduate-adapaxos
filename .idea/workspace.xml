@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="">
+    <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="Status: back to init&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR">
+      <change afterPath="$PROJECT_DIR$/src/logger/DummyLogger.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/network/message/protocols/TaggedMessage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/demo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/demo.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/instance/store/TaggedOffsetIndexStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/instance/store/TaggedOffsetIndexStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/logger/NaiveLogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/logger/NaiveLogger.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/network/service/GenericNetService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/GenericNetService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/network/service/module/ConnectionModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/module/ConnectionModule.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/network/service/module/HeartBeatModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/module/HeartBeatModule.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/network/service/receiver/BasicPeerMessageReceiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/receiver/BasicPeerMessageReceiver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/network/service/receiver/PeerMessageReceiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/receiver/PeerMessageReceiver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/network/service/receiver/SimulatorReceiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/receiver/SimulatorReceiver.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/network/service/sender/BasicPeerMessageSender.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/sender/BasicPeerMessageSender.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/AdaPaxosConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/AdaPaxosConfiguration.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -21,10 +33,26 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
+        <entry file="file://$PROJECT_DIR$/src/demo.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="231">
-              <caret line="294" column="17" selection-start-line="294" selection-start-column="17" selection-end-line="294" selection-end-column="17" />
+            <state relative-caret-position="205">
+              <caret line="264" selection-start-line="264" selection-end-line="264" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#4853#4854#0" expanded="true" />
+                <element signature="e#4884#4885#0" expanded="true" />
+                <element signature="e#6008#6009#0" expanded="true" />
+                <element signature="e#6070#6071#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/instance/store/TaggedOffsetIndexStore.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="294">
+              <caret line="28" column="33" selection-start-line="28" selection-start-column="33" selection-end-line="28" selection-end-column="33" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -33,93 +61,19 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/logs/server-0.diagnosis">
+        <entry file="file://$PROJECT_DIR$/logs/server-0.commit.log">
           <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/demo.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3514">
-              <caret line="273" column="80" selection-start-line="273" selection-start-column="80" selection-end-line="273" selection-end-column="80" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/network/service/GenericNetService.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2786">
-              <caret line="230" column="23" selection-start-line="230" selection-start-column="17" selection-end-line="230" selection-end-column="23" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/network/service/module/HeartBeatModule.java">
+        <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="247">
-              <caret line="132" column="9" lean-forward="true" selection-start-line="132" selection-start-column="9" selection-end-line="132" selection-end-column="9" />
-              <folding>
-                <element signature="e#2902#2903#0" expanded="true" />
-                <element signature="e#2952#2953#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/network/service/module/ConnectionModule.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="252">
-              <caret line="18" column="4" lean-forward="true" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="36" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/logger/NaiveLogger.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="266">
-              <caret line="30" column="28" selection-start-line="30" selection-start-column="28" selection-end-line="30" selection-end-column="28" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/agent/learner/AdaLearner.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2492">
-              <caret line="194" column="13" selection-start-line="194" selection-start-column="13" selection-end-line="194" selection-end-column="13" />
+            <state relative-caret-position="3752">
+              <caret line="387" column="17" selection-start-line="387" selection-start-column="17" selection-end-line="387" selection-end-column="17" />
               <folding>
                 <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/agent/proposer/AdaProposer.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2814">
-              <caret line="218" column="52" selection-start-line="218" selection-start-column="52" selection-end-line="218" selection-end-column="52" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/instance/store/PseudoRemoteInstanceStore.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="98">
-              <caret line="12" column="3" selection-start-line="12" selection-start-column="3" selection-end-line="12" selection-end-column="3" />
-              <folding>
-                <element signature="imports" expanded="true" />
+                <element signature="e#16490#16491#0" expanded="true" />
+                <element signature="e#16523#16524#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -131,8 +85,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Enum" />
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -159,17 +113,21 @@
       <find>(AdaPaxos</find>
       <find>getAndUpdate</find>
       <find>PROPOSE</find>
+      <find>Executors</find>
     </findStrings>
     <replaceStrings>
       <replace />
       <replace>separator</replace>
     </replaceStrings>
+    <dirStrings>
+      <dir>E:\Distributed Algorithms\Yijiang_Yang\Implementation\adapaxos\src\network\message\protocols</dir>
+    </dirStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="init" />
       </map>
     </option>
     <option name="RESET_MODE" value="HARD" />
@@ -177,16 +135,11 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/network/service/peer/SimulatorReceiver.java" />
-        <option value="$PROJECT_DIR$/src/network/service/SimulatedNetService.java" />
-        <option value="$PROJECT_DIR$/src/agent/acceptor/IntegratedDiskAcceptor.java" />
         <option value="$PROJECT_DIR$/src/rsm/DiskPaxosSMR.java" />
         <option value="$PROJECT_DIR$/src/instance/store/AdaStoreProxy.java" />
         <option value="$PROJECT_DIR$/src/instance/store/log.java" />
         <option value="$PROJECT_DIR$/src/instance/store/SequentialStore.java" />
         <option value="$PROJECT_DIR$/src/client/FileIteratorClient.java" />
-        <option value="$PROJECT_DIR$/src/network/service/receiver/PeerMessageReceiver.java" />
-        <option value="$PROJECT_DIR$/src/network/service/receiver/BasicPeerMessageReceiver.java" />
         <option value="$PROJECT_DIR$/src/rsm/monitor/InstanceUpdateMonitor.java" />
         <option value="$PROJECT_DIR$/src/network/message/protocols/AdaPaxosMessage.java" />
         <option value="$PROJECT_DIR$/src/agent/proposer/Proposer.java" />
@@ -195,7 +148,6 @@
         <option value="$PROJECT_DIR$/src/instance/RemoteInstanceStore.java" />
         <option value="$PROJECT_DIR$/src/instance/maintenance/HistoryMaintenance.java" />
         <option value="$PROJECT_DIR$/src/rsm/BasicPaxosRSM.java" />
-        <option value="$PROJECT_DIR$/src/network/service/sender/BasicPeerMessageSender.java" />
         <option value="$PROJECT_DIR$/src/rsm/DiskPaxosRSM.java" />
         <option value="$PROJECT_DIR$/src/instance/store/DummyStore.java" />
         <option value="$PROJECT_DIR$/src/instance/store/InstanceStore.java" />
@@ -207,27 +159,33 @@
         <option value="$PROJECT_DIR$/src/instance/StaticPaxosInstance.java" />
         <option value="$PROJECT_DIR$/src/agent/learner/GenericLearner.java" />
         <option value="$PROJECT_DIR$/src/rsm/GenericPaxosSMR.java" />
-        <option value="$PROJECT_DIR$/src/utils/AdaPaxosConfiguration.java" />
         <option value="$PROJECT_DIR$/src/agent/proposer/GenericProposer.java" />
         <option value="$PROJECT_DIR$/src/network/message/protocols/GenericPaxosMessage.java" />
         <option value="$PROJECT_DIR$/src/instance/store/OffsetIndexStore.java" />
         <option value="$PROJECT_DIR$/src/agent/acceptor/AdaAcceptor.java" />
-        <option value="$PROJECT_DIR$/src/instance/store/TaggedOffsetIndexStore.java" />
         <option value="$PROJECT_DIR$/src/utils/AdaAgents.java" />
         <option value="$PROJECT_DIR$/src/network/message/protocols/DiskPaxosMessage.java" />
         <option value="$PROJECT_DIR$/src/agent/DiskResponder.java" />
         <option value="$PROJECT_DIR$/src/instance/maintenance/AdaLeaderMaintenance.java" />
         <option value="$PROJECT_DIR$/src/instance/store/RemoteInstanceStore.java" />
         <option value="$PROJECT_DIR$/src/instance/store/PseudoRemoteInstanceStore.java" />
-        <option value="$PROJECT_DIR$/src/demo.java" />
         <option value="$PROJECT_DIR$/src/agent/proposer/AdaProposer.java" />
         <option value="$PROJECT_DIR$/src/agent/learner/AdaLearner.java" />
         <option value="$PROJECT_DIR$/src/logger/PaxosLogger.java" />
-        <option value="$PROJECT_DIR$/src/logger/NaiveLogger.java" />
-        <option value="$PROJECT_DIR$/src/network/service/GenericNetService.java" />
-        <option value="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" />
+        <option value="$PROJECT_DIR$/src/network/message/protocols/TaggedMessage.java" />
+        <option value="$PROJECT_DIR$/src/network/service/sender/BasicPeerMessageSender.java" />
+        <option value="$PROJECT_DIR$/src/network/service/receiver/PeerMessageReceiver.java" />
+        <option value="$PROJECT_DIR$/src/network/service/receiver/SimulatorReceiver.java" />
         <option value="$PROJECT_DIR$/src/network/service/module/ConnectionModule.java" />
+        <option value="$PROJECT_DIR$/src/network/service/receiver/BasicPeerMessageReceiver.java" />
+        <option value="$PROJECT_DIR$/src/logger/DummyLogger.java" />
+        <option value="$PROJECT_DIR$/src/network/service/GenericNetService.java" />
+        <option value="$PROJECT_DIR$/src/logger/NaiveLogger.java" />
+        <option value="$PROJECT_DIR$/src/utils/AdaPaxosConfiguration.java" />
         <option value="$PROJECT_DIR$/src/network/service/module/HeartBeatModule.java" />
+        <option value="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" />
+        <option value="$PROJECT_DIR$/src/demo.java" />
+        <option value="$PROJECT_DIR$/src/instance/store/TaggedOffsetIndexStore.java" />
       </list>
     </option>
   </component>
@@ -242,7 +200,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -353,6 +311,22 @@
               <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
               <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="network" type="462c0819:PsiDirectoryNode" />
+              <item name="service" type="462c0819:PsiDirectoryNode" />
+              <item name="receiver" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="network" type="462c0819:PsiDirectoryNode" />
+              <item name="service" type="462c0819:PsiDirectoryNode" />
+              <item name="sender" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="rsm" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -365,7 +339,7 @@
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -375,7 +349,7 @@
     <property name="Repository.Attach.Sources" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1553687716066" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1553779318601" />
     <property name="extract.method.default.visibility" value="private" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/lib/apache-log4j-2.11.1-bin" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
@@ -494,6 +468,9 @@
       <workItem from="1553667466102" duration="12370000" />
       <workItem from="1553688526614" duration="178000" />
       <workItem from="1553688757363" duration="2191000" />
+      <workItem from="1553692894280" duration="6454000" />
+      <workItem from="1553774702828" duration="5444000" />
+      <workItem from="1553780208275" duration="3274000" />
     </task>
     <task id="LOCAL-00001" summary="modify README.md">
       <created>1545406849881</created>
@@ -779,7 +756,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="552192000" />
+    <option name="totallyTimeSpent" value="567808000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -794,7 +771,7 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.32841823" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.347185" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -809,10 +786,10 @@
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32719547" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="8" weight="0.3286119" />
+      <window_info anchor="bottom" id="Version Control" order="8" sideWeight="0.49865952" weight="0.3286119" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Terminal" order="10" weight="0.32719547" />
-      <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.50067025" side_tool="true" weight="0.3286119" />
+      <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.5013405" side_tool="true" weight="0.3286119" />
       <window_info anchor="bottom" id="Messages" order="12" weight="0.3286119" />
       <window_info anchor="bottom" id="Duplicate detector" order="13" weight="0.3286119" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
@@ -826,38 +803,6 @@
       <window_info anchor="right" id="Database" order="8" />
       <window_info anchor="right" id="Coverage" order="9" side_tool="true" weight="0.3297587" />
     </layout>
-    <layout-to-restore>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.3150134" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Image Layers" order="2" />
-      <window_info id="Designer" order="3" />
-      <window_info id="UI Designer" order="4" />
-      <window_info id="Capture Tool" order="5" />
-      <window_info id="Favorites" order="6" side_tool="true" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.3286119" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49932975" visible="true" weight="0.3286119" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.39943343" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" weight="0.3281471" />
-      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="8" weight="0.3286119" />
-      <window_info anchor="bottom" id="Database Changes" order="9" />
-      <window_info anchor="bottom" id="Terminal" order="10" weight="0.32719547" />
-      <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.50067025" side_tool="true" weight="0.3286119" />
-      <window_info anchor="bottom" id="Messages" order="12" weight="0.3286119" />
-      <window_info anchor="right" id="Commander" order="0" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Palette" order="3" />
-      <window_info anchor="right" id="Theme Preview" order="4" />
-      <window_info anchor="right" id="Maven" order="5" />
-      <window_info anchor="right" id="Capture Analysis" order="6" />
-      <window_info anchor="right" id="Palette&#9;" order="7" />
-      <window_info anchor="right" id="Database" order="8" />
-      <window_info anchor="right" id="Coverage" order="9" side_tool="true" weight="0.3297587" />
-    </layout-to-restore>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
@@ -906,7 +851,6 @@
     <ignored-roots>
       <path value="E:" />
     </ignored-roots>
-    <MESSAGE value="Status: untested [4] Start Competitors early ABORT [5] Start Competitors late ABORT&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.rsm&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
     <MESSAGE value="Status: untested clientListener&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.rsm&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
     <MESSAGE value="Status: fix up some sequence map&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.rsm&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
     <MESSAGE value="Status: single machine&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.rsm&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
@@ -931,145 +875,10 @@
     <MESSAGE value="Status: AdaPaxosInstance&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
     <MESSAGE value="Status: AdaAgents&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: AdaPaxosRSM on running &#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
-    <option name="LAST_COMMIT_MESSAGE" value="Status: AdaPaxosRSM on running &#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
+    <MESSAGE value="Status: back to init&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
+    <option name="LAST_COMMIT_MESSAGE" value="Status: back to init&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/logs/server-2.log">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/sender/BasicPeerMessageSender.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="39" column="56" selection-start-line="39" selection-start-column="56" selection-end-line="39" selection-end-column="56" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/agent/proposer/Proposer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="140">
-          <caret line="12" column="12" selection-start-line="12" selection-start-column="12" selection-end-line="12" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/maintenance/DiskLeaderMaintenance.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="112">
-          <caret line="15" column="13" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/maintenance/LeaderMaintenance.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="154">
-          <caret line="11" column="3" lean-forward="true" selection-start-line="11" selection-start-column="3" selection-end-line="11" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/InstanceStatus.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="112">
-          <caret line="8" column="12" selection-start-line="8" selection-start-column="12" selection-end-line="8" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/store/DummyStore.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="16" column="53" selection-start-line="16" selection-start-column="53" selection-end-line="16" selection-end-column="53" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/store/InstanceStore.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="12" column="52" selection-start-line="12" selection-start-column="52" selection-end-line="12" selection-end-column="52" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-2.commit.log">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/agent/acceptor/GenericAcceptor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3850">
-          <caret line="280" column="9" selection-start-line="169" selection-start-column="8" selection-end-line="280" selection-end-column="9" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/agent/learner/GenericLearner.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1274">
-          <caret line="100" column="8" selection-start-line="100" selection-start-column="8" selection-end-line="141" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/PaxosInstance.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="14" column="29" selection-start-line="14" selection-start-column="29" selection-end-line="14" selection-end-column="29" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/StaticPaxosInstance.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="13" column="41" selection-start-line="13" selection-start-column="41" selection-end-line="13" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/client/FileIteratorClient.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="218">
-          <caret line="54" column="23" selection-start-line="54" selection-start-column="23" selection-end-line="54" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/rsm/DiskPaxosRSM.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="24" column="61" selection-start-line="24" selection-start-column="54" selection-end-line="24" selection-end-column="61" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/rsm/GenericPaxosSMR.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2772">
-          <caret line="214" column="41" selection-start-line="214" selection-start-column="41" selection-end-line="214" selection-end-column="41" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/utils/AdaPaxosConfiguration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="140">
-          <caret line="10" column="63" selection-start-line="10" selection-start-column="35" selection-end-line="10" selection-end-column="63" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/agent/proposer/GenericProposer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="14">
-          <caret line="23" column="25" selection-start-line="23" selection-start-column="25" selection-end-line="23" selection-end-column="25" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/agent/proposer/DiskProposer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="378">
@@ -1156,16 +965,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/store/TaggedOffsetIndexStore.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="266">
-          <caret line="23" column="49" selection-start-line="23" selection-start-column="49" selection-end-line="23" selection-end-column="49" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/instance/store/RemoteInstanceStore.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="140">
@@ -1216,23 +1015,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-1.log">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-0.commit.log">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-0.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="12" column="10" selection-start-line="12" selection-start-column="10" selection-end-line="12" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-0.paxos.log">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-0.heartbeat">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/src/logger/PaxosLogger.java">
@@ -1242,44 +1025,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
+    <entry file="file://$PROJECT_DIR$/src/instance/store/PseudoRemoteInstanceStore.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="231">
-          <caret line="294" column="17" selection-start-line="294" selection-start-column="17" selection-end-line="294" selection-end-column="17" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/demo.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3514">
-          <caret line="273" column="80" selection-start-line="273" selection-start-column="80" selection-end-line="273" selection-end-column="80" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/GenericNetService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2786">
-          <caret line="230" column="23" selection-start-line="230" selection-start-column="17" selection-end-line="230" selection-end-column="23" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/logger/NaiveLogger.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="266">
-          <caret line="30" column="28" selection-start-line="30" selection-start-column="28" selection-end-line="30" selection-end-column="28" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/agent/learner/AdaLearner.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2492">
-          <caret line="194" column="13" selection-start-line="194" selection-start-column="13" selection-end-line="194" selection-end-column="13" />
+        <state relative-caret-position="98">
+          <caret line="12" column="3" selection-start-line="12" selection-start-column="3" selection-end-line="12" selection-end-column="3" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1296,33 +1045,195 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/store/PseudoRemoteInstanceStore.java">
+    <entry file="file://$PROJECT_DIR$/src/network/message/protocols/TaggedMessage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="98">
-          <caret line="12" column="3" selection-start-line="12" selection-start-column="3" selection-end-line="12" selection-end-column="3" />
+        <state relative-caret-position="154">
+          <caret line="11" column="29" lean-forward="true" selection-start-line="11" selection-start-column="29" selection-end-line="11" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/receiver/PeerMessageReceiver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="140">
+          <caret line="12" column="46" selection-start-line="12" selection-start-column="46" selection-end-line="12" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/receiver/SimulatorReceiver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="448">
+          <caret line="37" column="38" selection-start-line="37" selection-start-column="38" selection-end-line="37" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/module/ConnectionModule.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="168">
+          <caret line="12" column="16" selection-start-line="12" selection-start-column="16" selection-end-line="12" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/receiver/BasicPeerMessageReceiver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="364">
+          <caret line="105" column="38" selection-start-line="105" selection-start-column="38" selection-end-line="105" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/sender/BasicPeerMessageSender.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="23">
+          <caret line="25" selection-start-line="25" selection-end-line="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/logger/NaiveLogger.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="224">
+          <caret line="115" column="2" selection-start-line="115" selection-start-column="2" selection-end-line="115" selection-end-column="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-2.commit.log">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-1.log">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-1.commit.log">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/agent/learner/AdaLearner.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="79">
+          <caret line="194" column="13" selection-start-line="194" selection-start-column="13" selection-end-line="194" selection-end-column="13" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-0.diagnosis">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/module/ConnectionModule.java">
+    <entry file="file://$PROJECT_DIR$/src/logger/DummyLogger.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="18" column="4" lean-forward="true" selection-start-line="18" selection-start-column="4" selection-end-line="18" selection-end-column="36" />
+        <state relative-caret-position="-509">
+          <caret line="30" column="19" selection-start-line="30" selection-start-column="19" selection-end-line="30" selection-end-column="19" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-0.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-247">
+          <caret line="10" column="10" selection-start-line="10" selection-start-column="10" selection-end-line="10" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/utils/AdaPaxosConfiguration.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="168">
+          <caret line="12" column="66" selection-start-line="12" selection-start-column="66" selection-end-line="12" selection-end-column="66" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/network/service/module/HeartBeatModule.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="132" column="9" lean-forward="true" selection-start-line="132" selection-start-column="9" selection-end-line="132" selection-end-column="9" />
+        <state relative-caret-position="267">
+          <caret line="149" column="9" selection-start-line="149" selection-start-column="9" selection-end-line="149" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-2.heartbeat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-672" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/GenericNetService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="331">
+          <caret line="234" column="46" selection-start-line="234" selection-start-column="39" selection-end-line="234" selection-end-column="46" />
           <folding>
-            <element signature="e#2902#2903#0" expanded="true" />
-            <element signature="e#2952#2953#0" expanded="true" />
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-4.heartbeat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-15974" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-2.diagnosis">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-4.diagnosis">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="21" lean-forward="true" selection-start-column="21" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-3.commit.log">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-3.diagnosis">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-1.heartbeat">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-1.diagnosis">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-3.heartbeat">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/demo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="205">
+          <caret line="264" selection-start-line="264" selection-end-line="264" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#4853#4854#0" expanded="true" />
+            <element signature="e#4884#4885#0" expanded="true" />
+            <element signature="e#6008#6009#0" expanded="true" />
+            <element signature="e#6070#6071#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/instance/store/TaggedOffsetIndexStore.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="294">
+          <caret line="28" column="33" selection-start-line="28" selection-start-column="33" selection-end-line="28" selection-end-column="33" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-0.commit.log">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-0.diagnosis">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-0.heartbeat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="14">
+          <caret line="1" column="36" selection-start-line="1" selection-start-column="36" selection-end-line="1" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3752">
+          <caret line="387" column="17" selection-start-line="387" selection-start-column="17" selection-end-line="387" selection-end-column="17" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#16490#16491#0" expanded="true" />
+            <element signature="e#16523#16524#0" expanded="true" />
           </folding>
         </state>
       </provider>

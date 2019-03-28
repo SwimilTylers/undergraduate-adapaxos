@@ -5,6 +5,7 @@ import javafx.util.Pair;
 import network.message.protocols.Distinguishable;
 import network.message.protocols.GenericConnectionMessage;
 import network.message.protocols.GenericPaxosMessage;
+import network.message.protocols.TaggedMessage;
 import network.service.module.ConnectionModule;
 import network.service.sender.PeerMessageSender;
 
@@ -55,7 +56,7 @@ public class BasicPeerMessageReceiver implements PeerMessageReceiver {
     }
 
     @Override
-    public void listenToPeers(@NotNull Socket chan){
+    public void listenToPeers(@NotNull final Socket chan, final int id){
         while (true){
             Object msg;
             try {
@@ -65,7 +66,7 @@ public class BasicPeerMessageReceiver implements PeerMessageReceiver {
                 continue;
             }
             try {
-                messageProcess(msg);
+                messageProcess(msg, id);
             } catch (InterruptedException e) {
                 break;
             }
@@ -74,20 +75,24 @@ public class BasicPeerMessageReceiver implements PeerMessageReceiver {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void messageProcess(Object msg) throws InterruptedException {
+    public void messageProcess(final Object wrapped, int fromId) throws InterruptedException {
+        long tag = ((TaggedMessage) wrapped).tag;
+        final Object msg = ((TaggedMessage) wrapped).load;
+
         if (msg instanceof GenericConnectionMessage.Beacon){
             long ts = System.currentTimeMillis();
             GenericConnectionMessage.Beacon cast = (GenericConnectionMessage.Beacon) msg;
             GenericConnectionMessage.ackBeacon ack = cModule.makeAck(ts, cast);
             if (ack != null) sender.sendPeerMessage(cast.fromId, ack);
-            cModule.updateByBeacon(ts, cast);
+            cModule.update(fromId, tag);
         }
         else if (msg instanceof GenericConnectionMessage.ackBeacon){
             long ts = System.currentTimeMillis();
             GenericConnectionMessage.ackBeacon cast = (GenericConnectionMessage.ackBeacon) msg;
-            cModule.updateByAckBeacon(ts, cast);
+            cModule.updateRound(ts, cast);
         }
         else if (msg instanceof GenericPaxosMessage){
+            cModule.update(fromId, tag);
             msgProcessor.execute(()->{
                 GenericPaxosMessage cast = (GenericPaxosMessage) msg;
                 try {
@@ -98,6 +103,7 @@ public class BasicPeerMessageReceiver implements PeerMessageReceiver {
             });
         }
         else{
+            cModule.update(fromId, tag);
             msgProcessor.execute(()->{
                 for (Pair<Distinguishable, BlockingQueue> t:channels) {
                     if (t.getKey().meet(msg)){

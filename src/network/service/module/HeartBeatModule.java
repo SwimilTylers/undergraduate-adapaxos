@@ -51,10 +51,10 @@ public class HeartBeatModule implements ConnectionModule{
     }
 
     @Override
-    public void updateByBeacon(long recvTs, GenericConnectionMessage.Beacon beacon) {
-        nodes.updateAndGet(beacon.fromId, nodeMonitor -> {
+    public void update(int fromId, long timestamp) {
+        nodes.updateAndGet(fromId, nodeMonitor -> {
             if (nodeMonitor != null)
-                nodeMonitor.lst_srv = Long.max(nodeMonitor.lst_srv, beacon.timestamp);
+                nodeMonitor.lst_srv = Long.max(nodeMonitor.lst_srv, timestamp);
 
             return nodeMonitor;
         });
@@ -62,7 +62,7 @@ public class HeartBeatModule implements ConnectionModule{
     }
 
     @Override
-    public void updateByAckBeacon(long recvTs, GenericConnectionMessage.ackBeacon ackBeacon) {
+    public void updateRound(long recvTs, GenericConnectionMessage.ackBeacon ackBeacon) {
         nodes.updateAndGet(ackBeacon.fromId, nodeMonitor -> {
             if (nodeMonitor != null) {
                 nodeMonitor.lst_srv = Long.max(nodeMonitor.lst_srv, ackBeacon.timestamp);
@@ -138,7 +138,7 @@ public class HeartBeatModule implements ConnectionModule{
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("[module:").append(moduleId).append("]\n").append("\t id | isConn | lst_srv | lst_rndSrv | lst_rnd <INIT, ARR> | rnd \n");
+        builder.append("[").append(System.currentTimeMillis()).append("][").append("[module:").append(moduleId).append("]\n").append("\t id | isConn | lst_srv | lst_rndSrv | lst_rnd <INIT, ARR> | rnd \n");
 
         for (int i = 0; i < nodes.length(); i++) {
             int id = i;

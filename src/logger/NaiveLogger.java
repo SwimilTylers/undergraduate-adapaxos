@@ -105,7 +105,7 @@ public class NaiveLogger implements PaxosLogger {
 
     @Override
     public void logPeerNet(int fromId, int toId, String desc) {
-        /*
+/*
         Date date = new Date();
         String netFormat = "[%tF %<tT:%<tL %<tz][network:peers][from=%d, to=%d][\"%s\"]%n";
         String message = String.format(netFormat, date, fromId, toId, desc);
@@ -113,7 +113,7 @@ public class NaiveLogger implements PaxosLogger {
         imm_toFile(nWriter, message);
 
         log(false, message);
-        */
+*/
     }
 
     @Override

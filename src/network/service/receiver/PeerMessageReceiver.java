@@ -9,6 +9,6 @@ import java.net.Socket;
  * @version : 2019/2/26 19:50
  */
 public interface PeerMessageReceiver {
-    void listenToPeers(@NotNull Socket chan);
-    void messageProcess(Object msg) throws InterruptedException;
+    void listenToPeers(@NotNull final Socket chan, final int id);
+    void messageProcess(Object msg, int fromId) throws InterruptedException;
 }

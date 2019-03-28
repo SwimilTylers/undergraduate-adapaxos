@@ -6,6 +6,7 @@ import javafx.util.Pair;
 import logger.PaxosLogger;
 import network.message.protocols.Distinguishable;
 import network.message.protocols.GenericClientMessage;
+import network.message.protocols.GenericConnectionMessage;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.module.ConnectionModule;
 import network.service.module.HeartBeatModule;
@@ -39,7 +40,7 @@ public class GenericNetService {
     protected PeerMessageSender sender;
     protected PeerMessageReceiver receiver;
 
-    public static final int DEFAULT_BEACON_INTERVAL = 10;
+    public static final int DEFAULT_BEACON_INTERVAL = 30;
     private int beaconItv = DEFAULT_BEACON_INTERVAL;
 
     protected ConnectionModule cModule;
@@ -130,8 +131,9 @@ public class GenericNetService {
 
         for (int i = 0; i < peerSize; i++) {
             if (i != netServiceId){
+                int id = i;
                 Socket socket = peers[i];
-                listenService.execute(() -> receiver.listenToPeers(socket));
+                listenService.execute(() -> receiver.listenToPeers(socket, id));
             }
         }
 
@@ -231,7 +233,8 @@ public class GenericNetService {
     private void beacon(){
         while (onRunning){
             logger.record(false, "hb", cModule.toString());
-            sender.broadcastPeerMessage(cModule.makeBeacon(System.currentTimeMillis()));
+            GenericConnectionMessage.Beacon beacon = cModule.makeBeacon(System.currentTimeMillis());
+            sender.broadcastPeerMessage(beacon);
             try {
                 Thread.sleep(beaconItv);
             } catch (InterruptedException e) {

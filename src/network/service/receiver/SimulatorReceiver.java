@@ -25,7 +25,7 @@ public class SimulatorReceiver implements PeerMessageReceiver{
     }
 
     @Override
-    public void listenToPeers(Socket chan) {
+    public void listenToPeers(final Socket chan, final int id) {
         while (true){
             Object msg;
             try {
@@ -35,7 +35,7 @@ public class SimulatorReceiver implements PeerMessageReceiver{
                 continue;
             }
             try {
-                messageProcess(msg);
+                messageProcess(msg, id);
             } catch (InterruptedException e) {
                 break;
             }
@@ -43,8 +43,8 @@ public class SimulatorReceiver implements PeerMessageReceiver{
     }
 
     @Override
-    public void messageProcess(Object msg) throws InterruptedException {
+    public void messageProcess(Object msg, int fromId) throws InterruptedException {
         if (!simulator.crush())
-            receiver.messageProcess(msg);
+            receiver.messageProcess(msg, fromId);
     }
 }
