@@ -36,8 +36,8 @@ public class BasicPeerMessageSender implements PeerMessageSender {
     synchronized public void sendPeerMessage(int toId, @NotNull Object msg){
         if (toId < peerSize){
             try {
-                //if (! (msg instanceof GenericConnectionMessage.Beacon) && ! (msg instanceof GenericConnectionMessage.ackBeacon))
-                logger.logPeerNet(netServiceId, toId, msg.toString());
+                if (! (msg instanceof GenericConnectionMessage))
+                    logger.logPeerNet(netServiceId, toId, msg.toString());
                 OutputStream socketStream = peers[toId].getOutputStream();
                 ObjectOutputStream ostream = new ObjectOutputStream(socketStream);
                 ostream.writeObject(new TaggedMessage(System.currentTimeMillis(), msg));

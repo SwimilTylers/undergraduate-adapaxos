@@ -63,9 +63,11 @@ public class AdaProposer implements Proposer, DiskResponder {
         instanceSpace.set(inst_no, inst);
 
         if (!forceFsync.get()) {
+            logger.logFormatted(false, ""+System.currentTimeMillis(), "prepare="+inst_no, "fsync=false");
             sender.broadcastPeerMessage(new GenericPaxosMessage.Prepare(inst_no, inst.crtLeaderId, inst.crtInstBallot));
         }
         else {
+            logger.logFormatted(false, ""+System.currentTimeMillis(), "prepare="+inst_no, "fsync=true");
             broadcastOnDisks(token, inst_no, inst, serverId, peerSize, remoteStore);
         }
     }
@@ -256,6 +258,7 @@ public class AdaProposer implements Proposer, DiskResponder {
             sender.broadcastPeerMessage(new GenericPaxosMessage.Accept(inst_no, serverId, inst.crtInstBallot, inst.requests));
         }
         else {
+            System.out.println("tikz");
             broadcastOnDisks(inst.lmu.token, inst_no, inst, serverId, peerSize, remoteStore);
         }
     }

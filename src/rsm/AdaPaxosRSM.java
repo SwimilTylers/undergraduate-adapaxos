@@ -66,12 +66,13 @@ public class AdaPaxosRSM implements Serializable{
     protected AtomicInteger maxSendInstance;
 
     protected AtomicInteger consecutiveCommit;
-    protected AtomicInteger fsyncInitInstance;
+    protected int fsyncInitInstance;
 
     transient protected InstanceStore localStore;
     transient protected RemoteInstanceStore remoteStore;
     protected AtomicBoolean forceFsync;
-    transient protected AtomicIntegerArray fsyncSignature;
+    transient protected boolean[] fsyncSignature;
+    transient protected BlockingQueue<Pair<Integer, AdaPaxosInstance>> fsyncQueue;
 
     /* agents */
     transient protected AdaProposer proposer;
@@ -116,19 +117,23 @@ public class AdaPaxosRSM implements Serializable{
         maxSendInstance = new AtomicInteger(0);
 
         consecutiveCommit = new AtomicInteger(0);
-        fsyncInitInstance = new AtomicInteger(initFsyncInstance);
+        fsyncInitInstance = initFsyncInstance;
 
         return this;
     }
 
     protected AdaPaxosRSM instanceStorageBuild(InstanceStore localStore,
                                         RemoteInstanceStore remoteStore,
-                                        boolean initFsync){
+                                        boolean initFsync, int waitingQueueLength){
 
         this.localStore = localStore;
         this.remoteStore = remoteStore;
+        remoteStore.setLogger(logger);
+        // TODO: 2019/3/29 setLogger
         forceFsync = new AtomicBoolean(initFsync);
-        fsyncSignature = new AtomicIntegerArray(instanceSpace.length());
+        fsyncSignature = new boolean[instanceSpace.length()];
+        Arrays.fill(fsyncSignature, false);
+        fsyncQueue = new ArrayBlockingQueue<>(waitingQueueLength);
 
         return this;
     }
@@ -159,7 +164,7 @@ public class AdaPaxosRSM implements Serializable{
         AdaPaxosRSM rsm = new AdaPaxosRSM(id, initAsLeader, new NaiveLogger(id));
         rsm.netConnectionBuild(net, net.getConnectionModule(), peerSize)
                 .instanceSpaceBuild(AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE, epoch << 16, 0)
-                .instanceStorageBuild(localStore, remoteStore, true)
+                .instanceStorageBuild(localStore, remoteStore, true, AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE)
                 .messageChanBuild(AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE);
         return rsm;
     }
@@ -247,7 +252,7 @@ public class AdaPaxosRSM implements Serializable{
                 ClientRequest[] cmd = requestList.toArray(new ClientRequest[0]);
                 if (asLeader.get()){
                     proposer.handleRequests(maxReceivedInstance.getAndIncrement(), crtInstBallot.get(), cmd);
-                    logger.log(true, "init a proposal\n");
+                    logger.logFormatted(true, "init a proposal");
                 }
             }
 
@@ -273,11 +278,11 @@ public class AdaPaxosRSM implements Serializable{
                     if (message.fsync) {
                         forceFsync.set(true);
                         fileSynchronize();
-                        logger.record(false, "diag","["+System.currentTimeMillis()+"]"+"[FSYNC=true]\n");
+                        logger.record(false, "diag","["+System.currentTimeMillis()+"]"+"[FSYNC=true][received]\n");
                     } else {
                         forceFsync.set(false);
                         memorySynchronize();
-                        logger.record(false, "diag","["+System.currentTimeMillis()+"]"+"[FSYNC=false]\n");
+                        logger.record(false, "diag","["+System.currentTimeMillis()+"]"+"[FSYNC=false][received]\n");
                     }
                 }
             }
@@ -288,25 +293,31 @@ public class AdaPaxosRSM implements Serializable{
                     logger.record(false, "diag", "["+System.currentTimeMillis()+"]"+Arrays.toString(crushed) + "\n");
                     if (crushed.length >= bare_minority && !forceFsync.get()){
                         stableConnCount = 0;
-                        //forceFsync.set(true);
+                        int ballot = crtInstBallot.incrementAndGet();
+                        forceFsync.set(true);
                         //fileSynchronize();
-                        logger.record(false, "diag","["+System.currentTimeMillis()+"]"+"[FSYNC=true]\n");
+                        logger.record(false, "diag","["+System.currentTimeMillis()+"]"+"[FSYNC=true][new ballot="+ballot+"]\n");
+                        net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(true));
                     }
                     else if (crushed.length < bare_minority && forceFsync.get()){
                         ++stableConnCount;
                         if (stableConnCount >= stability){
-                            //forceFsync.set(false);
+                            int ballot = crtInstBallot.incrementAndGet();
+                            forceFsync.set(false);
                             //memorySynchronize();
-                            logger.record(false, "diag","["+System.currentTimeMillis()+"]"+"[FSYNC=false]\n");
+                            logger.record(false, "diag","["+System.currentTimeMillis()+"]"+"[FSYNC=false][new ballot="+ballot+"]\n");
+                            net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(false));
                         }
                     }
                 }
                 else if (forceFsync.get()){ // no crash
                     ++stableConnCount;
                     if (stableConnCount >= stability){
-                        //forceFsync.set(false);
+                        int ballot = crtInstBallot.incrementAndGet();
+                        forceFsync.set(false);
                         //memorySynchronize();
-                        logger.record(false, "diag","["+System.currentTimeMillis()+"]"+"[FSYNC=false]\n");
+                        logger.record(false, "diag","["+System.currentTimeMillis()+"]"+"[FSYNC=false][new ballot="+ballot+"]\n");
+                        net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(false));
                     }
                 }
 
@@ -321,75 +332,98 @@ public class AdaPaxosRSM implements Serializable{
     }
 
     protected void routine_response(){
-        while (routineOnRunning.get()){
-            GenericPaxosMessage msg = pMessages.poll();
-            if (msg != null) {
-                logger.log(true, "receive "+msg.toString()+"\n");
+        try {
+            while (routineOnRunning.get()) {
+                GenericPaxosMessage msg = pMessages.poll();
+                if (msg != null) {
+                    logger.log(true, "receive " + msg.toString() + "\n");
 
-                maxReceivedInstance.updateAndGet(i->i=Integer.max(i, msg.inst_no));
+                    maxReceivedInstance.updateAndGet(i -> i = Integer.max(i, msg.inst_no));
 
-                if (msg instanceof GenericPaxosMessage.Prepare) {
-                    GenericPaxosMessage.Prepare cast = (GenericPaxosMessage.Prepare) msg;
-                    acceptor.handlePrepare(cast);
-                } else if (msg instanceof GenericPaxosMessage.ackPrepare) {
-                    GenericPaxosMessage.ackPrepare cast = (GenericPaxosMessage.ackPrepare) msg;
-                    proposer.handleAckPrepare(cast);
-                } else if (msg instanceof GenericPaxosMessage.Accept) {
-                    GenericPaxosMessage.Accept cast = (GenericPaxosMessage.Accept) msg;
-                    acceptor.handleAccept(cast);
-                } else if (msg instanceof GenericPaxosMessage.ackAccept) {
-                    GenericPaxosMessage.ackAccept cast = (GenericPaxosMessage.ackAccept) msg;
-                    learner.handleAckAccept(cast);
-                } else if (msg instanceof GenericPaxosMessage.Commit) {
-                    GenericPaxosMessage.Commit cast = (GenericPaxosMessage.Commit) msg;
-                    learner.handleCommit(cast);
-                    updateConsecutiveCommit();
-                } else if (msg instanceof GenericPaxosMessage.Restore) {
-                    GenericPaxosMessage.Restore cast = (GenericPaxosMessage.Restore) msg;
-                    //handleRestore(cast);
-                }
-
-                if (forceFsync.get())
-                    fileSynchronize(msg.inst_no);
-            }
-
-            if (asLeader.get()) {
-                DiskPaxosMessage dmsg = dMessages.poll();
-                if (dmsg != null){
-                    logger.log(true, "receive "+dmsg.toString()+"\n");
-
-                    maxReceivedInstance.updateAndGet(i->i=Integer.max(i, dmsg.inst_no));
-
-                    if (proposer.isValidMessage(dmsg.inst_no, dmsg.dialog_no)){
-                        if (dmsg instanceof DiskPaxosMessage.ackWrite)
-                            proposer.respond_ackWrite((DiskPaxosMessage.ackWrite) dmsg);
-                        else if (dmsg instanceof DiskPaxosMessage.ackRead)
-                            proposer.respond_ackRead((DiskPaxosMessage.ackRead) dmsg);
-                    }
-                    else if (learner.isValidMessage(dmsg.inst_no, dmsg.dialog_no)) {
-                        if (dmsg instanceof DiskPaxosMessage.ackWrite)
-                            learner.respond_ackWrite((DiskPaxosMessage.ackWrite) dmsg);
-                        else if (dmsg instanceof DiskPaxosMessage.ackRead)
-                            learner.respond_ackRead((DiskPaxosMessage.ackRead) dmsg);
+                    if (msg instanceof GenericPaxosMessage.Prepare) {
+                        GenericPaxosMessage.Prepare cast = (GenericPaxosMessage.Prepare) msg;
+                        acceptor.handlePrepare(cast);
+                    } else if (msg instanceof GenericPaxosMessage.ackPrepare) {
+                        GenericPaxosMessage.ackPrepare cast = (GenericPaxosMessage.ackPrepare) msg;
+                        proposer.handleAckPrepare(cast);
+                    } else if (msg instanceof GenericPaxosMessage.Accept) {
+                        GenericPaxosMessage.Accept cast = (GenericPaxosMessage.Accept) msg;
+                        acceptor.handleAccept(cast);
+                    } else if (msg instanceof GenericPaxosMessage.ackAccept) {
+                        GenericPaxosMessage.ackAccept cast = (GenericPaxosMessage.ackAccept) msg;
+                        learner.handleAckAccept(cast);
+                    } else if (msg instanceof GenericPaxosMessage.Commit) {
+                        GenericPaxosMessage.Commit cast = (GenericPaxosMessage.Commit) msg;
+                        learner.handleCommit(cast);
+                        //updateConsecutiveCommit();
+                    } else if (msg instanceof GenericPaxosMessage.Restore) {
+                        GenericPaxosMessage.Restore cast = (GenericPaxosMessage.Restore) msg;
+                        //handleRestore(cast);
                     }
 
-                    if (forceFsync.get())
-                        fileSynchronize(dmsg.inst_no);
+                    //System.out.println("hulu");
+
+                    //if (forceFsync.get())
+                    //    fileSynchronize(msg.inst_no);
+                }
+
+                if (asLeader.get()) {
+                    DiskPaxosMessage dmsg = dMessages.poll();
+                    if (dmsg != null) {
+                        logger.log(true, "receive " + dmsg.toString() + "\n");
+
+                        maxReceivedInstance.updateAndGet(i -> i = Integer.max(i, dmsg.inst_no));
+
+                        if (proposer.isValidMessage(dmsg.inst_no, dmsg.dialog_no)) {
+                            if (dmsg instanceof DiskPaxosMessage.ackWrite)
+                                proposer.respond_ackWrite((DiskPaxosMessage.ackWrite) dmsg);
+                            else if (dmsg instanceof DiskPaxosMessage.ackRead)
+                                proposer.respond_ackRead((DiskPaxosMessage.ackRead) dmsg);
+                        } else if (learner.isValidMessage(dmsg.inst_no, dmsg.dialog_no)) {
+                            if (dmsg instanceof DiskPaxosMessage.ackWrite)
+                                learner.respond_ackWrite((DiskPaxosMessage.ackWrite) dmsg);
+                            else if (dmsg instanceof DiskPaxosMessage.ackRead)
+                                learner.respond_ackRead((DiskPaxosMessage.ackRead) dmsg);
+                        }
+
+                        if (forceFsync.get())
+                            fileSynchronize(dmsg.inst_no);
+                    }
                 }
             }
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
 
     protected void routine_backup(final int backupItv){
+        boolean fastPersisted = false;
+        int persistUpperBound = fsyncInitInstance;
         while(routineOnRunning.get()){
-            if (!forceFsync.get())
-                fileSynchronize(true);
-
-            try {
-                Thread.sleep(backupItv); // drop the refreshing frequency of 'backup'
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return;
+            Pair<Integer, AdaPaxosInstance> backup = fsyncQueue.poll();
+            if (backup == null){
+                try {
+                    int len = fileSynchronize_immediate();
+                    if (!fastPersisted && !forceFsync.get()){
+                        localStore.meta("fsync=false, len="+len);
+                        fastPersisted = true;
+                    }
+                    Thread.sleep(backupItv);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            else {
+                int inst_no = backup.getKey();
+                AdaPaxosInstance instance = backup.getValue();
+                localStore.store(instance.crtLeaderId, inst_no, instance);
+                if (instance.status == InstanceStatus.COMMITTED)
+                    fsyncSignature[inst_no] = true;
+                if (inst_no > persistUpperBound){
+                    persistUpperBound = inst_no;
+                    fastPersisted = false;
+                    localStore.meta("fsync=true, len="+persistUpperBound);
+                }
             }
         }
     }
@@ -401,11 +435,34 @@ public class AdaPaxosRSM implements Serializable{
     /* protected-access file2mem-mem2file func */
 
     protected void fileSynchronize(){
-        fileSynchronize(false);
+        for (int inst_no = fsyncInitInstance; inst_no < Integer.max(maxSendInstance.get(), maxReceivedInstance.get()); inst_no++) {
+            fileSynchronize(inst_no);
+        }
     }
 
-    protected void fileSynchronize(boolean immediate){
-
+    protected int fileSynchronize_immediate(){
+        int inst_no = fsyncInitInstance;
+        for (; inst_no < consecutiveCommit.get(); inst_no++) {
+            if (!fsyncSignature[inst_no]){
+                AdaPaxosInstance instance = instanceSpace.get(inst_no);
+                if (instance != null) {
+                    localStore.store(instance.crtLeaderId, inst_no, instance);
+                    fsyncSignature[inst_no] = true;
+                }
+            }
+        }
+        fsyncInitInstance = inst_no;
+        for (; inst_no < Integer.max(maxSendInstance.get(), maxReceivedInstance.get()); inst_no++) {
+            if (!fsyncSignature[inst_no]){
+                AdaPaxosInstance instance = instanceSpace.get(inst_no);
+                if (instance != null) {
+                    localStore.store(instance.crtLeaderId, inst_no, instance);
+                    if (instance.status == InstanceStatus.COMMITTED)
+                        fsyncSignature[inst_no] = true;
+                }
+            }
+        }
+        return inst_no;
     }
 
     protected void memorySynchronize(){
@@ -413,7 +470,15 @@ public class AdaPaxosRSM implements Serializable{
     }
 
     protected void fileSynchronize(final int specific){
-
+        if (!fsyncSignature[specific]){
+            try {
+                AdaPaxosInstance instance = instanceSpace.get(specific);
+                if (instance != null)
+                    fsyncQueue.put(new Pair<>(specific, instance));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /* protected-access misc func */

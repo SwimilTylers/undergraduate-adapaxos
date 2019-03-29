@@ -32,6 +32,11 @@ public class GenericPaxosMessage implements Serializable {
             this.leaderId = leaderId;
             this.inst_ballot = inst_ballot;
         }
+
+        @Override
+        public String toString() {
+            return "[PREPARE][ino="+inst_no+",lid="+leaderId+",ibt="+inst_ballot+"]";
+        }
     }
 
     public static class ackPrepare extends GenericPaxosMessage{
@@ -47,6 +52,11 @@ public class GenericPaxosMessage implements Serializable {
             this.ack_leaderId = ack_leaderId;
             this.inst_ballot = inst_ballot;
             this.load = load;
+        }
+
+        @Override
+        public String toString() {
+            return "[ACK_PREPARE][ino="+inst_no+",lid="+ack_leaderId+",ibt="+inst_ballot+"]";
         }
     }
 
@@ -65,7 +75,7 @@ public class GenericPaxosMessage implements Serializable {
 
         @Override
         public String toString() {
-            return "["+inst_no+","+leaderId+","+inst_ballot+",cmd_length="+cmds.length+"["+cmds[0].exec+"...]]";
+            return "[ACCEPT][ino="+inst_no+",lid="+leaderId+",ibt="+inst_ballot+",cmd_length="+cmds.length+"["+cmds[0].exec+"...]]";
         }
     }
 
@@ -85,6 +95,11 @@ public class GenericPaxosMessage implements Serializable {
             this.load = load;
             this.cmds = cmds;
         }
+
+        @Override
+        public String toString() {
+            return "[ACK_ACCEPT][ino="+inst_no+",lid="+ack_leaderId+",ibt="+inst_ballot+"]"+",cmd_length="+cmds.length+"["+cmds[0].exec+"...]]";
+        }
     }
 
     public static class Commit extends GenericPaxosMessage{
@@ -98,6 +113,11 @@ public class GenericPaxosMessage implements Serializable {
             this.leaderId = leaderId;
             this.inst_ballot = inst_ballot;
             this.cmds = cmds;
+        }
+
+        @Override
+        public String toString() {
+            return "[COMMIT][ino="+inst_no+",lid="+leaderId+",ibt="+inst_ballot+"]"+",cmd_length="+cmds.length+"["+cmds[0].exec+"...]]";
         }
     }
 

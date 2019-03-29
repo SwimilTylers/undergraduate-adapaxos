@@ -1,6 +1,7 @@
 package instance.store;
 
 import instance.PaxosInstance;
+import logger.PaxosLogger;
 import network.message.protocols.DiskPaxosMessage;
 
 import java.util.concurrent.BlockingQueue;
@@ -16,6 +17,8 @@ public class PseudoRemoteInstanceStore implements RemoteInstanceStore{
     private InstanceStore[] stores;
     private final int thisId;
     private ExecutorService launchService;
+
+    private PaxosLogger logger;
 
     public PseudoRemoteInstanceStore(int thisId, InstanceStore[] stores) {
         this.stores = stores;
@@ -36,6 +39,7 @@ public class PseudoRemoteInstanceStore implements RemoteInstanceStore{
 
     @Override
     public void launchRemoteStore(long token, int disk_no, int access_id, int inst_id, PaxosInstance instance) {
+        logger.logFormatted(false, String.valueOf(System.currentTimeMillis()), "remote store", "inst_no="+inst_id+"' token="+token);
         launchService.execute(() -> {
             try {
                 if (stores[disk_no].store(access_id, inst_id, instance)) {
@@ -62,6 +66,7 @@ public class PseudoRemoteInstanceStore implements RemoteInstanceStore{
 
     @Override
     public void launchRemoteFetch(long token, int disk_no, int access_id, int inst_id) {
+        logger.logFormatted(false, String.valueOf(System.currentTimeMillis()), "remote fetch");
         launchService.execute(() -> {
             try {
                 if (stores[disk_no].isExist(access_id, inst_id)) {
@@ -87,5 +92,9 @@ public class PseudoRemoteInstanceStore implements RemoteInstanceStore{
                 e.printStackTrace();
             }
         });
+    }
+
+    public void setLogger(PaxosLogger logger) {
+        this.logger = logger;
     }
 }

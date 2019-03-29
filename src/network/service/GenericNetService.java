@@ -144,7 +144,7 @@ public class GenericNetService {
 
     protected void peerTransDeployment(){
         sender = new BasicPeerMessageSender(netServiceId, peerSize, peers, cModule, logger);
-        receiver = new BasicPeerMessageReceiver(netServiceId, sender, cModule, paxosChan, channels);
+        receiver = new BasicPeerMessageReceiver(netServiceId, sender, cModule, paxosChan, channels, logger);
     }
 
     private void connectToPeers(@NotNull CountDownLatch latch){

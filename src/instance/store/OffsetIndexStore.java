@@ -12,6 +12,7 @@ import java.io.*;
  * @version : 2019/2/19 14:39
  */
 public class OffsetIndexStore implements InstanceStore{
+    private String store_name;
     private OffsetIndexReader reader;
     private OffsetIndexWriter writer;
 
@@ -19,6 +20,7 @@ public class OffsetIndexStore implements InstanceStore{
     private static final String INST_ID_HEADER = "";
 
     public OffsetIndexStore(String store_name) {
+        this.store_name = store_name;
         this.reader = new OffsetIndexReader("store"+File.separator+store_name);
         this.writer = new OffsetIndexWriter("store"+File.separator+store_name);
     }
@@ -102,5 +104,24 @@ public class OffsetIndexStore implements InstanceStore{
         }
         else
             return null;
+    }
+
+    @Override
+    public boolean meta(Serializable metaData) {
+        try {
+            FileOutputStream fstream = new FileOutputStream(store_name+File.separator+".meta", false);
+            ObjectOutputStream ostream = new ObjectOutputStream(fstream);
+            ostream.writeObject(metaData);
+            ostream.flush();
+            fstream.flush();
+
+            ostream.close();
+            fstream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
     }
 }

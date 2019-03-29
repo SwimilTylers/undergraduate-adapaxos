@@ -2,6 +2,7 @@ package network.service.receiver;
 
 import com.sun.istack.internal.NotNull;
 import javafx.util.Pair;
+import logger.PaxosLogger;
 import network.message.protocols.Distinguishable;
 import network.message.protocols.GenericConnectionMessage;
 import network.message.protocols.GenericPaxosMessage;
@@ -31,19 +32,22 @@ public class BasicPeerMessageReceiver implements PeerMessageReceiver {
     private BlockingQueue<GenericPaxosMessage> paxosChan;
     private List<Pair<Distinguishable, BlockingQueue>> channels;
 
+    private PaxosLogger logger;
+
     private ExecutorService msgProcessor;
 
     public BasicPeerMessageReceiver(int netServiceId,
                                     @NotNull PeerMessageSender sender,
                                     @NotNull ConnectionModule cModule,
                                     @NotNull BlockingQueue<GenericPaxosMessage> paxosChan,
-                                    @NotNull List<Pair<Distinguishable, BlockingQueue>> channels) {
+                                    @NotNull List<Pair<Distinguishable, BlockingQueue>> channels, PaxosLogger logger) {
 
         this.netServiceId = netServiceId;
         this.sender = sender;
         this.cModule = cModule;
         this.paxosChan = paxosChan;
         this.channels = channels;
+        this.logger = logger;
 
         msgProcessor = Executors.newCachedThreadPool();
     }
@@ -67,8 +71,8 @@ public class BasicPeerMessageReceiver implements PeerMessageReceiver {
             }
             try {
                 messageProcess(msg, id);
-            } catch (InterruptedException e) {
-                break;
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -95,10 +99,12 @@ public class BasicPeerMessageReceiver implements PeerMessageReceiver {
             cModule.update(fromId, tag);
             msgProcessor.execute(()->{
                 GenericPaxosMessage cast = (GenericPaxosMessage) msg;
+                logger.logPeerNet(fromId, netServiceId, cast.toString());
                 try {
                     paxosChan.put(cast);
-                } catch (InterruptedException e) {
-                    System.out.println("Generic Paxos Message Interrupted");
+                    logger.logPeerNet(fromId, netServiceId, "pSize="+paxosChan.size());
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
         }
@@ -108,10 +114,11 @@ public class BasicPeerMessageReceiver implements PeerMessageReceiver {
                 for (Pair<Distinguishable, BlockingQueue> t:channels) {
                     if (t.getKey().meet(msg)){
                         try {
+                            logger.logPeerNet(fromId, netServiceId, msg.toString());
                             t.getValue().put(msg);
                             break;
-                        } catch (InterruptedException e) {
-                            System.out.println("Costumed Message Interrupted");
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
                     }
                 }

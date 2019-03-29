@@ -40,6 +40,8 @@ public class NaiveLogger implements PaxosLogger {
 
     private FileWriter diagWriter;
 
+    private FileWriter sWriter;
+
     public NaiveLogger(int serverId) {
         id = serverId;
         try {
@@ -49,6 +51,7 @@ public class NaiveLogger implements PaxosLogger {
             nWriter = new FileWriter("logs/server-"+id+".net.log", false);
             connWriter = new FileWriter("logs/server-"+id+".heartbeat", false);
             diagWriter = new FileWriter("logs/server-"+id+".diagnosis", false);
+            sWriter = new FileWriter("logs/server-"+id+".store", false);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -81,6 +84,8 @@ public class NaiveLogger implements PaxosLogger {
             imm_toFile(connWriter, record);
         else if (suffix.equals("diag"))
             imm_toFile(diagWriter, record);
+        else if (suffix.equals("store"))
+            imm_toFile(sWriter, record);
     }
 
     @Override
@@ -105,15 +110,13 @@ public class NaiveLogger implements PaxosLogger {
 
     @Override
     public void logPeerNet(int fromId, int toId, String desc) {
-/*
         Date date = new Date();
         String netFormat = "[%tF %<tT:%<tL %<tz][network:peers][from=%d, to=%d][\"%s\"]%n";
         String message = String.format(netFormat, date, fromId, toId, desc);
-        System.out.print(message);
+        //System.out.print(message);
         imm_toFile(nWriter, message);
 
-        log(false, message);
-*/
+        //log(false, message);
     }
 
     @Override
