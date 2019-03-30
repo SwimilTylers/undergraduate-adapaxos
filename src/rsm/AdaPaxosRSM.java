@@ -409,35 +409,33 @@ public class AdaPaxosRSM implements Serializable{
         int persist = 0;
 
         while (routineOnRunning.get()) {
-            Pair<Integer, AdaPaxosInstance> backup = fsyncQueue.poll();
-            if (backup == null){
-                if (!forceFsync.get()){
-                    persist = Integer.max(fileSynchronize_immediate(), persist);
-                    boolean oldState = metaFsync.getAndSet(false);
-                    if (oldState)
-                        localStore.meta("fast mode, persist="+persist);
-                }
-                try {
-                    Thread.sleep(backupItv);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            else {
-                int inst_no = backup.getKey();
-                AdaPaxosInstance instance = backup.getValue();
-                localStore.store(instance.crtLeaderId, inst_no, instance);
-                logger.logFormatted(false, "fsync", "confirm", "specific="+inst_no);
-                if (instance.status == InstanceStatus.COMMITTED)
-                    fsyncSignature[inst_no] = true;
+            try {
+                Pair<Integer, AdaPaxosInstance> backup = fsyncQueue.poll(backupItv, TimeUnit.MILLISECONDS);
+                if (backup == null) {
+                    if (!forceFsync.get()) {
+                        persist = Integer.max(fileSynchronize_immediate(), persist);
+                        boolean oldState = metaFsync.getAndSet(false);
+                        if (oldState)
+                            localStore.meta("fast mode, persist=" + persist);
+                    }
+                } else {
+                    int inst_no = backup.getKey();
+                    AdaPaxosInstance instance = backup.getValue();
+                    localStore.store(instance.crtLeaderId, inst_no, instance);
+                    logger.logFormatted(false, "fsync", "confirm", "specific=" + inst_no);
+                    if (instance.status == InstanceStatus.COMMITTED)
+                        fsyncSignature[inst_no] = true;
 
-                persist = Integer.max(inst_no, persist);
+                    persist = Integer.max(inst_no, persist);
 
-                if (forceFsync.get()) {
-                    boolean oldState = metaFsync.getAndSet(false);
-                    if (oldState)
-                        localStore.meta("slow mode");
+                    if (forceFsync.get()) {
+                        boolean oldState = metaFsync.getAndSet(false);
+                        if (oldState)
+                            localStore.meta("slow mode");
+                    }
                 }
+            } catch (Exception e){
+                e.printStackTrace();
             }
         }
     }
