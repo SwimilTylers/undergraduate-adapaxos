@@ -207,9 +207,10 @@ public class AdaPaxosRSM implements Serializable{
     public void routine(Runnable... supplement){
         routineOnRunning = new AtomicBoolean(true);
         ExecutorService routines = Executors.newCachedThreadPool();
-        routines.execute(()-> routine_batch(5000, GenericPaxosSMR.DEFAULT_REQUEST_COMPACTING_SIZE));
-        routines.execute(() -> routine_monitor(160, 80, 10));
+        routines.execute(()-> routine_batch(2000, GenericPaxosSMR.DEFAULT_REQUEST_COMPACTING_SIZE));
+        routines.execute(() -> routine_monitor(200, 100, 10));
         routines.execute(this::routine_response);
+        routines.execute(() -> routine_backup(5000));
         if (supplement != null && supplement.length != 0) {
             for (Runnable r : supplement)
                 routines.execute(r);
@@ -355,16 +356,14 @@ public class AdaPaxosRSM implements Serializable{
                     } else if (msg instanceof GenericPaxosMessage.Commit) {
                         GenericPaxosMessage.Commit cast = (GenericPaxosMessage.Commit) msg;
                         learner.handleCommit(cast);
-                        //updateConsecutiveCommit();
+                        updateConsecutiveCommit();
                     } else if (msg instanceof GenericPaxosMessage.Restore) {
                         GenericPaxosMessage.Restore cast = (GenericPaxosMessage.Restore) msg;
                         //handleRestore(cast);
                     }
 
-                    //System.out.println("hulu");
-
-                    //if (forceFsync.get())
-                    //    fileSynchronize(msg.inst_no);
+                    if (forceFsync.get())
+                        fileSynchronize(msg.inst_no);
                 }
 
                 if (asLeader.get()) {
@@ -397,6 +396,14 @@ public class AdaPaxosRSM implements Serializable{
     }
 
     protected void routine_backup(final int backupItv){
+        while (routineOnRunning.get()) {
+            try {
+                Thread.sleep(backupItv);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        /*
         boolean fastPersisted = false;
         int persistUpperBound = fsyncInitInstance;
         while(routineOnRunning.get()){
@@ -426,6 +433,7 @@ public class AdaPaxosRSM implements Serializable{
                 }
             }
         }
+        */
     }
 
     protected void routine_leadership(final int leadershipItv){
@@ -475,6 +483,7 @@ public class AdaPaxosRSM implements Serializable{
                 AdaPaxosInstance instance = instanceSpace.get(specific);
                 if (instance != null)
                     fsyncQueue.put(new Pair<>(specific, instance));
+                logger.log(true, "serverId="+serverId+", specific="+specific+", fqsize="+fsyncQueue.size()+"\n");
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -504,8 +513,9 @@ public class AdaPaxosRSM implements Serializable{
         int iter = consecutiveCommit.get();
         while (iter < Integer.max(maxReceivedInstance.get(), maxSendInstance.get())){
             AdaPaxosInstance inst = instanceSpace.get(iter);
-            if (inst != null && inst.status == InstanceStatus.COMMITTED)
-                ++iter;
+            if (inst == null || inst.status != InstanceStatus.COMMITTED)
+                break;
+            ++iter;
         }
         consecutiveCommit.set(iter);
     }
