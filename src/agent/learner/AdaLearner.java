@@ -1,6 +1,5 @@
 package agent.learner;
 
-import agent.DiskResponder;
 import client.ClientRequest;
 import instance.AdaPaxosInstance;
 import instance.InstanceStatus;
@@ -22,7 +21,7 @@ import static utils.AdaAgents.broadcastOnDisks;
  * @author : Swimiltylers
  * @version : 2019/3/15 17:31
  */
-public class AdaLearner implements Learner, DiskResponder {
+public class AdaLearner implements Learner, DiskCommitResponder {
     private final int serverId;
     private final int peerSize;
 
@@ -54,7 +53,7 @@ public class AdaLearner implements Learner, DiskResponder {
     }
 
     @Override
-    public void handleAckAccept(GenericPaxosMessage.ackAccept ackAccept) {
+    public void handleAckAccept(GenericPaxosMessage.ackAccept ackAccept, CommitUpdater updater) {
         AdaPaxosInstance inst = instanceSpace.get(ackAccept.inst_no);
 
         if (inst != null && inst.crtLeaderId == serverId && inst.status == InstanceStatus.PREPARED){         // on this client, local server works as a leader
@@ -93,7 +92,7 @@ public class AdaLearner implements Learner, DiskResponder {
                 }
 
                 if (inst.lmu.response > peerSize/2)
-                    furtherStep(ackAccept.inst_no);
+                    furtherStep(ackAccept.inst_no, updater);
             }
             else if (ackAccept.type == GenericPaxosMessage.ackMessageType.RECOVER){ // recovery case
                 /* vacant, due to the property mentioned in handleAccept.[recovery case] */
@@ -110,12 +109,13 @@ public class AdaLearner implements Learner, DiskResponder {
     }
 
     @Override
-    public void handleCommit(GenericPaxosMessage.Commit commit) {
+    public void handleCommit(GenericPaxosMessage.Commit commit, CommitUpdater updater) {
         AdaPaxosInstance inst = instanceSpace.get(commit.inst_no);
         if (inst == null){     // back-online case: catch up with current situation
             inst = AdaPaxosInstance.subInst(commit.leaderId, commit.inst_ballot, InstanceStatus.COMMITTED, commit.cmds);
             instanceSpace.set(commit.inst_no, inst);
             logger.logCommit(commit.inst_no, commit, "settled");
+            updater.update(commit.inst_no);
         }
         else{
             if (inst.crtLeaderId == commit.leaderId){      // normal case: whatever the status is, COMMIT demands comply
@@ -130,6 +130,7 @@ public class AdaLearner implements Learner, DiskResponder {
                     });
                     //System.out.println("successfully committed");
                     logger.logCommit(commit.inst_no, commit, "settled");
+                    updater.update(commit.inst_no);
                 }
 
                 /* otherwise, drop the message, which is expired */
@@ -153,7 +154,7 @@ public class AdaLearner implements Learner, DiskResponder {
     }
 
     @Override
-    public void respond_ackWrite(DiskPaxosMessage.ackWrite ackWrite) {
+    public boolean respond_ackWrite(DiskPaxosMessage.ackWrite ackWrite, CommitUpdater updater) {
         if (isValidMessage(ackWrite.inst_no, ackWrite.dialog_no)){
             AdaPaxosInstance inst = instanceSpace.updateAndGet(ackWrite.inst_no, instance -> {
                 instance = AdaPaxosInstance.copy(instance);
@@ -168,13 +169,17 @@ public class AdaLearner implements Learner, DiskResponder {
             /* accumulating until reach Paxos threshold
              * BROADCASTING_ACCEPT activated only once in each Paxos period (only in PREPARING status) */
 
-            if (inst.lmu.response > peerSize/2)
-                furtherStep(ackWrite.inst_no);
+            if (inst.lmu.response > peerSize/2) {
+                furtherStep(ackWrite.inst_no, updater);
+                return true;
+            }
         }
+
+        return false;
     }
 
     @Override
-    public void respond_ackRead(DiskPaxosMessage.ackRead ackRead) {
+    public boolean respond_ackRead(DiskPaxosMessage.ackRead ackRead, CommitUpdater updater) {
         if (isValidMessage(ackRead.inst_no, ackRead.dialog_no)){
             if (ackRead.status == DiskPaxosMessage.DiskStatus.READ_NO_SUCH_FILE) {
                 AdaPaxosInstance inst = instanceSpace.updateAndGet(ackRead.inst_no, instance -> {
@@ -190,8 +195,10 @@ public class AdaLearner implements Learner, DiskResponder {
 
                 /* accumulating until reach Paxos threshold
                  * BROADCASTING_ACCEPT activated only once in each Paxos period (only in PREPARING status) */
-                if (inst.lmu.response > peerSize/2)
-                    furtherStep(ackRead.inst_no);
+                if (inst.lmu.response > peerSize/2) {
+                    furtherStep(ackRead.inst_no, updater);
+                    return true;
+                }
             }
             else if (ackRead.status == DiskPaxosMessage.DiskStatus.READ_SUCCESS && ackRead.accessId != serverId){
                 AdaPaxosInstance inst = instanceSpace.get(ackRead.inst_no);
@@ -202,12 +209,16 @@ public class AdaLearner implements Learner, DiskResponder {
                     /* after this point, this server will no longer play the role of leader in this client.
                      * ABORT msg will only react once, since control flow will not reach here again.
                      * There must be only ONE leader in the network ! */
+
+                    return true;
                 }
             }
         }
+
+        return false;
     }
 
-    private void furtherStep(int inst_no) {
+    private void furtherStep(int inst_no, CommitUpdater updater) {
         AdaPaxosInstance inst = instanceSpace.updateAndGet(inst_no, instance -> {
             instance = AdaPaxosInstance.copy(instance);
             instance.status = InstanceStatus.COMMITTED;
@@ -225,5 +236,7 @@ public class AdaLearner implements Learner, DiskResponder {
         else {
             broadcastOnDisks(inst.lmu.token, inst_no, inst, serverId, peerSize, remoteStore);
         }
+
+        updater.update(inst_no);
     }
 }

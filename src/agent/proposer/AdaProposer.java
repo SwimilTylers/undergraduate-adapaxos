@@ -1,6 +1,5 @@
 package agent.proposer;
 
-import agent.DiskResponder;
 import client.ClientRequest;
 import instance.AdaPaxosInstance;
 import instance.InstanceStatus;
@@ -159,7 +158,7 @@ public class AdaProposer implements Proposer, DiskResponder {
     }
 
     @Override
-    public void respond_ackWrite(DiskPaxosMessage.ackWrite ackWrite) {
+    public boolean respond_ackWrite(DiskPaxosMessage.ackWrite ackWrite) {
         if (isValidMessage(ackWrite.inst_no, ackWrite.dialog_no)){
             AdaPaxosInstance inst = instanceSpace.updateAndGet(ackWrite.inst_no, instance -> {
                 instance = AdaPaxosInstance.copy(instance);
@@ -174,13 +173,17 @@ public class AdaProposer implements Proposer, DiskResponder {
             /* accumulating until reach Paxos threshold
              * BROADCASTING_ACCEPT activated only once in each Paxos period (only in PREPARING status) */
 
-            if (inst.lmu.response > peerSize/2)
+            if (inst.lmu.response > peerSize/2) {
                 furtherStep(ackWrite.inst_no);
+                return true;
+            }
         }
+
+        return false;
     }
 
     @Override
-    public void respond_ackRead(DiskPaxosMessage.ackRead ackRead) {
+    public boolean respond_ackRead(DiskPaxosMessage.ackRead ackRead) {
         if (isValidMessage(ackRead.inst_no, ackRead.dialog_no)){
             if (ackRead.status == DiskPaxosMessage.DiskStatus.READ_NO_SUCH_FILE) {
                 AdaPaxosInstance inst = instanceSpace.updateAndGet(ackRead.inst_no, instance -> {
@@ -196,8 +199,10 @@ public class AdaProposer implements Proposer, DiskResponder {
 
                 /* accumulating until reach Paxos threshold
                  * BROADCASTING_ACCEPT activated only once in each Paxos period (only in PREPARING status) */
-                if (inst.lmu.response > peerSize/2)
+                if (inst.lmu.response > peerSize/2) {
                     furtherStep(ackRead.inst_no);
+                    return true;
+                }
             }
             else if (ackRead.status == DiskPaxosMessage.DiskStatus.READ_SUCCESS && ackRead.accessId != serverId){
                 AdaPaxosInstance inst = instanceSpace.get(ackRead.inst_no);
@@ -208,6 +213,8 @@ public class AdaProposer implements Proposer, DiskResponder {
                     /* after this point, this server will no longer play the role of leader in this client.
                      * ABORT msg will only react once, since control flow will not reach here again.
                      * There must be only ONE leader in the network ! */
+
+                    return false;
                 }
                 else {
                     instanceSpace.updateAndGet(ackRead.inst_no, instance -> {   // early-restore case
@@ -232,11 +239,15 @@ public class AdaProposer implements Proposer, DiskResponder {
 
                     /* accumulating until reach Paxos threshold
                      * BROADCASTING_ACCEPT activated only once in each Paxos period (only in PREPARING status) */
-                    if (inst.lmu.response > peerSize/2)
+                    if (inst.lmu.response > peerSize/2) {
                         furtherStep(ackRead.inst_no);
+                        return true;
+                    }
                 }
             }
         }
+
+        return false;
     }
 
     private void furtherStep(int inst_no) {

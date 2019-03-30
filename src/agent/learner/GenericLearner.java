@@ -41,7 +41,7 @@ public class GenericLearner implements Learner {
     }
 
     @Override
-    public void handleAckAccept(GenericPaxosMessage.ackAccept ackAccept) {
+    public void handleAckAccept(GenericPaxosMessage.ackAccept ackAccept, CommitUpdater updater) {
         if (instanceSpace[ackAccept.inst_no] != null
                 && instanceSpace[ackAccept.inst_no].crtLeaderId == serverId){         // on this client, local server works as a leader
 
@@ -97,7 +97,7 @@ public class GenericLearner implements Learner {
     }
 
     @Override
-    public void handleCommit(GenericPaxosMessage.Commit commit) {
+    public void handleCommit(GenericPaxosMessage.Commit commit, CommitUpdater updater) {
         if (instanceSpace[commit.inst_no] == null){     // back-online case: catch up with current situation
             StaticPaxosInstance inst = new StaticPaxosInstance();
             inst.crtLeaderId = commit.leaderId;

@@ -13,4 +13,9 @@ public class AdaPaxosMessage implements Serializable {
     public AdaPaxosMessage(boolean fsync) {
         this.fsync = fsync;
     }
+
+    @Override
+    public String toString() {
+        return "[ADA_PAXOS][fsync="+fsync+"]";
+    }
 }

@@ -1,4 +1,4 @@
-package agent;
+package agent.proposer;
 
 import network.message.protocols.DiskPaxosMessage;
 
@@ -8,6 +8,6 @@ import network.message.protocols.DiskPaxosMessage;
  */
 public interface DiskResponder {
     boolean isValidMessage(int inst_no, long token);
-    void respond_ackWrite(DiskPaxosMessage.ackWrite ackWrite);
-    void respond_ackRead(DiskPaxosMessage.ackRead ackRead);
+    boolean respond_ackWrite(DiskPaxosMessage.ackWrite ackWrite);
+    boolean respond_ackRead(DiskPaxosMessage.ackRead ackRead);
 }

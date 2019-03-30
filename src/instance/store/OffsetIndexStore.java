@@ -109,7 +109,7 @@ public class OffsetIndexStore implements InstanceStore{
     @Override
     public boolean meta(Serializable metaData) {
         try {
-            FileOutputStream fstream = new FileOutputStream(store_name+File.separator+".meta", false);
+            FileOutputStream fstream = new FileOutputStream("store"+File.separator+store_name+File.separator+"rsm.meta", false);
             ObjectOutputStream ostream = new ObjectOutputStream(fstream);
             ostream.writeObject(metaData);
             ostream.flush();

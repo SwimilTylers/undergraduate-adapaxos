@@ -10,7 +10,6 @@ import client.ClientRequest;
 import logger.PaxosLogger;
 import network.message.protocols.GenericPaxosMessage;
 
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -87,12 +86,12 @@ public class BasicPaxosRSM extends GenericPaxosSMR{
             } else if (msg instanceof GenericPaxosMessage.ackAccept) {
                 GenericPaxosMessage.ackAccept cast = (GenericPaxosMessage.ackAccept) msg;
                 logger.logAckAccept(cast.inst_no, cast, "handle");
-                learner.handleAckAccept(cast);
+                learner.handleAckAccept(cast, null);
                 logger.logAckAccept(cast.inst_no, cast, "exit handle");
             } else if (msg instanceof GenericPaxosMessage.Commit) {
                 GenericPaxosMessage.Commit cast = (GenericPaxosMessage.Commit) msg;
                 logger.logCommit(cast.inst_no, cast, "handle");
-                learner.handleCommit(cast);
+                learner.handleCommit(cast, null);
                 updateConsecutiveCommit();
                 logger.logCommit(cast.inst_no, cast, "exit handle");
             } else if (msg instanceof GenericPaxosMessage.Restore) {
