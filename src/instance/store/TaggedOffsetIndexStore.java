@@ -1,5 +1,6 @@
 package instance.store;
 
+import instance.InstanceStatus;
 import instance.PaxosInstance;
 import javafx.util.Pair;
 
@@ -11,7 +12,7 @@ import java.util.Map;
  * @version : 2019/3/24 20:05
  */
 public class TaggedOffsetIndexStore extends OffsetIndexStore{
-    private Map<Pair<Integer, Integer>, Integer> tags;
+    private Map<Pair<Integer, Integer>, Pair<Integer, InstanceStatus>> tags;
 
     public TaggedOffsetIndexStore(String store_name) {
         super(store_name);
@@ -23,11 +24,11 @@ public class TaggedOffsetIndexStore extends OffsetIndexStore{
         Pair<Integer, Integer> key = new Pair<>(access_id, inst_id);
         int inst_ballot = instance.crtInstBallot;
         if (!tags.containsKey(key)) {
-            tags.put(key, inst_ballot);
+            tags.put(key, new Pair<>(inst_ballot, instance.status));
             return super.store(access_id, inst_id, instance);
         }
-        else if (tags.get(key) <= inst_ballot){
-            tags.replace(key, inst_ballot);
+        else if (tags.get(key).getKey() <= inst_ballot && !InstanceStatus.earlierThan(tags.get(key).getValue(), instance.status)){
+            tags.replace(key, new Pair<>(inst_ballot, instance.status));
             return super.store(access_id, inst_id, instance);
         }
         else

@@ -423,7 +423,7 @@ public class AdaPaxosRSM implements Serializable{
                     AdaPaxosInstance instance = instanceSpace.get(inst_no);
                     if (instance != null) {
                         localStore.store(instance.crtLeaderId, inst_no, instance);
-                        logger.logFormatted(false, "fsync", "confirm", "specific=" + inst_no);
+                        logger.logFormatted(false, "fsync", "confirm", "specific=" + inst_no, instance.toString());
                         if (instance.status == InstanceStatus.COMMITTED)
                             fsyncSignature[inst_no] = true;
 

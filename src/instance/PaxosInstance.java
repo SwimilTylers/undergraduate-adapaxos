@@ -15,7 +15,5 @@ abstract public class PaxosInstance implements Serializable {
     public int crtInstBallot;
     public InstanceStatus status;
 
-    public int update;
-
     public ClientRequest[] requests;
 }

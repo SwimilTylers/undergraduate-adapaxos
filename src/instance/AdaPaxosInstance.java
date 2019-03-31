@@ -53,4 +53,9 @@ public class AdaPaxosInstance extends PaxosInstance {
     public static AdaPaxosInstance copy(AdaPaxosInstance old){
         return new AdaPaxosInstance(old);
     }
+
+    @Override
+    public String toString() {
+        return "[lid="+crtLeaderId+",blt="+crtInstBallot+",cmd_len="+requests.length+"]["+status+"]";
+    }
 }
