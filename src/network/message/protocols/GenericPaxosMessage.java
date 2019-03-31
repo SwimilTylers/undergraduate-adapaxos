@@ -2,7 +2,6 @@ package network.message.protocols;
 
 import client.ClientRequest;
 import instance.PaxosInstance;
-import instance.StaticPaxosInstance;
 
 import java.io.Serializable;
 
@@ -117,7 +116,7 @@ public class GenericPaxosMessage implements Serializable {
 
         @Override
         public String toString() {
-            return "[COMMIT][ino="+inst_no+",lid="+leaderId+",ibt="+inst_ballot+"]"+",cmd_length="+cmds.length+"["+cmds[0].exec+"...]]";
+            return "[COMMIT][ino="+inst_no+",lid="+leaderId+",ibt="+inst_ballot+",cmd_length="+cmds.length+"]["+cmds[0].exec+"...]";
         }
     }
 
@@ -128,6 +127,21 @@ public class GenericPaxosMessage implements Serializable {
         public Restore(int inst_no, PaxosInstance load) {
             super(inst_no);
             this.load = load;
+        }
+    }
+
+    public static class Sync extends GenericPaxosMessage{
+        private static final long serialVersionUID = -8757260106040114565L;
+        public final PaxosInstance load;
+
+        public Sync(int inst_no, PaxosInstance load) {
+            super(inst_no);
+            this.load = load;
+        }
+
+        @Override
+        public String toString() {
+            return "[SYNC][inst_no="+inst_no+"]";
         }
     }
 }

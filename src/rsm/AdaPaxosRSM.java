@@ -3,6 +3,7 @@ package rsm;
 import agent.acceptor.Acceptor;
 import agent.acceptor.AdaAcceptor;
 import agent.learner.AdaLearner;
+import agent.learner.CommitUpdater;
 import agent.proposer.AdaProposer;
 import client.ClientRequest;
 import instance.AdaPaxosInstance;
@@ -365,9 +366,9 @@ public class AdaPaxosRSM implements Serializable{
                     } else if (msg instanceof GenericPaxosMessage.Commit) {
                         GenericPaxosMessage.Commit cast = (GenericPaxosMessage.Commit) msg;
                         learner.handleCommit(cast, i->updateConsecutiveCommit());
-                    } else if (msg instanceof GenericPaxosMessage.Restore) {
-                        GenericPaxosMessage.Restore cast = (GenericPaxosMessage.Restore) msg;
-                        //handleRestore(cast);
+                    } else if (msg instanceof GenericPaxosMessage.Sync) {
+                        GenericPaxosMessage.Sync cast = (GenericPaxosMessage.Sync) msg;
+                        memorySynchronize_immediate(cast.inst_no, (AdaPaxosInstance) cast.load, i->updateConsecutiveCommit());
                     }
 
                     if (forceFsync.get())
@@ -454,6 +455,7 @@ public class AdaPaxosRSM implements Serializable{
 
     protected int fileSynchronize_immediate(){
         int inst_no = fsyncInitInstance.get();
+        int fsyncInit_sta = inst_no;
         for (; inst_no < consecutiveCommit.get(); inst_no++) {
             if (!fsyncSignature[inst_no]){
                 AdaPaxosInstance instance = instanceSpace.get(inst_no);
@@ -466,7 +468,7 @@ public class AdaPaxosRSM implements Serializable{
             }
         }
         fsyncInitInstance.set(inst_no);
-        int fsyncInit = inst_no;
+        int fsyncInit_end = inst_no;
         for (; inst_no < maxReceivedInstance.get(); inst_no++) {
             if (!fsyncSignature[inst_no]){
                 AdaPaxosInstance instance = instanceSpace.get(inst_no);
@@ -477,16 +479,17 @@ public class AdaPaxosRSM implements Serializable{
                 }
             }
         }
-        logger.logFormatted(false, "fsync", "imm", "fsyncInit="+fsyncInit, "upto="+inst_no);
+        logger.logFormatted(false, "fsync", "backup", "fsyncInit="+fsyncInit_sta+"->"+fsyncInit_end, "upto="+inst_no);
         return inst_no;
     }
 
     protected void memorySynchronize(final int upto){
         int upper = maxReceivedInstance.updateAndGet(i-> Integer.max(i, upto));
-        for (int i = consecutiveCommit.get(); i < upper; i++) {
-            int inst_no = i;
-            instanceSpace.updateAndGet(i, instance -> {
+        for (int inst_no = consecutiveCommit.get(); inst_no < upper; inst_no++) {
+            try {
+                AdaPaxosInstance instance = instanceSpace.get(inst_no);
                 if (instance == null || instance.status != InstanceStatus.COMMITTED) {
+                    instance = null;
                     for (int server = 0; server < peerSize; server++) {
                         if (localStore.isExist(server, inst_no)) {
                             AdaPaxosInstance compare = (AdaPaxosInstance) localStore.fetch(server, inst_no);
@@ -499,12 +502,39 @@ public class AdaPaxosRSM implements Serializable{
                             }
                         }
                     }
-                    logger.logFormatted(false, "msync", "confirm", "inst_no=" + inst_no, "inst=" + (instance == null ? "null" : instance.toString()));
-                    if (instance != null && instance.status == InstanceStatus.COMMITTED)
-                        logger.logCommit(inst_no, new GenericPaxosMessage.Commit(inst_no, instance.crtLeaderId, instance.crtInstBallot, instance.requests), "recover");
+                    logger.logFormatted(false, "msync", "candidate", "inst_no=" + inst_no, "inst=" + (instance == null ? "null" : instance.toString()));
                 }
-                return instance;
+                pMessages.put(new GenericPaxosMessage.Sync(inst_no, instance));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    protected void memorySynchronize_immediate(final int inst_no, AdaPaxosInstance candidate, CommitUpdater updater){
+        AtomicBoolean commitUpdate = new AtomicBoolean(false);
+        if (candidate != null){
+            instanceSpace.updateAndGet(inst_no, instance -> {
+                if (instance == null
+                        || instance.crtInstBallot < candidate.crtInstBallot
+                        || (instance.crtInstBallot == candidate.crtInstBallot
+                            && !InstanceStatus.earlierThan(instance.status, candidate.status))) {
+
+                    if ((instance == null || instance.status != InstanceStatus.COMMITTED)
+                            && candidate.status == InstanceStatus.COMMITTED) {
+                        commitUpdate.set(true);
+                    }
+
+                    return candidate;
+                }
+                else
+                    return instance;
             });
+
+            if (commitUpdate.get()){
+                logger.logCommit(inst_no, new GenericPaxosMessage.Commit(inst_no, candidate.crtLeaderId, candidate.crtInstBallot, candidate.requests), "settled");
+                updater.update(inst_no);
+            }
         }
     }
 
