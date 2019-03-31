@@ -285,11 +285,11 @@ public class AdaPaxosRSM implements Serializable{
                         forceFsync.set(false);
                         metaFsync.set(true);
                         logger.record(false, "diag","["+System.currentTimeMillis()+"]"+"[FSYNC=false][received]\n");
-                        memorySynchronize();
+                        memorySynchronize(message.upto);
                     }
                 }
             }
-            else {
+            else {  // if you are a leader, MSync is not necessary.
                 int[] crushed = conn.filter(expire);
 
                 if (crushed != null) {
@@ -301,7 +301,7 @@ public class AdaPaxosRSM implements Serializable{
                             int ballot = crtInstBallot.incrementAndGet();
                             metaFsync.set(true);
                             logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=true][new ballot=" + ballot + "]\n");
-                            net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(true));
+                            net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(true, maxReceivedInstance.get()));
                             fileSynchronize();
                         }
                     }
@@ -313,8 +313,7 @@ public class AdaPaxosRSM implements Serializable{
                                 int ballot = crtInstBallot.incrementAndGet();
                                 metaFsync.set(true);
                                 logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=false][new ballot=" + ballot + "]\n");
-                                net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(false));
-                                memorySynchronize();
+                                net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(false, maxReceivedInstance.get()));
                             }
                         }
                     }
@@ -327,8 +326,7 @@ public class AdaPaxosRSM implements Serializable{
                             int ballot = crtInstBallot.incrementAndGet();
                             metaFsync.set(true);
                             logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=false][new ballot=" + ballot + "]\n");
-                            net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(false));
-                            memorySynchronize();
+                            net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(false, maxReceivedInstance.get()));
                         }
                     }
                 }
@@ -483,8 +481,31 @@ public class AdaPaxosRSM implements Serializable{
         return inst_no;
     }
 
-    protected void memorySynchronize(){
-
+    protected void memorySynchronize(final int upto){
+        int upper = maxReceivedInstance.updateAndGet(i-> Integer.max(i, upto));
+        for (int i = consecutiveCommit.get(); i < upper; i++) {
+            int inst_no = i;
+            instanceSpace.updateAndGet(i, instance -> {
+                if (instance == null || instance.status != InstanceStatus.COMMITTED) {
+                    for (int server = 0; server < peerSize; server++) {
+                        if (localStore.isExist(server, inst_no)) {
+                            AdaPaxosInstance compare = (AdaPaxosInstance) localStore.fetch(server, inst_no);
+                            if (instance == null
+                                    || instance.crtInstBallot < compare.crtInstBallot
+                                    || (instance.crtInstBallot == compare.crtInstBallot
+                                    && !InstanceStatus.earlierThan(instance.status, compare.status))) {
+                                instance = compare;
+                                logger.logFormatted(false, "msync", "competitor", "inst_no=" + inst_no, "source=" + server, "inst=" + compare);
+                            }
+                        }
+                    }
+                    logger.logFormatted(false, "msync", "confirm", "inst_no=" + inst_no, "inst=" + (instance == null ? "null" : instance.toString()));
+                    if (instance != null && instance.status == InstanceStatus.COMMITTED)
+                        logger.logCommit(inst_no, new GenericPaxosMessage.Commit(inst_no, instance.crtLeaderId, instance.crtInstBallot, instance.requests), "recover");
+                }
+                return instance;
+            });
+        }
     }
 
     protected void fileSynchronize(final int specific){

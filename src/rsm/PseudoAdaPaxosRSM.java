@@ -14,8 +14,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 /**
  * @author : Swimiltylers
@@ -105,14 +103,14 @@ public class PseudoAdaPaxosRSM extends GenericPaxosSMR{
 
     private void switchToMemory(){
         slowMode.set(false);
-        net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(false));
+//        net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(false, upto));
 
         // TODO: store FAST_MODE
     }
 
     private void switchToDisk(){
         slowMode.set(true);
-        net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(true));
+//        net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(true, upto));
         fileSynchronize();
 
         // TODO: store SLOW_MODE
