@@ -68,7 +68,7 @@ public class AdaPaxosRSM implements Serializable{
     protected AtomicBoolean forceFsync;
     protected AtomicBoolean metaFsync;
     transient protected boolean[] fsyncSignature;
-    transient protected BlockingQueue<Pair<Integer, AdaPaxosInstance>> fsyncQueue;
+    transient protected BlockingQueue<Integer> fsyncQueue;
 
     /* agents */
     transient protected AdaProposer proposer;
@@ -410,7 +410,7 @@ public class AdaPaxosRSM implements Serializable{
 
         while (routineOnRunning.get()) {
             try {
-                Pair<Integer, AdaPaxosInstance> backup = fsyncQueue.poll(backupItv, TimeUnit.MILLISECONDS);
+                Integer backup = fsyncQueue.poll(backupItv, TimeUnit.MILLISECONDS);
                 if (backup == null) {
                     if (!forceFsync.get()) {
                         persist = Integer.max(fileSynchronize_immediate(), persist);
@@ -419,19 +419,21 @@ public class AdaPaxosRSM implements Serializable{
                             localStore.meta("fast mode, persist=" + persist);
                     }
                 } else {
-                    int inst_no = backup.getKey();
-                    AdaPaxosInstance instance = backup.getValue();
-                    localStore.store(instance.crtLeaderId, inst_no, instance);
-                    logger.logFormatted(false, "fsync", "confirm", "specific=" + inst_no);
-                    if (instance.status == InstanceStatus.COMMITTED)
-                        fsyncSignature[inst_no] = true;
+                    int inst_no = backup;
+                    AdaPaxosInstance instance = instanceSpace.get(inst_no);
+                    if (instance != null) {
+                        localStore.store(instance.crtLeaderId, inst_no, instance);
+                        logger.logFormatted(false, "fsync", "confirm", "specific=" + inst_no);
+                        if (instance.status == InstanceStatus.COMMITTED)
+                            fsyncSignature[inst_no] = true;
 
-                    persist = Integer.max(inst_no, persist);
+                        persist = Integer.max(inst_no, persist);
 
-                    if (forceFsync.get()) {
-                        boolean oldState = metaFsync.getAndSet(false);
-                        if (oldState)
-                            localStore.meta("slow mode");
+                        if (forceFsync.get()) {
+                            boolean oldState = metaFsync.getAndSet(false);
+                            if (oldState)
+                                localStore.meta("slow mode");
+                        }
                     }
                 }
             } catch (Exception e){
@@ -461,9 +463,12 @@ public class AdaPaxosRSM implements Serializable{
                     localStore.store(instance.crtLeaderId, inst_no, instance);
                     fsyncSignature[inst_no] = true;
                 }
+                else
+                    break;
             }
         }
         fsyncInitInstance.set(inst_no);
+        int fsyncInit = inst_no;
         for (; inst_no < maxReceivedInstance.get(); inst_no++) {
             if (!fsyncSignature[inst_no]){
                 AdaPaxosInstance instance = instanceSpace.get(inst_no);
@@ -474,7 +479,7 @@ public class AdaPaxosRSM implements Serializable{
                 }
             }
         }
-        logger.logFormatted(false, "fsync", "imm", "fsyncInit="+inst_no, "upto="+inst_no);
+        logger.logFormatted(false, "fsync", "imm", "fsyncInit="+fsyncInit, "upto="+inst_no);
         return inst_no;
     }
 
@@ -485,11 +490,8 @@ public class AdaPaxosRSM implements Serializable{
     protected void fileSynchronize(final int specific){
         if (!fsyncSignature[specific]){
             try {
-                AdaPaxosInstance instance = instanceSpace.get(specific);
-                if (instance != null) {
-                    fsyncQueue.put(new Pair<>(specific, instance));
-                    logger.logFormatted(false, "fsync", "submit", "specific=" + specific);
-                }
+                fsyncQueue.put(specific);
+                logger.logFormatted(false, "fsync", "submit", "specific=" + specific);
             } catch (Exception e) {
                 e.printStackTrace();
             }
