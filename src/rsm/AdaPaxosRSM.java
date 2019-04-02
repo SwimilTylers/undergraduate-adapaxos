@@ -157,6 +157,12 @@ public class AdaPaxosRSM implements Serializable{
         return this;
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        routineOnRunning.set(false);
+        super.finalize();
+    }
+
     @SuppressWarnings("unchecked")
     public static AdaPaxosRSM makeInstance(final int id, final int epoch, final int peerSize, InstanceStore localStore, RemoteInstanceStore remoteStore, GenericNetService net, boolean initAsLeader){
         AdaPaxosRSM rsm = new AdaPaxosRSM(id, initAsLeader, new NaiveLogger(id));
@@ -349,7 +355,7 @@ public class AdaPaxosRSM implements Serializable{
                 if (msg != null) {
                     logger.log(true, "receive " + msg.toString() + "\n");
 
-                    maxReceivedInstance.updateAndGet(i -> i = Integer.max(i, msg.inst_no));
+                    maxReceivedInstance.updateAndGet(i -> Integer.max(i, msg.inst_no));
 
                     if (msg instanceof GenericPaxosMessage.Prepare) {
                         GenericPaxosMessage.Prepare cast = (GenericPaxosMessage.Prepare) msg;
@@ -442,7 +448,10 @@ public class AdaPaxosRSM implements Serializable{
     }
 
     protected void routine_leadership(final int leadershipItv){
+        int crtLeaderId;
+        while (routineOnRunning.get()){
 
+        }
     }
 
     /* protected-access file2mem-mem2file func */
