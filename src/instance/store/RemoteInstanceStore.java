@@ -15,5 +15,4 @@ public interface RemoteInstanceStore {
     void connect(BlockingQueue<DiskPaxosMessage> dMessages);
     void launchRemoteStore(long token, int disk_no, int access_id, int inst_id, PaxosInstance instance);
     void launchRemoteFetch(long token, int disk_no, int access_id, int inst_id);
-    void setLogger(PaxosLogger logger);
 }

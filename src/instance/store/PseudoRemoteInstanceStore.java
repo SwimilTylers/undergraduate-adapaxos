@@ -39,7 +39,7 @@ public class PseudoRemoteInstanceStore implements RemoteInstanceStore{
 
     @Override
     public void launchRemoteStore(long token, int disk_no, int access_id, int inst_id, PaxosInstance instance) {
-        logger.logFormatted(false, String.valueOf(System.currentTimeMillis()), "remote store", "inst_no="+inst_id+"' token="+token);
+        logger.logFormatted(false, "remote store", "inst_no="+inst_id+", token="+token);
         launchService.execute(() -> {
             try {
                 if (stores[disk_no].store(access_id, inst_id, instance)) {

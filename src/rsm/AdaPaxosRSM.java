@@ -10,6 +10,7 @@ import instance.AdaPaxosInstance;
 import instance.InstanceStatus;
 import instance.maintenance.AdaRecoveryMaintenance;
 import instance.store.InstanceStore;
+import instance.store.PseudoRemoteInstanceStore;
 import instance.store.RemoteInstanceStore;
 import javafx.util.Pair;
 import logger.NaiveLogger;
@@ -129,7 +130,7 @@ public class AdaPaxosRSM implements Serializable{
 
         this.localStore = localStore;
         this.remoteStore = remoteStore;
-        remoteStore.setLogger(logger);
+        ((PseudoRemoteInstanceStore)remoteStore).setLogger(logger);
         // TODO: 2019/3/29 setLogger
         forceFsync = new AtomicBoolean(initFsync);
         metaFsync = new AtomicBoolean(true);
@@ -424,14 +425,17 @@ public class AdaPaxosRSM implements Serializable{
                     if (!forceFsync.get()) {
                         persist = Integer.max(fileSynchronize_immediate(), persist);
                         boolean oldState = metaFsync.getAndSet(false);
-                        if (oldState)
-                            localStore.meta("fast mode, persist=" + persist);
+                        if (oldState) {
+                            // TODO: 2019/4/2 meta-data
+                            //localStore.meta("fast mode, persist=" + persist);
+                        }
                     }
                 } else {
                     int inst_no = backup;
                     AdaPaxosInstance instance = instanceSpace.get(inst_no);
                     if (instance != null) {
-                        localStore.store(instance.crtLeaderId, inst_no, instance);
+                        remoteStore.launchRemoteStore(AdaAgents.newToken(), serverId, instance.crtLeaderId, inst_no, instance);
+                        //localStore.store(instance.crtLeaderId, inst_no, instance);
                         logger.logFormatted(false, "fsync", "confirm", "specific=" + inst_no, instance.toString());
                         if (instance.status == InstanceStatus.COMMITTED)
                             fsyncSignature[inst_no] = true;
@@ -440,8 +444,10 @@ public class AdaPaxosRSM implements Serializable{
 
                         if (forceFsync.get()) {
                             boolean oldState = metaFsync.getAndSet(false);
-                            if (oldState)
-                                localStore.meta("slow mode");
+                            if (oldState) {
+                                // TODO: 2019/4/2 meta-data
+                                //localStore.meta("slow mode");
+                            }
                         }
                     }
                 }
@@ -473,7 +479,8 @@ public class AdaPaxosRSM implements Serializable{
             if (!fsyncSignature[inst_no]){
                 AdaPaxosInstance instance = instanceSpace.get(inst_no);
                 if (instance != null) {
-                    localStore.store(instance.crtLeaderId, inst_no, instance);
+                    remoteStore.launchRemoteStore(AdaAgents.newToken(), serverId, instance.crtLeaderId, inst_no, instance);
+                    //localStore.store(instance.crtLeaderId, inst_no, instance);
                     fsyncSignature[inst_no] = true;
                 }
                 else
@@ -486,7 +493,8 @@ public class AdaPaxosRSM implements Serializable{
             if (!fsyncSignature[inst_no]){
                 AdaPaxosInstance instance = instanceSpace.get(inst_no);
                 if (instance != null) {
-                    localStore.store(instance.crtLeaderId, inst_no, instance);
+                    remoteStore.launchRemoteStore(AdaAgents.newToken(), serverId, instance.crtLeaderId, inst_no, instance);
+                    //localStore.store(instance.crtLeaderId, inst_no, instance);
                     if (instance.status == InstanceStatus.COMMITTED)
                         fsyncSignature[inst_no] = true;
                 }

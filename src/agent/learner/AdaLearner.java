@@ -146,7 +146,7 @@ public class AdaLearner implements Learner, DiskCommitResponder {
     @Override
     public boolean isValidMessage(int inst_no, long token) {
         AdaPaxosInstance inst = instanceSpace.get(inst_no);
-        if (inst != null){
+        if (inst != null && inst.lmu != null){
             return inst.lmu.token == token && inst.status == InstanceStatus.PREPARED;
         }
         else

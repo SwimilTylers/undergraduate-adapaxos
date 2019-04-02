@@ -133,7 +133,7 @@ public class NaiveLogger implements PaxosLogger {
     @Override
     public void logPrepare(int inst_no, GenericPaxosMessage.Prepare msg, String supplement) {
         Date date = new Date();
-        String prepareFormat = "[%tF %<tT:%<tL %<tz][p%08d][PREPARE][leaderId=%d, inst_no=%d][\"%s\"]%n";
+        String prepareFormat = "[%tF %<tT:%<tL %<tz][0x%08x][PREPARE][leaderId=%d, inst_no=%d][\"%s\"]%n";
         String message = String.format(prepareFormat, date, msg.inst_ballot, msg.leaderId, inst_no, supplement);
         //System.out.print(message);
         imm_toFile(pWriter, message);
@@ -144,7 +144,7 @@ public class NaiveLogger implements PaxosLogger {
     @Override
     public void logAckPrepare(int inst_no, GenericPaxosMessage.ackPrepare ack, String supplement) {
         Date date = new Date();
-        String ackPrepareFormat = "[%tF %<tT:%<tL %<tz][p%08d][makeAck:PREPARE][leaderId=%d, inst_no=%d][\"%s\"]%n";
+        String ackPrepareFormat = "[%tF %<tT:%<tL %<tz][0x%08x][makeAck:PREPARE][leaderId=%d, inst_no=%d][\"%s\"]%n";
         String message = String.format(ackPrepareFormat, date, ack.inst_ballot, ack.ack_leaderId, inst_no, supplement);
         //System.out.print(message);
         imm_toFile(pWriter, message);
@@ -155,7 +155,7 @@ public class NaiveLogger implements PaxosLogger {
     @Override
     public void logAccept(int inst_no, GenericPaxosMessage.Accept msg, String supplement) {
         Date date = new Date();
-        String acceptFormat = "[%tF %<tT:%<tL %<tz][p%08d][ACCEPT][leaderId=%d, inst_no=%d, cmd_length=%d][\"%s\"]%n";
+        String acceptFormat = "[%tF %<tT:%<tL %<tz][0x%08x][ACCEPT][leaderId=%d, inst_no=%d, cmd_length=%d][\"%s\"]%n";
         String message = String.format(acceptFormat, date, msg.inst_ballot, msg.leaderId, inst_no, msg.cmds.length, supplement);
         //System.out.print(message);
         imm_toFile(pWriter, message);
@@ -166,7 +166,7 @@ public class NaiveLogger implements PaxosLogger {
     @Override
     public void logAckAccept(int inst_no, GenericPaxosMessage.ackAccept ack, String supplement) {
         Date date = new Date();
-        String ackAcceptFormat = "[%tF %<tT:%<tL %<tz][p%08d][makeAck:Accept][leaderId=%d, inst_no=%d, cmd_length=%d][\"%s\"]%n";
+        String ackAcceptFormat = "[%tF %<tT:%<tL %<tz][0x%08x][makeAck:Accept][leaderId=%d, inst_no=%d, cmd_length=%d][\"%s\"]%n";
         String message = String.format(ackAcceptFormat, date, ack.inst_ballot, ack.ack_leaderId, inst_no, ack.cmds.length, supplement);
         //System.out.print(message);
         imm_toFile(pWriter, message);
@@ -188,7 +188,7 @@ public class NaiveLogger implements PaxosLogger {
     @Override
     public void logCommit(int inst_no, @NotNull GenericPaxosMessage.Commit msg, @NotNull String supplement) {
         Date date = new Date();
-        String commitFormat = "[%tF %<tT:%<tL %<tz][p%08d][COMMIT][leaderId=%d, inst_no=%d, cmd_length=%d][\"%s\"]%n";
+        String commitFormat = "[%tF %<tT:%<tL %<tz][0x%08x][COMMIT][leaderId=%d, inst_no=%d, cmd_length=%d][\"%s\"]%n";
         String message = String.format(commitFormat, date, msg.inst_ballot, msg.leaderId, inst_no, msg.cmds.length, supplement);
         //System.out.print(message);
         imm_toFile(pWriter, message);
