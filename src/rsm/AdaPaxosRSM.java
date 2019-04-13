@@ -218,7 +218,7 @@ public class AdaPaxosRSM implements Serializable{
         routineOnRunning = new AtomicBoolean(true);
         ExecutorService routines = Executors.newCachedThreadPool();
         routines.execute(()-> routine_batch(2000, GenericPaxosSMR.DEFAULT_REQUEST_COMPACTING_SIZE));
-        routines.execute(() -> routine_monitor(50, 60, 2, 20));
+        routines.execute(() -> routine_monitor(40, 60, 2, 20));
         routines.execute(this::routine_response);
         routines.execute(() -> routine_backup(5000));
         if (supplement != null && supplement.length != 0) {
@@ -308,16 +308,16 @@ public class AdaPaxosRSM implements Serializable{
                 if (crushed != null) {
                     logger.record(false, "diag", "["+System.currentTimeMillis()+"]"+Arrays.toString(crushed) + "\n");
                     if (crushed.length >= bare_minority){
-                        boolean oldState = forceFsync.getAndSet(true);
-                        if (!oldState) {
-                            try {
-                                Thread.sleep(decisionDelay);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            finally {
-                                crushed = conn.filter(expire);
-                                if (crushed != null && crushed.length >= bare_minority) {
+                        try {
+                            Thread.sleep(decisionDelay);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        finally {
+                            crushed = conn.filter(expire);
+                            if (crushed != null && crushed.length >= bare_minority) {
+                                boolean oldState = forceFsync.getAndSet(true);
+                                if (!oldState) {
                                     stableConnCount = 0;
                                     int ballot = crtInstBallot.incrementAndGet();
                                     metaFsync.set(true);
@@ -325,9 +325,9 @@ public class AdaPaxosRSM implements Serializable{
                                     net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(true, maxReceivedInstance.get()));
                                     fileSynchronize();
                                 }
-                                else
-                                    forceFsync.set(false);
                             }
+                            else
+                                forceFsync.set(false);
                         }
                     }
                     else {

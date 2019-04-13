@@ -2,13 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/network/service/module/UnidirectionalHeartBeatModule.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/network/service/sender/ParallelPeerMessageSender.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/client/FileIteratorClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/client/FileIteratorClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/service/GenericNetService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/GenericNetService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/service/module/HeartBeatModule.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/module/BidirectionalHeartBeatModule.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/service/sender/BasicPeerMessageSender.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/sender/BasicPeerMessageSender.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -31,8 +25,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="154">
-              <caret line="220" column="48" selection-start-line="220" selection-start-column="48" selection-end-line="220" selection-end-column="48" />
+            <state relative-caret-position="320">
+              <caret line="316" column="54" selection-start-line="316" selection-start-column="54" selection-end-line="316" selection-end-column="54" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -41,17 +35,17 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/logs/server-0.diagnosis">
-          <provider selected="true" editor-type-id="text-editor" />
+        <entry file="file://$PROJECT_DIR$/logs/server-0.heartbeat">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="649">
+              <caret line="2797" column="21" selection-start-line="2797" selection-start-column="21" selection-end-line="2797" selection-end-column="21" />
+            </state>
+          </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/logs/server-0.heartbeat">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="33068">
-              <caret line="2467" column="21" selection-start-line="2467" selection-start-column="21" selection-end-line="2467" selection-end-column="21" />
-            </state>
-          </provider>
+        <entry file="file://$PROJECT_DIR$/logs/server-0.diagnosis">
+          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
@@ -113,7 +107,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>recovery case</find>
       <find>recovery</find>
       <find>out</find>
       <find>send</find>
@@ -143,6 +136,7 @@
       <find>remote store</find>
       <find>1555146250</find>
       <find>15551468711</find>
+      <find>diag</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -236,6 +230,11 @@
             <path>
               <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
               <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="logs" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
@@ -504,14 +503,7 @@
       <workItem from="1554171812567" duration="15867000" />
       <workItem from="1554727002762" duration="1023000" />
       <workItem from="1555137179099" duration="3227000" />
-      <workItem from="1555140485921" duration="8840000" />
-    </task>
-    <task id="LOCAL-00003" summary="Status: one-turn paxos server-client model, without separate i/o channel &amp; paxos agent&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ logger is working properly&#10;+ cannot separate registration and paxos procedures&#10;+ proposal number is increased sequentially&#10;+ integrated paxos agent &amp; i/o channel">
-      <created>1545490987853</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1545490987853</updated>
+      <workItem from="1555140485921" duration="10438000" />
     </task>
     <task id="LOCAL-00004" summary="Status: reconstruct proposer, separate two stages of action and add timeout mechanism&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is working properly&#10;+ proposal number is increased sequentially&#10;+ integrated paxos agent &amp; i/o channel&#10;+ Paxos message construction and interpretation are not reliable">
       <created>1546496134904</created>
@@ -849,11 +841,18 @@
       <option name="project" value="LOCAL" />
       <updated>1555137981693</updated>
     </task>
-    <option name="localTasksCounter" value="52" />
+    <task id="LOCAL-00052" summary="Status: beaconThread.setPriority(Thread.MAX_PRIORITY); drop expire to 60 ms&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR">
+      <created>1555155779368</created>
+      <option name="number" value="00052" />
+      <option name="presentableId" value="LOCAL-00052" />
+      <option name="project" value="LOCAL" />
+      <updated>1555155779369</updated>
+    </task>
+    <option name="localTasksCounter" value="53" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="649864000" />
+    <option name="totallyTimeSpent" value="651462000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -868,7 +867,7 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.30294907" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.30294907" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -948,7 +947,6 @@
     <ignored-roots>
       <path value="E:" />
     </ignored-roots>
-    <MESSAGE value="Status: tested OffsetIndexStore&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
     <MESSAGE value="Status: tested DiskPaxosSMR in normal case, with OffsetIndexStore&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
     <MESSAGE value="Status: tested DiskPaxosSMR in normal case + addition cases&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
     <MESSAGE value="Status: elaborated HistoryMaintenance&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
@@ -973,12 +971,10 @@
     <MESSAGE value="Status: on de-localStorage&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: de-localStorage-lized&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: start decouple disk and machine&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
-    <option name="LAST_COMMIT_MESSAGE" value="Status: start decouple disk and machine&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
+    <MESSAGE value="Status: beaconThread.setPriority(Thread.MAX_PRIORITY); drop expire to 60 ms&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
+    <option name="LAST_COMMIT_MESSAGE" value="Status: beaconThread.setPriority(Thread.MAX_PRIORITY); drop expire to 60 ms&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/logs/server-0.store">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/network/message/protocols/GenericPaxosMessage.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="952">
@@ -1240,9 +1236,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-1.diagnosis">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-1.heartbeat">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -1318,10 +1311,16 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-1.diagnosis">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-0.store">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-0.heartbeat">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="33068">
-          <caret line="2467" column="21" selection-start-line="2467" selection-start-column="21" selection-end-line="2467" selection-end-column="21" />
+        <state relative-caret-position="649">
+          <caret line="2797" column="21" selection-start-line="2797" selection-start-column="21" selection-end-line="2797" selection-end-column="21" />
         </state>
       </provider>
     </entry>
@@ -1330,8 +1329,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="154">
-          <caret line="220" column="48" selection-start-line="220" selection-start-column="48" selection-end-line="220" selection-end-column="48" />
+        <state relative-caret-position="320">
+          <caret line="316" column="54" selection-start-line="316" selection-start-column="54" selection-end-line="316" selection-end-column="54" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
