@@ -131,7 +131,6 @@ public class AdaPaxosRSM implements Serializable{
         this.localStore = localStore;
         this.remoteStore = remoteStore;
         ((PseudoRemoteInstanceStore)remoteStore).setLogger(logger);
-        // TODO: 2019/3/29 setLogger
         forceFsync = new AtomicBoolean(initFsync);
         metaFsync = new AtomicBoolean(true);
         fsyncSignature = new boolean[instanceSpace.length()];
@@ -219,7 +218,7 @@ public class AdaPaxosRSM implements Serializable{
         routineOnRunning = new AtomicBoolean(true);
         ExecutorService routines = Executors.newCachedThreadPool();
         routines.execute(()-> routine_batch(2000, GenericPaxosSMR.DEFAULT_REQUEST_COMPACTING_SIZE));
-        routines.execute(() -> routine_monitor(200, 100, 10));
+        routines.execute(() -> routine_monitor(50, 60, 2, 20));
         routines.execute(this::routine_response);
         routines.execute(() -> routine_backup(5000));
         if (supplement != null && supplement.length != 0) {
@@ -280,7 +279,7 @@ public class AdaPaxosRSM implements Serializable{
         }
     }
 
-    protected void routine_monitor(final int monitorItv, final int expire, final int stability){
+    protected void routine_monitor(final int monitorItv, final int expire, final int stability, final int decisionDelay){
         final int bare_majority = (peerSize+1)/2;
         final int bare_minority = peerSize - bare_majority;
 
@@ -309,14 +308,26 @@ public class AdaPaxosRSM implements Serializable{
                 if (crushed != null) {
                     logger.record(false, "diag", "["+System.currentTimeMillis()+"]"+Arrays.toString(crushed) + "\n");
                     if (crushed.length >= bare_minority){
-                        stableConnCount = 0;
                         boolean oldState = forceFsync.getAndSet(true);
                         if (!oldState) {
-                            int ballot = crtInstBallot.incrementAndGet();
-                            metaFsync.set(true);
-                            logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=true][new ballot=" + ballot + "]\n");
-                            net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(true, maxReceivedInstance.get()));
-                            fileSynchronize();
+                            try {
+                                Thread.sleep(decisionDelay);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                            finally {
+                                crushed = conn.filter(expire);
+                                if (crushed != null && crushed.length >= bare_minority) {
+                                    stableConnCount = 0;
+                                    int ballot = crtInstBallot.incrementAndGet();
+                                    metaFsync.set(true);
+                                    logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=true][new ballot=" + ballot + "]\n");
+                                    net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(true, maxReceivedInstance.get()));
+                                    fileSynchronize();
+                                }
+                                else
+                                    forceFsync.set(false);
+                            }
                         }
                     }
                     else {

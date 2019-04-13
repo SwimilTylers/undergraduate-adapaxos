@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
  * @author : Swimiltylers
  * @version : 2019/2/26 17:19
  */
-public class HeartBeatModule implements ConnectionModule{
+public class BidirectionalHeartBeatModule implements ConnectionModule{
     private static class NodeMonitor{
         private boolean isConn = true;
         private long lst_srv = 0;
@@ -34,7 +34,7 @@ public class HeartBeatModule implements ConnectionModule{
     private int moduleId;
     private AtomicReferenceArray<NodeMonitor> nodes;
 
-    public HeartBeatModule(int moduleId, int totalSize) {
+    public BidirectionalHeartBeatModule(int moduleId, int totalSize) {
         this.moduleId = moduleId;
         nodes = new AtomicReferenceArray<>(totalSize);
         nodes.set(moduleId, new NodeMonitor());

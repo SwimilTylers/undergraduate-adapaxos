@@ -9,7 +9,8 @@ import network.message.protocols.GenericClientMessage;
 import network.message.protocols.GenericConnectionMessage;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.module.ConnectionModule;
-import network.service.module.HeartBeatModule;
+import network.service.module.BidirectionalHeartBeatModule;
+import network.service.module.UnidirectionalHeartBeatModule;
 import network.service.receiver.BasicPeerMessageReceiver;
 import network.service.sender.BasicPeerMessageSender;
 import network.service.receiver.PeerMessageReceiver;
@@ -40,7 +41,7 @@ public class GenericNetService {
     protected PeerMessageSender sender;
     protected PeerMessageReceiver receiver;
 
-    public static final int DEFAULT_BEACON_INTERVAL = 50;
+    public static final int DEFAULT_BEACON_INTERVAL = 20;
     private int beaconItv = DEFAULT_BEACON_INTERVAL;
 
     protected ConnectionModule cModule;
@@ -111,7 +112,7 @@ public class GenericNetService {
         peerPortList = port;
 
         peers = new Socket[peerSize];
-        cModule = new HeartBeatModule(netServiceId, peerSize);
+        cModule = new UnidirectionalHeartBeatModule(netServiceId, peerSize);
 
         CountDownLatch latch = new CountDownLatch(2);
 
@@ -137,7 +138,9 @@ public class GenericNetService {
             }
         }
 
-        service.execute(this::beacon);
+        Thread beaconThread = new Thread(this::beacon);
+        beaconThread.setPriority(Thread.MAX_PRIORITY);
+        beaconThread.start();
 
         service.shutdown();
     }

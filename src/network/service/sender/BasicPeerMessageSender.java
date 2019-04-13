@@ -16,8 +16,8 @@ import java.net.Socket;
  * @version : 2019/2/26 19:48
  */
 public class BasicPeerMessageSender implements PeerMessageSender {
-    private int netServiceId;
-    private int peerSize;
+    protected int netServiceId;
+    protected int peerSize;
     private Socket[] peers;
 
     private ConnectionModule cModule;
