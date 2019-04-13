@@ -3,8 +3,8 @@ package rsm;
 import agent.acceptor.Acceptor;
 import agent.acceptor.AdaAcceptor;
 import agent.learner.AdaLearner;
-import agent.learner.CommitUpdater;
 import agent.proposer.AdaProposer;
+import agent.recovery.AdaRecovery;
 import client.ClientRequest;
 import instance.AdaPaxosInstance;
 import instance.InstanceStatus;
@@ -41,7 +41,7 @@ public class AdaPaxosRSM implements Serializable{
     /* unique identity */
     protected int serverId;
     transient protected AtomicBoolean asLeader;
-
+    transient volatile int crtLeader;
 
     /* net and connect */
     protected int peerSize;
@@ -79,6 +79,7 @@ public class AdaPaxosRSM implements Serializable{
     transient protected AdaProposer proposer;
     transient protected AdaLearner learner;
     transient protected Acceptor acceptor;
+    transient protected AdaRecovery recovery;
 
     /* misc */
     transient protected PaxosLogger logger;
@@ -91,6 +92,10 @@ public class AdaPaxosRSM implements Serializable{
 
         this.serverId = serverId;
         this.asLeader = new AtomicBoolean(initAsLeader);
+        if (initAsLeader)
+            crtLeader = serverId;
+        else
+            crtLeader = -1;
         this.logger = logger;
 
         this.restoredQueue = new ConcurrentLinkedQueue<>();
@@ -211,6 +216,7 @@ public class AdaPaxosRSM implements Serializable{
         proposer = new AdaProposer(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
         acceptor = new AdaAcceptor(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
         learner = new AdaLearner(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
+        recovery = new AdaRecovery(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, recoveryList, logger);
     }
 
     public void routine(Runnable... supplement){
@@ -391,6 +397,12 @@ public class AdaPaxosRSM implements Serializable{
                     } else if (msg instanceof GenericPaxosMessage.Commit) {
                         GenericPaxosMessage.Commit cast = (GenericPaxosMessage.Commit) msg;
                         learner.handleCommit(cast, i->updateConsecutiveCommit());
+                    } else if (msg instanceof GenericPaxosMessage.Sync){
+                        GenericPaxosMessage.Sync cast = (GenericPaxosMessage.Sync) msg;
+                        recovery.handleSync(cast);
+                    } else if (msg instanceof GenericPaxosMessage.ackSync){
+                        GenericPaxosMessage.ackSync cast = (GenericPaxosMessage.ackSync) msg;
+                        recovery.handleAckSync(cast, i->updateConsecutiveCommit(), this::LLEDispatcher);
                     }
 
                     if (forceFsync.get())
@@ -414,10 +426,9 @@ public class AdaPaxosRSM implements Serializable{
                             update = learner.respond_ackWrite((DiskPaxosMessage.ackWrite) dmsg, i->updateConsecutiveCommit());
                         else if (dmsg instanceof DiskPaxosMessage.ackRead)
                             update = learner.respond_ackRead((DiskPaxosMessage.ackRead) dmsg, i->updateConsecutiveCommit());
-                    } else if (!asLeader.get()){
-                        AdaPaxosInstance inst = instanceSpace.get(dmsg.inst_no);
-                        if (inst == null || inst.status != InstanceStatus.COMMITTED)
-                            memorySynchronize_immediate((DiskPaxosMessage.ackRead)dmsg, i->updateConsecutiveCommit());
+                    } else if (recovery.isValidMessage(dmsg.inst_no, dmsg.dialog_no)){
+                        if (dmsg instanceof DiskPaxosMessage.ackRead)
+                            update = learner.respond_ackRead((DiskPaxosMessage.ackRead) dmsg, i->updateConsecutiveCommit());
                     }
                     if (forceFsync.get() && update)
                         fileSynchronize(dmsg.inst_no);
@@ -542,74 +553,6 @@ public class AdaPaxosRSM implements Serializable{
         }
     }
 
-    protected void memorySynchronize_immediate(DiskPaxosMessage.ackRead ackRead, CommitUpdater updater){
-        AdaPaxosInstance[] winner = new AdaPaxosInstance[] {null};
-        if (ackRead.status == DiskPaxosMessage.DiskStatus.READ_NO_SUCH_FILE) {
-            recoveryList.updateAndGet(ackRead.inst_no, unit -> {
-                if (unit != null && unit.token == ackRead.dialog_no) {
-                    unit.readCount++;
-
-                    if (unit.readCount == peerSize)
-                        winner[0] = unit.potential;
-                }
-
-                return unit;
-            });
-        }
-        else if (ackRead.status == DiskPaxosMessage.DiskStatus.READ_SUCCESS){
-            recoveryList.updateAndGet(ackRead.inst_no, unit -> {
-                if (unit != null && unit.token == ackRead.dialog_no) {
-                    if (unit.potential == null
-                            || unit.potential.crtInstBallot < ackRead.load.crtInstBallot
-                            || (unit.potential.crtInstBallot == ackRead.load.crtInstBallot
-                            && !InstanceStatus.earlierThan(unit.potential.status, ackRead.load.status))) {
-                        unit.potential = (AdaPaxosInstance) ackRead.load;
-                    }
-
-                    unit.readCount++;
-
-                    if (unit.readCount == peerSize)
-                        winner[0] = unit.potential;
-                }
-
-                return unit;
-            });
-        }
-
-        if (winner[0] != null){
-
-            logger.logFormatted(false, "msync", "nominal", "inst="+winner[0].toString());
-            boolean[] commitUpdate = new boolean[]{false};
-
-            instanceSpace.updateAndGet(ackRead.inst_no, instance -> {
-                if (instance == null
-                        || instance.crtInstBallot < winner[0].crtInstBallot
-                        || (instance.crtInstBallot == winner[0].crtInstBallot
-                            && !InstanceStatus.earlierThan(instance.status, winner[0].status))) {
-
-                    if ((instance == null || instance.status != InstanceStatus.COMMITTED)
-                            && winner[0].status == InstanceStatus.COMMITTED) {
-                        commitUpdate[0] = true;
-                    }
-
-                    logger.logFormatted(false, "msync", "confirmed", "inst="+winner[0].toString());
-                    return winner[0];
-                }
-                else
-                    return instance;
-            });
-
-            if (commitUpdate[0]){
-                logger.logCommit(ackRead.inst_no, new GenericPaxosMessage.Commit(ackRead.inst_no, winner[0].crtLeaderId, winner[0].crtInstBallot, winner[0].requests), "settled");
-                updater.update(ackRead.inst_no);
-            }
-        }
-    }
-
-    protected void peerRecovery_immediate(GenericPaxosMessage.Sync sync){
-
-    }
-
     /* protected-access misc func */
 
     /*
@@ -639,5 +582,10 @@ public class AdaPaxosRSM implements Serializable{
         }
         consecutiveCommit.set(iter);
         logger.logFormatted(false, "consecutive-commit", "upto="+iter);
+    }
+
+    protected void LLEDispatcher(final int LLE){
+        int leadershipToken = maxReceivedInstance.updateAndGet(i -> Integer.max(i, LLE));
+        net.getPeerMessageSender().broadcastPeerMessage(leadershipToken);
     }
 }

@@ -2,9 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/agent/recovery/DiskCommitVacantResponder.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/agent/recovery/RecoveryPerformer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/agent/recovery/VacantInstanceUpdater.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/service/GenericNetService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/GenericNetService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/network/message/protocols/GenericPaxosMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/message/protocols/GenericPaxosMessage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -27,26 +30,20 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="317">
-              <caret line="50" lean-forward="true" selection-start-line="50" selection-end-line="50" />
+            <state relative-caret-position="-19">
+              <caret line="53" lean-forward="true" selection-start-line="53" selection-end-line="53" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#1882#1883#0" expanded="true" />
-                <element signature="e#1910#1911#0" expanded="true" />
-                <element signature="e#2022#2023#0" expanded="true" />
-                <element signature="e#2050#2051#0" expanded="true" />
-                <element signature="e#2159#2160#0" expanded="true" />
-                <element signature="e#2187#2188#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/instance/AdaPaxosInstance.java">
+        <entry file="file://$PROJECT_DIR$/src/network/message/protocols/GenericPaxosMessage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="305">
-              <caret line="58" selection-start-line="58" selection-end-line="58" />
+            <state relative-caret-position="569">
+              <caret line="162" lean-forward="true" selection-start-line="162" selection-end-line="162" />
             </state>
           </provider>
         </entry>
@@ -91,11 +88,29 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="625">
-              <caret line="605" column="9" lean-forward="true" selection-start-line="545" selection-start-column="8" selection-end-line="605" selection-end-column="9" />
+            <state relative-caret-position="-245">
+              <caret line="108" column="25" lean-forward="true" selection-start-line="108" selection-start-column="25" selection-end-line="108" selection-end-column="25" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/agent/learner/CommitUpdater.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="126">
+              <caret line="9" column="1" lean-forward="true" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/agent/learner/DiskCommitResponder.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="126">
+              <caret line="9" column="4" lean-forward="true" selection-start-line="9" selection-start-column="4" selection-end-line="11" selection-end-column="85" />
             </state>
           </provider>
         </entry>
@@ -106,8 +121,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Enum" />
-        <option value="Interface" />
         <option value="Class" />
+        <option value="Interface" />
       </list>
     </option>
   </component>
@@ -164,10 +179,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/rsm/DiskPaxosRSM.java" />
-        <option value="$PROJECT_DIR$/src/agent/acceptor/DiskAcceptor.java" />
-        <option value="$PROJECT_DIR$/src/agent/proposer/DiskProposer.java" />
-        <option value="$PROJECT_DIR$/src/agent/learner/DiskLearner.java" />
         <option value="$PROJECT_DIR$/src/instance/StaticPaxosInstance.java" />
         <option value="$PROJECT_DIR$/src/agent/learner/GenericLearner.java" />
         <option value="$PROJECT_DIR$/src/rsm/GenericPaxosSMR.java" />
@@ -185,7 +196,6 @@
         <option value="$PROJECT_DIR$/src/network/service/module/HeartBeatModule.java" />
         <option value="$PROJECT_DIR$/src/instance/store/InstanceStore.java" />
         <option value="$PROJECT_DIR$/src/instance/store/DummyStore.java" />
-        <option value="$PROJECT_DIR$/src/network/message/protocols/GenericPaxosMessage.java" />
         <option value="$PROJECT_DIR$/src/network/service/receiver/BasicPeerMessageReceiver.java" />
         <option value="$PROJECT_DIR$/src/instance/store/OffsetIndexStore.java" />
         <option value="$PROJECT_DIR$/src/agent/DiskResponder.java" />
@@ -213,6 +223,11 @@
         <option value="$PROJECT_DIR$/src/client/FileIteratorClient.java" />
         <option value="$PROJECT_DIR$/src/demo.java" />
         <option value="$PROJECT_DIR$/src/network/service/GenericNetService.java" />
+        <option value="$PROJECT_DIR$/src/network/message/protocols/GenericPaxosMessage.java" />
+        <option value="$PROJECT_DIR$/src/agent/recovery/VacantInstanceHandler.java" />
+        <option value="$PROJECT_DIR$/src/agent/recovery/VacantInstanceUpdater.java" />
+        <option value="$PROJECT_DIR$/src/agent/recovery/DiskCommitVacantResponder.java" />
+        <option value="$PROJECT_DIR$/src/agent/recovery/RecoveryPerformer.java" />
         <option value="$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java" />
         <option value="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" />
       </list>
@@ -313,6 +328,13 @@
               <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="network" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="network" type="462c0819:PsiDirectoryNode" />
+              <item name="protocols" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
@@ -511,14 +533,7 @@
       <workItem from="1554171812567" duration="15867000" />
       <workItem from="1554727002762" duration="1023000" />
       <workItem from="1555137179099" duration="3227000" />
-      <workItem from="1555140485921" duration="13909000" />
-    </task>
-    <task id="LOCAL-00005" summary="Status: reconstruct proposer, separate two stages of action (on acceptors)&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is working properly&#10;+ proposal number is increased sequentially&#10;+ integrated paxos agent &amp; i/o channel&#10;+ Paxos message construction and interpretation are not reliable">
-      <created>1546520956746</created>
-      <option name="number" value="00005" />
-      <option name="presentableId" value="LOCAL-00005" />
-      <option name="project" value="LOCAL" />
-      <updated>1546520956746</updated>
+      <workItem from="1555140485921" duration="18728000" />
     </task>
     <task id="LOCAL-00006" summary="Status: provide a solution of serialization and its counterpart&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is working properly&#10;+ proposal number is increased sequentially&#10;+ integrated paxos agent &amp; i/o channel&#10;+ Paxos message construction needs utilization of constructors">
       <created>1546526967978</created>
@@ -856,11 +871,18 @@
       <option name="project" value="LOCAL" />
       <updated>1555157467178</updated>
     </task>
-    <option name="localTasksCounter" value="54" />
+    <task id="LOCAL-00054" summary="Status: recovery&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR">
+      <created>1555160921574</created>
+      <option name="number" value="00054" />
+      <option name="presentableId" value="LOCAL-00054" />
+      <option name="project" value="LOCAL" />
+      <updated>1555160921574</updated>
+    </task>
+    <option name="localTasksCounter" value="55" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="654933000" />
+    <option name="totallyTimeSpent" value="659752000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -955,7 +977,6 @@
     <ignored-roots>
       <path value="E:" />
     </ignored-roots>
-    <MESSAGE value="Status: tested DiskPaxosSMR in normal case + addition cases&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
     <MESSAGE value="Status: elaborated HistoryMaintenance&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
     <MESSAGE value="Status: BasicPaxosSMR&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
     <MESSAGE value="Status: HeartBeatModule&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation" />
@@ -980,71 +1001,10 @@
     <MESSAGE value="Status: start decouple disk and machine&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: beaconThread.setPriority(Thread.MAX_PRIORITY); drop expire to 60 ms&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: eager fsync -&gt; hesitate fsync&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
-    <option name="LAST_COMMIT_MESSAGE" value="Status: eager fsync -&gt; hesitate fsync&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
+    <MESSAGE value="Status: recovery&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
+    <option name="LAST_COMMIT_MESSAGE" value="Status: recovery&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/logs/server-1.net.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="14">
-          <caret line="75" selection-start-line="75" selection-end-line="75" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/store/OffsetIndexStore.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1554">
-          <caret line="116" selection-start-line="116" selection-end-line="116" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/store/index/OffsetIndexWriter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="406">
-          <caret line="36" column="8" selection-start-line="36" selection-start-column="8" selection-end-line="43" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-2.net.log">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/agent/learner/CommitUpdater.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="9" column="1" lean-forward="true" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/agent/learner/Learner.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="140">
-          <caret line="10" column="80" selection-start-line="10" selection-start-column="80" selection-end-line="10" selection-end-column="80" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-3.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="201">
-          <caret line="31" column="36" selection-start-line="31" selection-start-column="36" selection-end-line="31" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/StaticPaxosInstance.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="112">
-          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/PaxosInstance.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="182">
-          <caret line="15" column="33" lean-forward="true" selection-start-line="15" selection-start-column="33" selection-end-line="15" selection-end-column="33" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-4.log">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-535" />
@@ -1227,13 +1187,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/AdaPaxosInstance.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="305">
-          <caret line="58" selection-start-line="58" selection-end-line="58" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-1.commit.log">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -1326,26 +1279,96 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java">
+    <entry file="file://$PROJECT_DIR$/src/instance/AdaPaxosInstance.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="317">
-          <caret line="50" lean-forward="true" selection-start-line="50" selection-end-line="50" />
+        <state relative-caret-position="527">
+          <caret line="58" selection-start-line="58" selection-end-line="58" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/message/protocols/GenericConnectionMessage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/message/protocols/GenericPaxosMessage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="569">
+          <caret line="162" lean-forward="true" selection-start-line="162" selection-end-line="162" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/agent/learner/CommitUpdater.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="9" column="1" lean-forward="true" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/agent/recovery/VacantInstanceUpdater.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="8" column="1" lean-forward="true" selection-start-line="8" selection-start-column="1" selection-end-line="8" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/agent/learner/DiskCommitResponder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="9" column="4" lean-forward="true" selection-start-line="9" selection-start-column="4" selection-end-line="11" selection-end-column="85" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/agent/recovery/DiskCommitVacantResponder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="9" column="44" lean-forward="true" selection-start-line="9" selection-start-column="44" selection-end-line="9" selection-end-column="44" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#1882#1883#0" expanded="true" />
-            <element signature="e#1910#1911#0" expanded="true" />
-            <element signature="e#2022#2023#0" expanded="true" />
-            <element signature="e#2050#2051#0" expanded="true" />
-            <element signature="e#2159#2160#0" expanded="true" />
-            <element signature="e#2187#2188#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/agent/proposer/DiskResponder.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="9" column="4" selection-start-line="9" selection-start-column="4" selection-end-line="11" selection-end-column="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/agent/learner/Learner.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="8" column="17" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/agent/recovery/RecoveryPerformer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="8" column="3" lean-forward="true" selection-start-line="8" selection-start-column="3" selection-end-line="8" selection-end-column="3" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-19">
+          <caret line="53" lean-forward="true" selection-start-line="53" selection-end-line="53" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="625">
-          <caret line="605" column="9" lean-forward="true" selection-start-line="545" selection-start-column="8" selection-end-line="605" selection-end-column="9" />
+        <state relative-caret-position="-245">
+          <caret line="108" column="25" lean-forward="true" selection-start-line="108" selection-start-column="25" selection-end-line="108" selection-end-column="25" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

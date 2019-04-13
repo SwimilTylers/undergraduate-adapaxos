@@ -144,4 +144,19 @@ public class GenericPaxosMessage implements Serializable {
             return "[SYNC][inst_no="+inst_no+"]";
         }
     }
+
+    public static class ackSync extends GenericPaxosMessage{
+        private static final long serialVersionUID = -8757260106040114565L;
+        public final PaxosInstance load;
+
+        public ackSync(int inst_no, PaxosInstance load) {
+            super(inst_no);
+            this.load = load;
+        }
+
+        @Override
+        public String toString() {
+            return "[ACK_SYNC][inst_no="+inst_no+"]";
+        }
+    }
 }
