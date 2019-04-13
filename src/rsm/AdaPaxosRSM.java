@@ -142,6 +142,7 @@ public class AdaPaxosRSM implements Serializable{
         return this;
     }
 
+    @SuppressWarnings({"unchecked", "varargs"})
     protected AdaPaxosRSM messageChanBuild(final int sizeCMessageChan,
                                  final int sizePMessage,
                                  final int sizeDMessage,
