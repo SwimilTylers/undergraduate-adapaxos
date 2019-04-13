@@ -29,7 +29,6 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLongArray;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
@@ -74,7 +73,7 @@ public class AdaPaxosRSM implements Serializable{
     protected AtomicBoolean metaFsync;
     transient protected boolean[] fsyncSignature;
     transient protected BlockingQueue<Integer> fsyncQueue;
-    transient protected AtomicReferenceArray<AdaRecoveryMaintenance> mSync;
+    transient protected AtomicReferenceArray<AdaRecoveryMaintenance> recoveryList;
 
     /* agents */
     transient protected AdaProposer proposer;
@@ -136,7 +135,7 @@ public class AdaPaxosRSM implements Serializable{
         fsyncSignature = new boolean[instanceSpace.length()];
         Arrays.fill(fsyncSignature, false);
         fsyncQueue = new ArrayBlockingQueue<>(waitingQueueLength);
-        mSync = new AtomicReferenceArray<>(instanceSpace.length());
+        recoveryList = new AtomicReferenceArray<>(instanceSpace.length());
 
         return this;
     }
@@ -218,7 +217,7 @@ public class AdaPaxosRSM implements Serializable{
         routineOnRunning = new AtomicBoolean(true);
         ExecutorService routines = Executors.newCachedThreadPool();
         routines.execute(()-> routine_batch(2000, GenericPaxosSMR.DEFAULT_REQUEST_COMPACTING_SIZE));
-        routines.execute(() -> routine_monitor(40, 60, 2, 20));
+        routines.execute(() -> routine_monitor(20, 40, 3, 10));
         routines.execute(this::routine_response);
         routines.execute(() -> routine_backup(5000));
         if (supplement != null && supplement.length != 0) {
@@ -326,8 +325,10 @@ public class AdaPaxosRSM implements Serializable{
                                     fileSynchronize();
                                 }
                             }
-                            else
+                            else {
+                                logger.record(false, "diag", "[" + System.currentTimeMillis() + "][cancel]\n");
                                 forceFsync.set(false);
+                            }
                         }
                     }
                     else {
@@ -401,7 +402,7 @@ public class AdaPaxosRSM implements Serializable{
                     logger.log(true, "receive " + dmsg.toString() + "\n");
                     boolean update = false;
 
-                    maxReceivedInstance.updateAndGet(i -> i = Integer.max(i, dmsg.inst_no));
+                    maxReceivedInstance.updateAndGet(i -> Integer.max(i, dmsg.inst_no));
 
                     if (proposer.isValidMessage(dmsg.inst_no, dmsg.dialog_no)) {
                         if (dmsg instanceof DiskPaxosMessage.ackWrite)
@@ -476,11 +477,22 @@ public class AdaPaxosRSM implements Serializable{
         }
     }
 
-    /* protected-access file2mem-mem2file func */
+    /* protected-access sync & recovery func */
 
     protected void fileSynchronize(){
         for (int inst_no = fsyncInitInstance.get(); inst_no < maxReceivedInstance.get(); inst_no++) {
             fileSynchronize(inst_no);
+        }
+    }
+
+    protected void fileSynchronize(final int specific){
+        if (!fsyncSignature[specific]){
+            try {
+                fsyncQueue.put(specific);
+                logger.logFormatted(false, "fsync", "submit", "specific=" + specific);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -522,7 +534,7 @@ public class AdaPaxosRSM implements Serializable{
         for (int inst_no = consecutiveCommit.get(); inst_no < upper; inst_no++) {
             AdaPaxosInstance instance = instanceSpace.get(inst_no);
             if (instance == null || instance.status != InstanceStatus.COMMITTED) {
-                mSync.set(inst_no, new AdaRecoveryMaintenance(token));
+                recoveryList.set(inst_no, new AdaRecoveryMaintenance(token));
                 for (int leaderId = 0; leaderId < peerSize; leaderId++)
                     if (leaderId != serverId)
                         remoteStore.launchRemoteFetch(token, serverId, leaderId, inst_no);
@@ -533,7 +545,7 @@ public class AdaPaxosRSM implements Serializable{
     protected void memorySynchronize_immediate(DiskPaxosMessage.ackRead ackRead, CommitUpdater updater){
         AdaPaxosInstance[] winner = new AdaPaxosInstance[] {null};
         if (ackRead.status == DiskPaxosMessage.DiskStatus.READ_NO_SUCH_FILE) {
-            mSync.updateAndGet(ackRead.inst_no, unit -> {
+            recoveryList.updateAndGet(ackRead.inst_no, unit -> {
                 if (unit != null && unit.token == ackRead.dialog_no) {
                     unit.readCount++;
 
@@ -545,7 +557,7 @@ public class AdaPaxosRSM implements Serializable{
             });
         }
         else if (ackRead.status == DiskPaxosMessage.DiskStatus.READ_SUCCESS){
-            mSync.updateAndGet(ackRead.inst_no, unit -> {
+            recoveryList.updateAndGet(ackRead.inst_no, unit -> {
                 if (unit != null && unit.token == ackRead.dialog_no) {
                     if (unit.potential == null
                             || unit.potential.crtInstBallot < ackRead.load.crtInstBallot
@@ -594,15 +606,8 @@ public class AdaPaxosRSM implements Serializable{
         }
     }
 
-    protected void fileSynchronize(final int specific){
-        if (!fsyncSignature[specific]){
-            try {
-                fsyncQueue.put(specific);
-                logger.logFormatted(false, "fsync", "submit", "specific=" + specific);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+    protected void peerRecovery_immediate(GenericPaxosMessage.Sync sync){
+
     }
 
     /* protected-access misc func */

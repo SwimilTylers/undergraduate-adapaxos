@@ -41,7 +41,7 @@ public class GenericNetService {
     protected PeerMessageSender sender;
     protected PeerMessageReceiver receiver;
 
-    public static final int DEFAULT_BEACON_INTERVAL = 20;
+    public static final int DEFAULT_BEACON_INTERVAL = 10;
     private int beaconItv = DEFAULT_BEACON_INTERVAL;
 
     protected ConnectionModule cModule;
