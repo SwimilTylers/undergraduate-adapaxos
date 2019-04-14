@@ -9,6 +9,7 @@ import instance.store.RemoteInstanceStore;
 import logger.PaxosLogger;
 import network.message.protocols.DiskPaxosMessage;
 import network.message.protocols.GenericPaxosMessage;
+import network.message.protocols.LeaderElectionMessage;
 import network.service.sender.PeerMessageSender;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -18,7 +19,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
  * @author : Swimiltylers
  * @version : 2019/4/13 20:49
  */
-public class AdaRecovery implements RecoveryPerformer, DiskCommitVacantResponder {
+public class AdaRecovery implements RecoveryPerformer, DiskCommitVacantResponder, LeaderElectionPerformer {
     private final int serverId;
     private final int peerSize;
 
@@ -132,5 +133,35 @@ public class AdaRecovery implements RecoveryPerformer, DiskCommitVacantResponder
         }
 
         return false;
+    }
+
+    @Override
+    public boolean isLeaderSurvive() {
+        return false;
+    }
+
+    @Override
+    public void readyForLeaderElection() {
+
+    }
+
+    @Override
+    public boolean initLeaderElection(long token) {
+        return false;
+    }
+
+    @Override
+    public boolean initLeaderElection(long token, int waitingTime) {
+        return false;
+    }
+
+    @Override
+    public void handleLEPropaganda(LeaderElectionMessage.Propaganda propaganda) {
+
+    }
+
+    @Override
+    public void handleLEVote(LeaderElectionMessage.Vote vote) {
+
     }
 }

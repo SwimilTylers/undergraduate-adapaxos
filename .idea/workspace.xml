@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/agent/recovery/DiskCommitVacantResponder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/agent/recovery/RecoveryPerformer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/agent/recovery/VacantInstanceUpdater.java" afterDir="false" />
+    <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="Status: with LLE&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR">
+      <change afterPath="$PROJECT_DIR$/src/agent/recovery/LeaderElectionPerformer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/network/message/protocols/LeaderElectionMessage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/message/protocols/GenericPaxosMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/message/protocols/GenericPaxosMessage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -27,90 +25,25 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-19">
-              <caret line="53" lean-forward="true" selection-start-line="53" selection-end-line="53" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/network/message/protocols/GenericPaxosMessage.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="569">
-              <caret line="162" lean-forward="true" selection-start-line="162" selection-end-line="162" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/client/FileIteratorClient.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="341">
-              <caret line="59" column="57" selection-start-line="59" selection-start-column="57" selection-end-line="59" selection-end-column="57" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/network/service/GenericNetService.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="322">
-              <caret line="43" column="55" selection-start-line="43" selection-start-column="55" selection-end-line="43" selection-end-column="55" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/demo.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="239">
-              <caret line="323" column="35" selection-start-line="323" selection-start-column="35" selection-end-line="323" selection-end-column="35" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#4899#4900#0" expanded="true" />
-                <element signature="e#4930#4931#0" expanded="true" />
-                <element signature="e#6054#6055#0" expanded="true" />
-                <element signature="e#6116#6117#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-245">
-              <caret line="108" column="25" lean-forward="true" selection-start-line="108" selection-start-column="25" selection-end-line="108" selection-end-column="25" />
+            <state relative-caret-position="609">
+              <caret line="435" column="13" lean-forward="true" selection-start-line="435" selection-start-column="13" selection-end-line="435" selection-end-column="13" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#5145#5188#0" expanded="true" />
+                <element signature="e#6166#6196#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/agent/learner/CommitUpdater.java">
+        <entry file="file://$PROJECT_DIR$/src/agent/recovery/LeaderElectionPerformer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="126">
-              <caret line="9" column="1" lean-forward="true" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/agent/learner/DiskCommitResponder.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="126">
-              <caret line="9" column="4" lean-forward="true" selection-start-line="9" selection-start-column="4" selection-end-line="11" selection-end-column="85" />
+            <state relative-caret-position="112">
+              <caret line="8" column="42" lean-forward="true" selection-start-line="8" selection-start-column="42" selection-end-line="8" selection-end-column="42" />
             </state>
           </provider>
         </entry>
@@ -121,8 +54,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Enum" />
-        <option value="Class" />
         <option value="Interface" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -171,7 +104,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="753433122263bde57c6fe6113d6057a779f82dc8" />
       </map>
     </option>
     <option name="RESET_MODE" value="HARD" />
@@ -179,8 +112,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/instance/StaticPaxosInstance.java" />
-        <option value="$PROJECT_DIR$/src/agent/learner/GenericLearner.java" />
         <option value="$PROJECT_DIR$/src/rsm/GenericPaxosSMR.java" />
         <option value="$PROJECT_DIR$/src/agent/proposer/GenericProposer.java" />
         <option value="$PROJECT_DIR$/src/utils/AdaAgents.java" />
@@ -228,6 +159,8 @@
         <option value="$PROJECT_DIR$/src/agent/recovery/VacantInstanceUpdater.java" />
         <option value="$PROJECT_DIR$/src/agent/recovery/DiskCommitVacantResponder.java" />
         <option value="$PROJECT_DIR$/src/agent/recovery/RecoveryPerformer.java" />
+        <option value="$PROJECT_DIR$/src/network/message/protocols/LeaderElectionMessage.java" />
+        <option value="$PROJECT_DIR$/src/agent/recovery/LeaderElectionPerformer.java" />
         <option value="$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java" />
         <option value="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" />
       </list>
@@ -244,7 +177,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -377,6 +309,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
       <pane id="Scope" />
     </panes>
   </component>
@@ -882,7 +815,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="659752000" />
+    <option name="totallyTimeSpent" value="661801000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -897,7 +830,7 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.30294907" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.3116622" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -1005,44 +938,6 @@
     <option name="LAST_COMMIT_MESSAGE" value="Status: recovery&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/logs/server-4.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-535" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/store/TaggedOffsetIndexStore.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="294">
-          <caret line="21" column="13" selection-start-line="21" selection-start-column="13" selection-end-line="21" selection-end-column="13" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/InstanceStatus.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="518">
-          <caret line="37" selection-start-line="37" selection-end-line="37" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#971#972#0" expanded="true" />
-            <element signature="e#1000#1001#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/message/protocols/AdaPaxosMessage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="280">
-          <caret line="20" column="44" selection-start-line="20" selection-start-column="44" selection-end-line="20" selection-end-column="44" />
-          <folding>
-            <element signature="e#472#473#0" expanded="true" />
-            <element signature="e#540#541#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/rsm/PseudoAdaPaxosRSM.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-537">
@@ -1286,20 +1181,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/message/protocols/GenericConnectionMessage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="112">
-          <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/message/protocols/GenericPaxosMessage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="569">
-          <caret line="162" lean-forward="true" selection-start-line="162" selection-end-line="162" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/agent/learner/CommitUpdater.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="126">
@@ -1355,22 +1236,76 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/message/protocols/GenericConnectionMessage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/message/protocols/GenericClientMessage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/message/protocols/AdaPaxosMessage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="280">
+          <caret line="20" column="44" selection-start-line="20" selection-start-column="44" selection-end-line="20" selection-end-column="44" />
+          <folding>
+            <element signature="e#472#473#0" expanded="true" />
+            <element signature="e#539#540#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/message/protocols/LeaderElectionMessage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="266">
+          <caret line="19" column="49" lean-forward="true" selection-start-line="19" selection-start-column="49" selection-end-line="19" selection-end-column="49" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/message/protocols/GenericPaxosMessage.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="11" column="13" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-19">
-          <caret line="53" lean-forward="true" selection-start-line="53" selection-end-line="53" />
+        <state relative-caret-position="513">
+          <caret line="164" lean-forward="true" selection-start-line="164" selection-end-line="164" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#5234#5235#0" expanded="true" />
+            <element signature="e#5262#5263#0" expanded="true" />
+            <element signature="e#5394#5395#0" expanded="true" />
+            <element signature="e#5422#5423#0" expanded="true" />
+            <element signature="e#5506#5507#0" expanded="true" />
+            <element signature="e#5534#5535#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/agent/recovery/LeaderElectionPerformer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="8" column="42" lean-forward="true" selection-start-line="8" selection-start-column="42" selection-end-line="8" selection-end-column="42" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-245">
-          <caret line="108" column="25" lean-forward="true" selection-start-line="108" selection-start-column="25" selection-end-line="108" selection-end-column="25" />
+        <state relative-caret-position="609">
+          <caret line="435" column="13" lean-forward="true" selection-start-line="435" selection-start-column="13" selection-end-line="435" selection-end-column="13" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#5145#5188#0" expanded="true" />
+            <element signature="e#6166#6196#0" expanded="true" />
           </folding>
         </state>
       </provider>

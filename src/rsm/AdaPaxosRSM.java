@@ -402,7 +402,7 @@ public class AdaPaxosRSM implements Serializable{
                         recovery.handleSync(cast);
                     } else if (msg instanceof GenericPaxosMessage.ackSync){
                         GenericPaxosMessage.ackSync cast = (GenericPaxosMessage.ackSync) msg;
-                        recovery.handleAckSync(cast, i->updateConsecutiveCommit(), this::LLEDispatcher);
+                        recovery.handleAckSync(cast, i->updateConsecutiveCommit(), i->recovery.readyForLeaderElection());
                     }
 
                     if (forceFsync.get())
@@ -428,7 +428,7 @@ public class AdaPaxosRSM implements Serializable{
                             update = learner.respond_ackRead((DiskPaxosMessage.ackRead) dmsg, i->updateConsecutiveCommit());
                     } else if (recovery.isValidMessage(dmsg.inst_no, dmsg.dialog_no)){
                         if (dmsg instanceof DiskPaxosMessage.ackRead)
-                            update = learner.respond_ackRead((DiskPaxosMessage.ackRead) dmsg, i->updateConsecutiveCommit());
+                            update = recovery.respond_ackRead((DiskPaxosMessage.ackRead) dmsg, i->updateConsecutiveCommit(), i->recovery.readyForLeaderElection());
                     }
                     if (forceFsync.get() && update)
                         fileSynchronize(dmsg.inst_no);
@@ -582,10 +582,5 @@ public class AdaPaxosRSM implements Serializable{
         }
         consecutiveCommit.set(iter);
         logger.logFormatted(false, "consecutive-commit", "upto="+iter);
-    }
-
-    protected void LLEDispatcher(final int LLE){
-        int leadershipToken = maxReceivedInstance.updateAndGet(i -> Integer.max(i, LLE));
-        net.getPeerMessageSender().broadcastPeerMessage(leadershipToken);
     }
 }
