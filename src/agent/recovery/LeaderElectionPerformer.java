@@ -7,7 +7,7 @@ import network.message.protocols.LeaderElectionMessage;
  * @version : 2019/4/14 22:09
  */
 public interface LeaderElectionPerformer {
-    boolean isLeaderSurvive();
+    boolean isLeaderSurvive(final int expire, final int decisionDelay);
 
     void readyForLeaderElection();
     boolean initLeaderElection(long token);

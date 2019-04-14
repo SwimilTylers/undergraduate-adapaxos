@@ -7,7 +7,7 @@ import network.message.protocols.GenericPaxosMessage;
  * @author : Swimiltylers
  * @version : 2019/4/13 22:31
  */
-public interface RecoveryPerformer {
+public interface CrashRecoveryPerformer {
     void handleSync(GenericPaxosMessage.Sync sync);
     void handleAckSync(GenericPaxosMessage.ackSync ackSync, CommitUpdater cUpdater, VacantInstanceUpdater vUpdater);
 }

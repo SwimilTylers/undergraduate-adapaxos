@@ -15,10 +15,7 @@ import instance.store.RemoteInstanceStore;
 import javafx.util.Pair;
 import logger.NaiveLogger;
 import logger.PaxosLogger;
-import network.message.protocols.AdaPaxosMessage;
-import network.message.protocols.DiskPaxosMessage;
-import network.message.protocols.Distinguishable;
-import network.message.protocols.GenericPaxosMessage;
+import network.message.protocols.*;
 import network.service.GenericNetService;
 import network.service.module.ConnectionModule;
 import utils.AdaAgents;
@@ -55,6 +52,7 @@ public class AdaPaxosRSM implements Serializable{
     transient protected BlockingQueue<GenericPaxosMessage> pMessages;
     transient protected BlockingQueue<DiskPaxosMessage> dMessages;
     transient protected BlockingQueue<AdaPaxosMessage> aMessages;
+    transient protected BlockingQueue<LeaderElectionMessage> lMessages;
     transient protected List<Pair<Distinguishable, BlockingQueue>> customizedChannels;
 
 
@@ -150,12 +148,14 @@ public class AdaPaxosRSM implements Serializable{
                                  final int sizePMessage,
                                  final int sizeDMessage,
                                  final int sizeAMessage,
+                                 final int sizeLMessage,
                                  Pair<Distinguishable, BlockingQueue>... supplement){
 
         cMessages = new ArrayBlockingQueue<>(sizeCMessageChan);
         pMessages = new ArrayBlockingQueue<>(sizePMessage);
         dMessages = new ArrayBlockingQueue<>(sizeDMessage);
         aMessages = new ArrayBlockingQueue<>(sizeAMessage);
+        lMessages = new ArrayBlockingQueue<>(sizeLMessage);
 
         customizedChannels = new ArrayList<>();
 
@@ -179,7 +179,7 @@ public class AdaPaxosRSM implements Serializable{
         rsm.netConnectionBuild(net, net.getConnectionModule(), peerSize)
                 .instanceSpaceBuild(AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE, epoch << 16, 0)
                 .instanceStorageBuild(localStore, remoteStore, false, AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE)
-                .messageChanBuild(AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE);
+                .messageChanBuild(AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE);
         return rsm;
     }
 
@@ -197,6 +197,7 @@ public class AdaPaxosRSM implements Serializable{
         net.setPaxosChan(pMessages);
         net.registerChannel(o->o instanceof DiskPaxosMessage, dMessages);
         net.registerChannel(o->o instanceof AdaPaxosMessage, aMessages);
+        net.registerChannel(o->o instanceof LeaderElectionMessage, lMessages);
         for (Pair<Distinguishable, BlockingQueue> chan : customizedChannels) {
             net.registerChannel(chan.getKey(), chan.getValue());
         }
@@ -223,7 +224,7 @@ public class AdaPaxosRSM implements Serializable{
         routineOnRunning = new AtomicBoolean(true);
         ExecutorService routines = Executors.newCachedThreadPool();
         routines.execute(()-> routine_batch(2000, GenericPaxosSMR.DEFAULT_REQUEST_COMPACTING_SIZE));
-        routines.execute(() -> routine_monitor(20, 40, 3, 10));
+        routines.execute(() -> routine_monitor(20, 40, 3, 10, 5000));
         routines.execute(this::routine_response);
         routines.execute(() -> routine_backup(5000));
         if (supplement != null && supplement.length != 0) {
@@ -284,7 +285,7 @@ public class AdaPaxosRSM implements Serializable{
         }
     }
 
-    protected void routine_monitor(final int monitorItv, final int expire, final int stability, final int decisionDelay){
+    protected void routine_monitor(final int monitorItv, final int expire, final int stability, final int decisionDelay, final int LEDeadline){
         final int bare_majority = (peerSize+1)/2;
         final int bare_minority = peerSize - bare_majority;
 
@@ -292,19 +293,36 @@ public class AdaPaxosRSM implements Serializable{
 
         while (routineOnRunning.get()){
             if (!asLeader.get()) {
-                AdaPaxosMessage message = aMessages.poll();
-                if (message != null) {
-                    if (message.fsync) {
-                        forceFsync.set(true);
-                        metaFsync.set(true);
-                        logger.record(false, "diag","["+System.currentTimeMillis()+"]"+"[FSYNC=true][received]\n");
-                        fileSynchronize();
-                    } else {
-                        forceFsync.set(false);
-                        metaFsync.set(true);
-                        logger.record(false, "diag","["+System.currentTimeMillis()+"]"+"[FSYNC=false][received]\n");
-                        memorySynchronize(message.upto);
+                try {
+                    AdaPaxosMessage message = aMessages.poll(monitorItv, TimeUnit.MILLISECONDS);
+                    if (message != null) {
+                        if (message.fsync) {
+                            forceFsync.set(true);
+                            metaFsync.set(true);
+                            logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=true][received]\n");
+                            fileSynchronize();
+                        } else {
+                            forceFsync.set(false);
+                            metaFsync.set(true);
+                            logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=false][received]\n");
+                            memorySynchronize(message.upto);
+                        }
+                    } else if (!recovery.isLeaderSurvive(expire, decisionDelay)) {
+                        if (forceFsync.getAndSet(true)) {
+                            metaFsync.set(true);
+                            logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=true][Fetch From Disk][leader election]\n");
+                            memorySynchronize();
+                        } else {
+                            metaFsync.set(true);
+                            logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=true][leader election]\n");
+                            fileSynchronize();
+                            recovery.readyForLeaderElection();
+                        }
+
+                        asLeader.set(recovery.initLeaderElection(AdaAgents.newToken(), LEDeadline));
                     }
+                } catch (Exception e){
+                    e.printStackTrace();
                 }
             }
             else {  // if you are a leader, MSync is not necessary.
@@ -482,9 +500,20 @@ public class AdaPaxosRSM implements Serializable{
     }
 
     protected void routine_leadership(final int leadershipItv){
-        int crtLeaderId;
         while (routineOnRunning.get()){
-
+            try {
+                LeaderElectionMessage msg = lMessages.poll(leadershipItv, TimeUnit.MILLISECONDS);
+                if (msg instanceof LeaderElectionMessage.Propaganda){
+                    LeaderElectionMessage.Propaganda cast = (LeaderElectionMessage.Propaganda) msg;
+                    recovery.handleLEPropaganda(cast);
+                }
+                else if (msg instanceof LeaderElectionMessage.Vote){
+                    LeaderElectionMessage.Vote cast = (LeaderElectionMessage.Vote) msg;
+                    recovery.handleLEVote(cast);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -551,6 +580,10 @@ public class AdaPaxosRSM implements Serializable{
                         remoteStore.launchRemoteFetch(token, serverId, leaderId, inst_no);
             }
         }
+    }
+
+    protected void memorySynchronize(){
+
     }
 
     /* protected-access misc func */

@@ -1,7 +1,6 @@
 package agent.recovery;
 
 import agent.learner.CommitUpdater;
-import agent.learner.DiskCommitResponder;
 import instance.AdaPaxosInstance;
 import instance.InstanceStatus;
 import instance.maintenance.AdaRecoveryMaintenance;
@@ -19,7 +18,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
  * @author : Swimiltylers
  * @version : 2019/4/13 20:49
  */
-public class AdaRecovery implements RecoveryPerformer, DiskCommitVacantResponder, LeaderElectionPerformer {
+public class AdaRecovery implements CrashRecoveryPerformer, DiskCommitVacantResponder, LeaderElectionPerformer {
     private final int serverId;
     private final int peerSize;
 
@@ -136,7 +135,7 @@ public class AdaRecovery implements RecoveryPerformer, DiskCommitVacantResponder
     }
 
     @Override
-    public boolean isLeaderSurvive() {
+    public boolean isLeaderSurvive(final int expire, final int decisionDelay) {
         return false;
     }
 
