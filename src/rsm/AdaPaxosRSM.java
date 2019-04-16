@@ -5,6 +5,7 @@ import agent.acceptor.AdaAcceptor;
 import agent.learner.AdaLearner;
 import agent.proposer.AdaProposer;
 import agent.recovery.AdaRecovery;
+import agent.recovery.LeaderElectionPerformer;
 import client.ClientRequest;
 import instance.AdaPaxosInstance;
 import instance.InstanceStatus;
@@ -19,7 +20,8 @@ import network.message.protocols.*;
 import network.service.GenericNetService;
 import network.service.module.ConnectionModule;
 import utils.AdaAgents;
-import utils.AdaPaxosConfiguration;
+import utils.AdaPaxosParameters;
+import utils.NetworkConfiguration;
 
 import java.io.Serializable;
 import java.util.*;
@@ -37,6 +39,7 @@ public class AdaPaxosRSM implements Serializable{
 
     /* unique identity */
     protected int serverId;
+    protected NetworkConfiguration nConfig;
     transient protected AtomicBoolean asLeader;
     transient volatile int crtLeader;
 
@@ -177,21 +180,26 @@ public class AdaPaxosRSM implements Serializable{
     public static AdaPaxosRSM makeInstance(final int id, final int epoch, final int peerSize, InstanceStore localStore, RemoteInstanceStore remoteStore, GenericNetService net, boolean initAsLeader){
         AdaPaxosRSM rsm = new AdaPaxosRSM(id, initAsLeader, new NaiveLogger(id));
         rsm.netConnectionBuild(net, net.getConnectionModule(), peerSize)
-                .instanceSpaceBuild(AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE, epoch << 16, 0)
-                .instanceStorageBuild(localStore, remoteStore, false, AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE)
-                .messageChanBuild(AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE, AdaPaxosConfiguration.RSM.DEFAULT_INSTANCE_SIZE);
+                .instanceSpaceBuild(AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, epoch << 16, 0)
+                .instanceStorageBuild(localStore, remoteStore, false, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE)
+                .messageChanBuild(AdaPaxosParameters.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosParameters.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosParameters.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE);
         return rsm;
     }
 
     /* public-access deployment func, including:
     * - link: connection establishment of both net and remote-disk */
 
-    public void link(String[] peerAddr, int[] peerPort, final int clientPort) throws InterruptedException {
-        link(peerAddr, peerPort, clientPort, AdaPaxosConfiguration.RSM.DEFAULT_LINK_STABLE_WAITING);
+    public void link(NetworkConfiguration netConfig, final int clientPort) throws InterruptedException {
+        link(netConfig, clientPort, AdaPaxosParameters.RSM.DEFAULT_LINK_STABLE_WAITING);
     }
 
-    public void link(String[] peerAddr, int[] peerPort, final int clientPort, int stableWaits) throws InterruptedException {
+    public void link(NetworkConfiguration netConfig, final int clientPort, int stableWaits) throws InterruptedException {
+        String[] peerAddr = netConfig.peerAddr;
+        int[] peerPort = netConfig.peerPort;
+        this.nConfig = netConfig;
+
         assert peerAddr.length == peerPort.length && peerAddr.length == peerSize;
+        assert !(asLeader.get() && (netConfig.initLeaderId != serverId));
 
         net.setClientChan(cMessages);
         net.setPaxosChan(pMessages);
@@ -217,7 +225,7 @@ public class AdaPaxosRSM implements Serializable{
         proposer = new AdaProposer(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
         acceptor = new AdaAcceptor(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
         learner = new AdaLearner(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
-        recovery = new AdaRecovery(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, recoveryList, logger);
+        recovery = new AdaRecovery(serverId, peerSize, nConfig.initLeaderId, net.getPeerMessageSender(), net.getConnectionModule(), maxReceivedInstance, instanceSpace, recoveryList, logger);
     }
 
     public void routine(Runnable... supplement){
@@ -306,21 +314,34 @@ public class AdaPaxosRSM implements Serializable{
                             forceFsync.set(false);
                             metaFsync.set(true);
                             logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=false][received]\n");
-                            memorySynchronize();
+                            memorySynchronize(AdaAgents.newToken());
                         }
-                    } else if (!recovery.isLeaderSurvive(expire, decisionDelay)) {
-                        if (forceFsync.getAndSet(true)) {
-                            metaFsync.set(true);
-                            logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=true][Fetch From Disk][leader election]\n");
-                            memorySynchronize();
-                        } else {
-                            metaFsync.set(true);
-                            logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=true][leader election]\n");
-                            fileSynchronize();
-                            recovery.tryLeaderElection(AdaAgents.newToken());
-                        }
+                    }
+                    else if (!recovery.onLeaderElection()){      // carry out leader detection
+                        if (recovery.isLeaderSurvive(expire)){
 
-                        asLeader.set(recovery.getLeaderElectionResult(LEDeadline));
+                            /* at the first sight out timeout, follower should flush all on-memory instances to disk */
+
+                            fileSynchronize();
+                            logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader failure][test=1]\n");
+                            Thread.sleep(decisionDelay);
+                            if (recovery.isLeaderSurvive(expire)){  // leader crash confirmed, running into FAST_MODE
+                                if (!forceFsync.getAndSet(false)){   // FAST_MODE before leader crashed
+                                    metaFsync.set(true);
+                                    long leToken = AdaAgents.newToken();
+                                    recovery.stateSet(LeaderElectionPerformer.LeaderElectionState.RECOVERED);   // join LeaderElection
+                                    logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader failure][test=2][confirmed][RECOVERED, token="+leToken+"]\n");
+                                    LeaderElectionMessage.LeStart startSignal = new LeaderElectionMessage.LeStart(serverId, leToken, maxReceivedInstance.get());
+                                    lMessages.put(startSignal); // init LeaderElection
+                                }
+                                else {  // SLOW_MODE before leader crashed
+                                    long leToken = AdaAgents.newToken();
+                                    recovery.stateSet(LeaderElectionPerformer.LeaderElectionState.RECOVERING);  // wait for update
+                                    logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader failure][test=2][confirmed][RECOVERING, token="+leToken+"]\n");
+                                    memorySynchronize(leToken); // fetch up-to-date information from disk
+                                }
+                            }
+                        }
                     }
                 } catch (Exception e){
                     e.printStackTrace();
@@ -420,7 +441,7 @@ public class AdaPaxosRSM implements Serializable{
                         recovery.handleSync(cast);
                     } else if (msg instanceof GenericPaxosMessage.ackSync){
                         GenericPaxosMessage.ackSync cast = (GenericPaxosMessage.ackSync) msg;
-                        recovery.handleAckSync(cast, i->updateConsecutiveCommit(), i->recovery.tryLeaderElection(AdaAgents.newToken()));
+                        recovery.handleAckSync(cast, i->updateConsecutiveCommit(), this::finishDisk2Mem);
                     }
 
                     if (forceFsync.get())
@@ -446,7 +467,7 @@ public class AdaPaxosRSM implements Serializable{
                             update = learner.respond_ackRead((DiskPaxosMessage.ackRead) dmsg, i->updateConsecutiveCommit());
                     } else if (recovery.isValidMessage(dmsg.inst_no, dmsg.dialog_no)){
                         if (dmsg instanceof DiskPaxosMessage.ackRead)
-                            update = recovery.respond_ackRead((DiskPaxosMessage.ackRead) dmsg, i->updateConsecutiveCommit(), i->recovery.tryLeaderElection(AdaAgents.newToken()));
+                            update = recovery.respond_ackRead((DiskPaxosMessage.ackRead) dmsg, i->updateConsecutiveCommit(), this::finishDisk2Mem);
                     }
                     if (forceFsync.get() && update)
                         fileSynchronize(dmsg.inst_no);
@@ -504,13 +525,17 @@ public class AdaPaxosRSM implements Serializable{
             try {
                 LeaderElectionMessage msg = lMessages.poll(leadershipItv, TimeUnit.MILLISECONDS);
                 if (msg != null){
+                    if (msg instanceof LeaderElectionMessage.LeStart){
+                        LeaderElectionMessage.LeStart cast = (LeaderElectionMessage.LeStart) msg;
+                        recovery.handleLEStart(cast);
+                    }
                     if (msg instanceof LeaderElectionMessage.Propaganda){
                         LeaderElectionMessage.Propaganda cast = (LeaderElectionMessage.Propaganda) msg;
                         recovery.handleLEPropaganda(cast);
                     }
                     else if (msg instanceof LeaderElectionMessage.Vote){
                         LeaderElectionMessage.Vote cast = (LeaderElectionMessage.Vote) msg;
-                        recovery.handleLEVote(cast);
+                        recovery.handleLEVote(cast, (tk, id) -> asLeader.set(id == serverId));
                     }
                 }
             } catch (Exception e) {
@@ -585,7 +610,7 @@ public class AdaPaxosRSM implements Serializable{
         }
     }
 
-    protected void memorySynchronize(){
+    protected void memorySynchronize(final long token){
         // TODO: 2019/4/14 step-by-step MSync
     }
 
@@ -618,5 +643,17 @@ public class AdaPaxosRSM implements Serializable{
         }
         consecutiveCommit.set(iter);
         logger.logFormatted(false, "consecutive-commit", "upto="+iter);
+    }
+
+    protected void finishDisk2Mem(long dialog_no, int vacant_no){
+        if (recovery.stateCompareAndSet(LeaderElectionPerformer.LeaderElectionState.RECOVERING,
+                LeaderElectionPerformer.LeaderElectionState.RECOVERED)){    // join LeaderElection
+            LeaderElectionMessage.LeStart startSignal = new LeaderElectionMessage.LeStart(serverId, dialog_no, vacant_no-1);
+            try {
+                lMessages.put(startSignal);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -17,13 +17,24 @@ public class LeaderElectionMessage implements Serializable {
         this.token = token;
     }
 
+    public static class LeStart extends LeaderElectionMessage{
+        public final long LeDialog_no;
+        public final int LeTicket_local;
+
+        public LeStart(int fromId, long leDialog_no, int leTicket_local) {
+            super(fromId, leDialog_no);
+            LeDialog_no = leDialog_no;
+            LeTicket_local = leTicket_local;
+        }
+    }
+
     public static class Propaganda extends LeaderElectionMessage{
         private static final long serialVersionUID = 8087204963401567707L;
-        public final int ticket;
+        public final int[] tickets;
 
-        public Propaganda(int fromId, long token, int ticket) {
+        public Propaganda(int fromId, long token, int[] tickets) {
             super(fromId, token);
-            this.ticket = ticket;
+            this.tickets = tickets;
         }
     }
 

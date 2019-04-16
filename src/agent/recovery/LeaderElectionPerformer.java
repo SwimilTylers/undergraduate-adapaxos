@@ -7,18 +7,16 @@ import network.message.protocols.LeaderElectionMessage;
  * @version : 2019/4/14 22:09
  */
 public interface LeaderElectionPerformer {
-    boolean isLeaderSurvive(final int expire, final int decisionDelay);
+    boolean onLeaderElection();
+    boolean isLeaderSurvive(final int expire);
+    void stateSet(LeaderElectionState set);
+    boolean stateCompareAndSet(LeaderElectionState expect, LeaderElectionState set);
 
-    void prepareForLeaderElection(LeaderElectionState state, long token);
-    void tryLeaderElection(int ticket);
-
+    void handleLEStart(LeaderElectionMessage.LeStart leStart);
     void handleLEPropaganda(LeaderElectionMessage.Propaganda propaganda);
-    void handleLEVote(LeaderElectionMessage.Vote vote);
-
-    void initLESync();
-    void handleLESync(LeaderElectionMessage.LESync leSync);
+    void handleLEVote(LeaderElectionMessage.Vote vote, LeaderElectionResultUpdater updater);
 
     enum LeaderElectionState{
-        COMPLETE, RECOVERED, RECOVERING
+        COMPLETE, ON_RUNNING, RECOVERED, RECOVERING
     }
 }

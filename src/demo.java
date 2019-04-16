@@ -12,7 +12,8 @@ import rsm.AdaPaxosRSM;
 import rsm.BasicPaxosRSM;
 import rsm.DiskPaxosRSM;
 import rsm.GenericPaxosSMR;
-import utils.AdaPaxosConfiguration;
+import utils.AdaPaxosParameters;
+import utils.NetworkConfiguration;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -256,13 +257,14 @@ public class demo {
 
     public static class AdaPaxosRSMTesting{
         static InstanceStore[] stores = new InstanceStore[]{
-                new TaggedOffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+0),
-                new TaggedOffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+1),
-                new TaggedOffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+2),
-                new TaggedOffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+3),
-                new TaggedOffsetIndexStore(AdaPaxosConfiguration.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+4)
+                new TaggedOffsetIndexStore(AdaPaxosParameters.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+0),
+                new TaggedOffsetIndexStore(AdaPaxosParameters.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+1),
+                new TaggedOffsetIndexStore(AdaPaxosParameters.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+2),
+                new TaggedOffsetIndexStore(AdaPaxosParameters.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+3),
+                new TaggedOffsetIndexStore(AdaPaxosParameters.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+4)
         };
 
+        static NetworkConfiguration netConfig = new NetworkConfiguration(NetServiceTesting.addr, NetServiceTesting.port, 0);
 
         static void test0(){
             ExecutorService service = Executors.newCachedThreadPool();
@@ -276,7 +278,7 @@ public class demo {
                                 new GenericNetService(serverId),
                                 serverId == 0
                         );
-                        rsm.link(NetServiceTesting.addr, NetServiceTesting.port, 4470+serverId*2);
+                        rsm.link(netConfig, 4470+serverId*2);
                         rsm.agent();
                         rsm.routine();
                     } catch (Exception e) {
@@ -306,7 +308,7 @@ public class demo {
                                 new GenericNetService(serverId),
                                 serverId == 0
                         );
-                        rsm.link(Arrays.copyOfRange(NetServiceTesting.addr, 0, totalNum), Arrays.copyOfRange(NetServiceTesting.port, 0, totalNum), 4470+serverId*2);
+                        rsm.link(new NetworkConfiguration(Arrays.copyOfRange(NetServiceTesting.addr, 0, totalNum), Arrays.copyOfRange(NetServiceTesting.port, 0, totalNum), 0), 4470+serverId*2);
                         rsm.agent();
                         rsm.routine();
                     } catch (Exception e) {

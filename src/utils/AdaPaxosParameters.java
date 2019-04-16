@@ -4,7 +4,7 @@ package utils;
  * @author : Swimiltylers
  * @version : 2019/3/24 15:09
  */
-public class AdaPaxosConfiguration {
+public class AdaPaxosParameters {
     public static class RSM{
         public static final int DEFAULT_BATCH_CHAN_SIZE = 1;
         public static final int DEFAULT_INSTANCE_SIZE = 1024;
