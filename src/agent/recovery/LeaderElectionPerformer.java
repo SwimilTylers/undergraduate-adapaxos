@@ -9,10 +9,16 @@ import network.message.protocols.LeaderElectionMessage;
 public interface LeaderElectionPerformer {
     boolean isLeaderSurvive(final int expire, final int decisionDelay);
 
-    void readyForLeaderElection();
-    boolean initLeaderElection(long token);
-    boolean initLeaderElection(long token, int waitingTime);
+    void prepareForLeaderElection(LeaderElectionState state, long token);
+    void tryLeaderElection(int ticket);
 
     void handleLEPropaganda(LeaderElectionMessage.Propaganda propaganda);
     void handleLEVote(LeaderElectionMessage.Vote vote);
+
+    void initLESync();
+    void handleLESync(LeaderElectionMessage.LESync leSync);
+
+    enum LeaderElectionState{
+        COMPLETE, RECOVERED, RECOVERING
+    }
 }

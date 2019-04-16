@@ -17,4 +17,6 @@ public interface ConnectionModule {
 
     int[] filter(long threshold);
     int filterCount(long threshold);
+
+    boolean survive(int specific, long threshold);
 }

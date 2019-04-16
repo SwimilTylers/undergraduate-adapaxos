@@ -1,7 +1,7 @@
 <!---
  Licensed to the Apache Software Foundation (ASF) under one or more
  contributor license agreements.  See the NOTICE file distributed with
- this work for additional information regarding copyright ownership.
+ this work for additional tickets regarding copyright ownership.
  The ASF licenses this file to You under the Apache License, Version 2.0
  (the "License"); you may not use this file except in compliance with
  the License.  You may obtain a copy of the License at
@@ -191,7 +191,7 @@ does not implement some of the very implementation specific classes and methods.
 names and Maven groupId have been changed to org.apache.logging.log4j to avoid any conflicts
 with log4j 1.x.
 
-For complete information on Apache Log4j 2, including instructions on how to submit bug
+For complete tickets on Apache Log4j 2, including instructions on how to submit bug
 reports, patches, or suggestions for improvement, see the Apache Apache Log4j 2 website:
 
 https://logging.apache.org/log4j/2.x/

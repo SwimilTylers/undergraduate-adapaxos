@@ -29,13 +29,23 @@ public class LeaderElectionMessage implements Serializable {
 
     public static class Vote extends LeaderElectionMessage {
         private static final long serialVersionUID = 3554427274394541688L;
-        public final boolean agree;
-        public final int recommend;
+        public final int[] tickets;
 
-        public Vote(int fromId, long token, boolean agree, int recommend) {
+        public Vote(int fromId, long token, int[] tickets) {
             super(fromId, token);
-            this.agree = agree;
-            this.recommend = recommend;
+            this.tickets = tickets;
+        }
+    }
+
+    public static class LESync extends LeaderElectionMessage {
+        private static final long serialVersionUID = 3554427274394541688L;
+        public final int[] tickets;
+        public final boolean asLeader;
+
+        public LESync(int fromId, long token, int[] tickets, boolean asLeader) {
+            super(fromId, token);
+            this.tickets = tickets;
+            this.asLeader = asLeader;
         }
     }
 }

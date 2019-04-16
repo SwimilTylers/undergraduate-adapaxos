@@ -227,6 +227,7 @@ public class AdaPaxosRSM implements Serializable{
         routines.execute(() -> routine_monitor(20, 40, 3, 10, 5000));
         routines.execute(this::routine_response);
         routines.execute(() -> routine_backup(5000));
+        routines.execute(() -> routine_leadership(5000));
         if (supplement != null && supplement.length != 0) {
             for (Runnable r : supplement)
                 routines.execute(r);
@@ -305,7 +306,7 @@ public class AdaPaxosRSM implements Serializable{
                             forceFsync.set(false);
                             metaFsync.set(true);
                             logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=false][received]\n");
-                            memorySynchronize(message.upto);
+                            memorySynchronize();
                         }
                     } else if (!recovery.isLeaderSurvive(expire, decisionDelay)) {
                         if (forceFsync.getAndSet(true)) {
@@ -316,10 +317,10 @@ public class AdaPaxosRSM implements Serializable{
                             metaFsync.set(true);
                             logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=true][leader election]\n");
                             fileSynchronize();
-                            recovery.readyForLeaderElection();
+                            recovery.tryLeaderElection(AdaAgents.newToken());
                         }
 
-                        asLeader.set(recovery.initLeaderElection(AdaAgents.newToken(), LEDeadline));
+                        asLeader.set(recovery.getLeaderElectionResult(LEDeadline));
                     }
                 } catch (Exception e){
                     e.printStackTrace();
@@ -336,23 +337,22 @@ public class AdaPaxosRSM implements Serializable{
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        finally {
-                            crushed = conn.filter(expire);
-                            if (crushed != null && crushed.length >= bare_minority) {
-                                boolean oldState = forceFsync.getAndSet(true);
-                                if (!oldState) {
-                                    stableConnCount = 0;
-                                    int ballot = crtInstBallot.incrementAndGet();
-                                    metaFsync.set(true);
-                                    logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=true][new ballot=" + ballot + "]\n");
-                                    net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(true, maxReceivedInstance.get()));
-                                    fileSynchronize();
-                                }
+
+                        crushed = conn.filter(expire);
+                        if (crushed != null && crushed.length >= bare_minority) {
+                            boolean oldState = forceFsync.getAndSet(true);
+                            if (!oldState) {
+                                stableConnCount = 0;
+                                int ballot = crtInstBallot.incrementAndGet();
+                                metaFsync.set(true);
+                                logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=true][new ballot=" + ballot + "]\n");
+                                net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(true, maxReceivedInstance.get()));
+                                fileSynchronize();
                             }
-                            else {
-                                logger.record(false, "diag", "[" + System.currentTimeMillis() + "][cancel]\n");
-                                forceFsync.set(false);
-                            }
+                        }
+                        else {
+                            logger.record(false, "diag", "[" + System.currentTimeMillis() + "][cancel]\n");
+                            forceFsync.set(false);
                         }
                     }
                     else {
@@ -420,7 +420,7 @@ public class AdaPaxosRSM implements Serializable{
                         recovery.handleSync(cast);
                     } else if (msg instanceof GenericPaxosMessage.ackSync){
                         GenericPaxosMessage.ackSync cast = (GenericPaxosMessage.ackSync) msg;
-                        recovery.handleAckSync(cast, i->updateConsecutiveCommit(), i->recovery.readyForLeaderElection());
+                        recovery.handleAckSync(cast, i->updateConsecutiveCommit(), i->recovery.tryLeaderElection(AdaAgents.newToken()));
                     }
 
                     if (forceFsync.get())
@@ -446,7 +446,7 @@ public class AdaPaxosRSM implements Serializable{
                             update = learner.respond_ackRead((DiskPaxosMessage.ackRead) dmsg, i->updateConsecutiveCommit());
                     } else if (recovery.isValidMessage(dmsg.inst_no, dmsg.dialog_no)){
                         if (dmsg instanceof DiskPaxosMessage.ackRead)
-                            update = recovery.respond_ackRead((DiskPaxosMessage.ackRead) dmsg, i->updateConsecutiveCommit(), i->recovery.readyForLeaderElection());
+                            update = recovery.respond_ackRead((DiskPaxosMessage.ackRead) dmsg, i->updateConsecutiveCommit(), i->recovery.tryLeaderElection(AdaAgents.newToken()));
                     }
                     if (forceFsync.get() && update)
                         fileSynchronize(dmsg.inst_no);
@@ -503,13 +503,15 @@ public class AdaPaxosRSM implements Serializable{
         while (routineOnRunning.get()){
             try {
                 LeaderElectionMessage msg = lMessages.poll(leadershipItv, TimeUnit.MILLISECONDS);
-                if (msg instanceof LeaderElectionMessage.Propaganda){
-                    LeaderElectionMessage.Propaganda cast = (LeaderElectionMessage.Propaganda) msg;
-                    recovery.handleLEPropaganda(cast);
-                }
-                else if (msg instanceof LeaderElectionMessage.Vote){
-                    LeaderElectionMessage.Vote cast = (LeaderElectionMessage.Vote) msg;
-                    recovery.handleLEVote(cast);
+                if (msg != null){
+                    if (msg instanceof LeaderElectionMessage.Propaganda){
+                        LeaderElectionMessage.Propaganda cast = (LeaderElectionMessage.Propaganda) msg;
+                        recovery.handleLEPropaganda(cast);
+                    }
+                    else if (msg instanceof LeaderElectionMessage.Vote){
+                        LeaderElectionMessage.Vote cast = (LeaderElectionMessage.Vote) msg;
+                        recovery.handleLEVote(cast);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -568,6 +570,7 @@ public class AdaPaxosRSM implements Serializable{
         return inst_no;
     }
 
+    @Deprecated
     protected void memorySynchronize(final int upto){
         int upper = maxReceivedInstance.updateAndGet(i-> Integer.max(i, upto));
         long token = AdaAgents.newToken();
@@ -583,7 +586,7 @@ public class AdaPaxosRSM implements Serializable{
     }
 
     protected void memorySynchronize(){
-
+        // TODO: 2019/4/14 step-by-step MSync
     }
 
     /* protected-access misc func */
