@@ -76,6 +76,17 @@ public class UnidirectionalHeartBeatModule implements ConnectionModule{
     }
 
     @Override
+    public boolean survive(int specific, long threshold) {
+        if (specific == moduleId)
+            return true;
+        else {
+            long crt = System.currentTimeMillis();
+
+            return crt - nodes.get(specific) > threshold;
+        }
+    }
+
+    @Override
     public String toString() {
         long crt = System.currentTimeMillis();
         StringBuilder builder = new StringBuilder();

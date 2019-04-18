@@ -10,7 +10,6 @@ import client.ClientRequest;
 import instance.AdaPaxosInstance;
 import instance.InstanceStatus;
 import instance.maintenance.AdaRecoveryMaintenance;
-import instance.store.InstanceStore;
 import instance.store.PseudoRemoteInstanceStore;
 import instance.store.RemoteInstanceStore;
 import javafx.util.Pair;
@@ -68,8 +67,8 @@ public class AdaPaxosRSM implements Serializable{
     protected AtomicInteger consecutiveCommit;
     protected AtomicInteger fsyncInitInstance;
 
-    transient protected InstanceStore localStore;
     transient protected RemoteInstanceStore remoteStore;
+    transient protected int diskSize;
     protected AtomicBoolean forceFsync;
     protected AtomicBoolean metaFsync;
     transient protected boolean[] fsyncSignature;
@@ -129,12 +128,11 @@ public class AdaPaxosRSM implements Serializable{
         return this;
     }
 
-    protected AdaPaxosRSM instanceStorageBuild(InstanceStore localStore,
-                                        RemoteInstanceStore remoteStore,
+    protected AdaPaxosRSM instanceStorageBuild(RemoteInstanceStore remoteStore,
                                         boolean initFsync, int waitingQueueLength){
 
-        this.localStore = localStore;
         this.remoteStore = remoteStore;
+        this.diskSize = remoteStore.getDiskSize();
         ((PseudoRemoteInstanceStore)remoteStore).setLogger(logger);
         forceFsync = new AtomicBoolean(initFsync);
         metaFsync = new AtomicBoolean(true);
@@ -177,11 +175,11 @@ public class AdaPaxosRSM implements Serializable{
     }
 
     @SuppressWarnings("unchecked")
-    public static AdaPaxosRSM makeInstance(final int id, final int epoch, final int peerSize, InstanceStore localStore, RemoteInstanceStore remoteStore, GenericNetService net, boolean initAsLeader){
+    public static AdaPaxosRSM makeInstance(final int id, final int epoch, final int peerSize, RemoteInstanceStore remoteStore, GenericNetService net, boolean initAsLeader){
         AdaPaxosRSM rsm = new AdaPaxosRSM(id, initAsLeader, new NaiveLogger(id));
         rsm.netConnectionBuild(net, net.getConnectionModule(), peerSize)
                 .instanceSpaceBuild(AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, epoch << 16, 0)
-                .instanceStorageBuild(localStore, remoteStore, false, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE)
+                .instanceStorageBuild(remoteStore, false, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE)
                 .messageChanBuild(AdaPaxosParameters.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosParameters.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosParameters.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE);
         return rsm;
     }
@@ -225,7 +223,7 @@ public class AdaPaxosRSM implements Serializable{
         proposer = new AdaProposer(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
         acceptor = new AdaAcceptor(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
         learner = new AdaLearner(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
-        recovery = new AdaRecovery(serverId, peerSize, nConfig.initLeaderId, net.getPeerMessageSender(), net.getConnectionModule(), maxReceivedInstance, instanceSpace, recoveryList, logger);
+        recovery = new AdaRecovery(serverId, peerSize, diskSize, nConfig.initLeaderId, net.getPeerMessageSender(), net.getConnectionModule(), maxReceivedInstance, instanceSpace, recoveryList, logger);
     }
 
     public void routine(Runnable... supplement){
@@ -595,23 +593,21 @@ public class AdaPaxosRSM implements Serializable{
         return inst_no;
     }
 
-    @Deprecated
-    protected void memorySynchronize(final int upto){
-        int upper = maxReceivedInstance.updateAndGet(i-> Integer.max(i, upto));
-        long token = AdaAgents.newToken();
-        for (int inst_no = consecutiveCommit.get(); inst_no < upper; inst_no++) {
-            AdaPaxosInstance instance = instanceSpace.get(inst_no);
-            if (instance == null || instance.status != InstanceStatus.COMMITTED) {
-                recoveryList.set(inst_no, new AdaRecoveryMaintenance(token));
-                for (int leaderId = 0; leaderId < peerSize; leaderId++)
-                    if (leaderId != serverId)
-                        remoteStore.launchRemoteFetch(token, serverId, leaderId, inst_no);
-            }
-        }
-    }
-
     protected void memorySynchronize(final long token){
-        // TODO: 2019/4/14 step-by-step MSync
+        int inst_no = consecutiveCommit.get();
+        AdaPaxosInstance instance = instanceSpace.get(inst_no);
+
+        while (instance != null && instance.status == InstanceStatus.COMMITTED){
+            ++inst_no;
+            instance = instanceSpace.get(inst_no);
+        }
+
+        recoveryList.set(inst_no, new AdaRecoveryMaintenance(token, diskSize));
+        for (int disk_no = 0; disk_no < diskSize; disk_no++) {
+            for (int leaderId = 0; leaderId < peerSize; leaderId++)
+                if (leaderId != serverId)
+                    remoteStore.launchRemoteFetch(token, disk_no, leaderId, inst_no);
+        }
     }
 
     /* protected-access misc func */

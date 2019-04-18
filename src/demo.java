@@ -15,6 +15,7 @@ import rsm.GenericPaxosSMR;
 import utils.AdaPaxosParameters;
 import utils.NetworkConfiguration;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Random;
@@ -264,6 +265,31 @@ public class demo {
                 new TaggedOffsetIndexStore(AdaPaxosParameters.RSM.DEFAULT_LOCAL_STORAGE_PREFIX+4)
         };
 
+        static {
+            deleteDir("store");
+        }
+
+        static boolean deleteDir(String dirPath){
+            File file = new File(dirPath);
+
+            if (file.exists()) {
+                if (file.isFile())
+                    return file.delete();
+                else {
+                    File[] files = file.listFiles();
+                    if (files == null)
+                        return file.delete();
+                    else {
+                        for (File value : files) deleteDir(value.getAbsolutePath());
+                        return file.delete();
+                    }
+                }
+            }
+            else {
+                return true;
+            }
+        }
+
         static NetworkConfiguration netConfig = new NetworkConfiguration(NetServiceTesting.addr, NetServiceTesting.port, 0);
 
         static void test0(){
@@ -273,7 +299,6 @@ public class demo {
                 service.execute(() -> {
                     try {
                         AdaPaxosRSM rsm = AdaPaxosRSM.makeInstance(serverId, 0, 5,
-                                stores[serverId],
                                 new PseudoRemoteInstanceStore(serverId, stores),
                                 new GenericNetService(serverId),
                                 serverId == 0
@@ -303,7 +328,6 @@ public class demo {
                 service.execute(() -> {
                     try {
                         AdaPaxosRSM rsm = AdaPaxosRSM.makeInstance(serverId, 0, 5,
-                                stores[serverId],
                                 new PseudoRemoteInstanceStore(serverId, stores),
                                 new GenericNetService(serverId),
                                 serverId == 0
@@ -323,6 +347,7 @@ public class demo {
         //NetServiceTesting.test2();
         //GenericPaxosSMRTesting.test0();
         //DiskPaxosSMRTesting.test1();
+        //AdaPaxosRSMTesting.deleteDir("store");
         AdaPaxosRSMTesting.test0();
         //AdaPaxosRSMTesting.test1(5);
         //OffsetIndexStoreTesting.test4();

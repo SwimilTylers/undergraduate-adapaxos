@@ -136,6 +136,23 @@ public class BidirectionalHeartBeatModule implements ConnectionModule{
     }
 
     @Override
+    public boolean survive(int specific, long threshold) {
+        if (specific == moduleId)
+            return true;
+        else {
+            long crt = System.currentTimeMillis();
+            boolean[] ret = {true};
+            nodes.updateAndGet(specific, nodeMonitor -> {
+                nodeMonitor.isConn = crt - nodeMonitor.lst_srv <= threshold;
+                if (!nodeMonitor.isConn)
+                    ret[0] = false;
+                return nodeMonitor;
+            });
+            return ret[0];
+        }
+    }
+
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("[").append(System.currentTimeMillis()).append("][").append("[module:").append(moduleId).append("]\n").append("\t id | isConn | lst_srv | lst_rndSrv | lst_rnd <INIT, ARR> | rnd \n");

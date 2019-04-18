@@ -38,6 +38,11 @@ public class PseudoRemoteInstanceStore implements RemoteInstanceStore{
     }
 
     @Override
+    public int getDiskSize() {
+        return stores.length;
+    }
+
+    @Override
     public void launchRemoteStore(long token, int disk_no, int access_id, int inst_id, PaxosInstance instance) {
         logger.logFormatted(false, "remote store", "inst_no="+inst_id+", token="+token);
         launchService.execute(() -> {
