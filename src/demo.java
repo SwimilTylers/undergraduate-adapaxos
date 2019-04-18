@@ -266,7 +266,7 @@ public class demo {
         };
 
         static {
-            deleteDir("store");
+            //deleteDir("store");
         }
 
         static boolean deleteDir(String dirPath){
@@ -341,6 +341,28 @@ public class demo {
                 });
             }
         }
+
+        static void test2(){
+            ExecutorService service = Executors.newCachedThreadPool();
+            for (int i = 0; i < 5; i++) {
+                int serverId = i;
+                service.execute(() -> {
+                    try {
+                        AdaPaxosRSM rsm = AdaPaxosRSM.makeInstance(serverId, 0, 5,
+                                new PseudoRemoteInstanceStore(serverId, stores),
+                                new GenericNetService(serverId),
+                                serverId == 0
+                        );
+                        rsm.link(netConfig, 4470+serverId*2);
+                        rsm.agent();
+                        if (serverId != 0)
+                            rsm.routine();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+        }
     }
 
     public static void main(String[] args) {
@@ -348,8 +370,9 @@ public class demo {
         //GenericPaxosSMRTesting.test0();
         //DiskPaxosSMRTesting.test1();
         //AdaPaxosRSMTesting.deleteDir("store");
-        AdaPaxosRSMTesting.test0();
-        //AdaPaxosRSMTesting.test1(5);
+        //AdaPaxosRSMTesting.test0();
+        AdaPaxosRSMTesting.test1(5);
+        //AdaPaxosRSMTesting.test2();
         //OffsetIndexStoreTesting.test4();
         //Synchronized.main(args);
         //Date date = new Date();

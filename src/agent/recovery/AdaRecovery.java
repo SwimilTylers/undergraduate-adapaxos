@@ -4,6 +4,7 @@ import agent.learner.CommitUpdater;
 import instance.AdaPaxosInstance;
 import instance.InstanceStatus;
 import instance.maintenance.AdaRecoveryMaintenance;
+import instance.store.RemoteInstanceStore;
 import logger.PaxosLogger;
 import network.message.protocols.DiskPaxosMessage;
 import network.message.protocols.GenericPaxosMessage;
@@ -18,6 +19,7 @@ import java.util.concurrent.atomic.*;
  */
 public class AdaRecovery extends LeaderElectionRecovery implements CrashRecoveryPerformer, DiskCommitVacantResponder {
     private final int diskSize;
+    private RemoteInstanceStore remoteStore;
 
     private final AtomicReferenceArray<AdaPaxosInstance> instanceSpace;
     private final AtomicReferenceArray<AdaRecoveryMaintenance> recoveryList;;
@@ -25,15 +27,16 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
     private final PaxosLogger logger;
 
     public AdaRecovery(int serverId, int peerSize,
-                       int diskSize, int leaderId,
+                       int leaderId,
                        PeerMessageSender sender,
                        ConnectionModule conn,
                        AtomicInteger maxRecvInstance,
-                       AtomicReferenceArray<AdaPaxosInstance> instanceSpace,
+                       RemoteInstanceStore remoteStore, AtomicReferenceArray<AdaPaxosInstance> instanceSpace,
                        AtomicReferenceArray<AdaRecoveryMaintenance> recoveryList,
                        PaxosLogger logger) {
         super(serverId, peerSize, leaderId, maxRecvInstance, sender, conn, logger);
-        this.diskSize = diskSize;
+        this.remoteStore = remoteStore;
+        this.diskSize = remoteStore.getDiskSize();
         this.serverId = serverId;
         this.peerSize = peerSize;
         this.sender = sender;
@@ -81,7 +84,7 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
                 return unit;
             });
 
-            if (armu.recovered){
+            if (armu != null && armu.recovered){
                 chosen = true;
                 chosenInstance = armu.potential;
             }
@@ -107,7 +110,7 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
                 return unit;
             });
 
-            if (armu.recovered){
+            if (armu != null && armu.recovered){
                 chosen = true;
                 chosenInstance = armu.potential;
             }
@@ -145,6 +148,15 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
                 if ((oldInst == null || oldInst.status != InstanceStatus.COMMITTED) && updated.status == InstanceStatus.COMMITTED){
                     logger.logCommit(ackRead.inst_no, new GenericPaxosMessage.Commit(ackRead.inst_no, updated.crtLeaderId, updated.crtInstBallot, updated.requests), "settled");
                     cUpdater.update(ackRead.inst_no);
+                }
+
+                int next_inst = ackRead.inst_no + 1;
+                long token = ackRead.dialog_no;
+
+                recoveryList.set(next_inst, new AdaRecoveryMaintenance(token, diskSize));
+                for (int disk_no = 0; disk_no < diskSize; disk_no++) {
+                    for (int leaderId = 0; leaderId < peerSize; leaderId++)
+                        remoteStore.launchRemoteFetch(token, disk_no, leaderId, next_inst);
                 }
 
                 return true;

@@ -179,7 +179,7 @@ public class AdaPaxosRSM implements Serializable{
         AdaPaxosRSM rsm = new AdaPaxosRSM(id, initAsLeader, new NaiveLogger(id));
         rsm.netConnectionBuild(net, net.getConnectionModule(), peerSize)
                 .instanceSpaceBuild(AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, epoch << 16, 0)
-                .instanceStorageBuild(remoteStore, false, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE)
+                .instanceStorageBuild(remoteStore, true, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE)
                 .messageChanBuild(AdaPaxosParameters.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosParameters.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosParameters.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE);
         return rsm;
     }
@@ -223,7 +223,7 @@ public class AdaPaxosRSM implements Serializable{
         proposer = new AdaProposer(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
         acceptor = new AdaAcceptor(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
         learner = new AdaLearner(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
-        recovery = new AdaRecovery(serverId, peerSize, diskSize, nConfig.initLeaderId, net.getPeerMessageSender(), net.getConnectionModule(), maxReceivedInstance, instanceSpace, recoveryList, logger);
+        recovery = new AdaRecovery(serverId, peerSize, nConfig.initLeaderId, net.getPeerMessageSender(), net.getConnectionModule(), maxReceivedInstance, remoteStore, instanceSpace, recoveryList, logger);
     }
 
     public void routine(Runnable... supplement){
@@ -319,9 +319,9 @@ public class AdaPaxosRSM implements Serializable{
                         if (recovery.isLeaderSurvive(expire)){
 
                             /* at the first sight out timeout, follower should flush all on-memory instances to disk */
-
-                            fileSynchronize();
                             logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader failure][test=1]\n");
+                            //fileSynchronize();
+
                             Thread.sleep(decisionDelay);
                             if (recovery.isLeaderSurvive(expire)){  // leader crash confirmed, running into FAST_MODE
                                 if (!forceFsync.getAndSet(false)){   // FAST_MODE before leader crashed
@@ -415,7 +415,7 @@ public class AdaPaxosRSM implements Serializable{
             while (routineOnRunning.get()) {
                 GenericPaxosMessage msg = pMessages.poll();
                 if (msg != null) {
-                    logger.log(true, "receive " + msg.toString() + "\n");
+                    logger.logFormatted(true, "receive", msg.toString());
 
                     maxReceivedInstance.updateAndGet(i -> Integer.max(i, msg.inst_no));
 
@@ -448,7 +448,7 @@ public class AdaPaxosRSM implements Serializable{
 
                 DiskPaxosMessage dmsg = dMessages.poll();
                 if (dmsg != null) {
-                    logger.log(true, "receive " + dmsg.toString() + "\n");
+                    logger.logFormatted(true, "receive", dmsg.toString());
                     boolean update = false;
 
                     maxReceivedInstance.updateAndGet(i -> Integer.max(i, dmsg.inst_no));
@@ -605,8 +605,7 @@ public class AdaPaxosRSM implements Serializable{
         recoveryList.set(inst_no, new AdaRecoveryMaintenance(token, diskSize));
         for (int disk_no = 0; disk_no < diskSize; disk_no++) {
             for (int leaderId = 0; leaderId < peerSize; leaderId++)
-                if (leaderId != serverId)
-                    remoteStore.launchRemoteFetch(token, disk_no, leaderId, inst_no);
+                remoteStore.launchRemoteFetch(token, disk_no, leaderId, inst_no);
         }
     }
 
