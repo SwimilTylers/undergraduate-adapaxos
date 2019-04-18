@@ -44,7 +44,7 @@ public class PseudoRemoteInstanceStore implements RemoteInstanceStore{
 
     @Override
     public void launchRemoteStore(long token, int disk_no, int access_id, int inst_id, PaxosInstance instance) {
-        logger.logFormatted(false, "remote store", "inst_no="+inst_id+", token="+token+", access="+access_id, "inst="+(instance==null?"null":instance.toString()));
+        logger.logFormatted(false, "remote store", "ino="+inst_id+",tkn="+token+",aid="+access_id, "inst="+(instance==null?"null":instance.toString()));
         launchService.execute(() -> {
             try {
                 if (stores[disk_no].store(access_id, inst_id, instance)) {
@@ -71,7 +71,7 @@ public class PseudoRemoteInstanceStore implements RemoteInstanceStore{
 
     @Override
     public void launchRemoteFetch(long token, int disk_no, int access_id, int inst_id) {
-        logger.logFormatted(false, String.valueOf(System.currentTimeMillis()), "remote fetch", "inst_no="+inst_id+", token="+token+", access="+access_id);
+        logger.logFormatted(false, String.valueOf(System.currentTimeMillis()), "remote fetch", "ino="+inst_id+",tkn="+token+",aid="+access_id);
         launchService.execute(() -> {
             try {
                 if (stores[disk_no].isExist(access_id, inst_id)) {

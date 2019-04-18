@@ -42,7 +42,7 @@ public class DiskPaxosMessage implements Serializable {
 
         @Override
         public String toString() {
-            return "[WRITE][ino="+inst_no+",lid="+leaderId+",ibt="+inst_no+",tkn="+dialog_no+"][load="+(load==null?"null":load)+"]";
+            return "[WRITE][ino="+inst_no+",lid="+leaderId+",blt="+inst_no+",tkn="+dialog_no+"][load="+(load==null?"null":load)+"]";
         }
     }
 
@@ -65,9 +65,9 @@ public class DiskPaxosMessage implements Serializable {
         @Override
         public String toString() {
             if (status == DiskStatus.WRITE_SUCCESS)
-                return "[ACK_WRITE][SUCCESS][disk_no="+disk_no+"][ino="+inst_no+",lid="+leaderId+",ibt="+inst_ballot+",tkn="+dialog_no+"]";
+                return "[ACK_WRITE][SUCCESS][disk_no="+disk_no+"][ino="+inst_no+",lid="+leaderId+",blt="+inst_ballot+",tkn="+dialog_no+"]";
             else
-                return "[ACK_WRITE][FAIL][disk_no="+disk_no+"][ino="+inst_no+",lid="+leaderId+",ibt="+inst_ballot+",tkn="+dialog_no+"]";
+                return "[ACK_WRITE][FAIL][disk_no="+disk_no+"][ino="+inst_no+",lid="+leaderId+",blt="+inst_ballot+",tkn="+dialog_no+"]";
         }
     }
 
@@ -87,7 +87,7 @@ public class DiskPaxosMessage implements Serializable {
 
         @Override
         public String toString() {
-            return "[READ][ino="+inst_no+",lid="+leaderId+",ibt="+inst_no+",tkn="+dialog_no+"]";
+            return "[READ][ino="+inst_no+",lid="+leaderId+",blt="+inst_no+",tkn="+dialog_no+"]";
         }
     }
 
@@ -114,9 +114,9 @@ public class DiskPaxosMessage implements Serializable {
         @Override
         public String toString() {
             if (status == DiskStatus.READ_SUCCESS)
-                return "[ACK_READ][SUCCESS][disk_no="+disk_no+"][ino="+inst_no+",lid="+leaderId+",ibt="+inst_ballot+",tkn="+dialog_no+"][load="+(load==null?"null":load)+"]";
+                return "[ACK_READ][SUCCESS][disk_no="+disk_no+"][ino="+inst_no+",lid="+leaderId+",blt="+inst_ballot+",tkn="+dialog_no+"][load="+(load==null?"null":load)+"]";
             else if (status == DiskStatus.READ_NO_SUCH_FILE)
-                return "[ACK_READ][NO_SUCH_FILE][disk_no="+disk_no+"][ino="+inst_no+",lid="+leaderId+",ibt="+inst_ballot+",tkn="+dialog_no+"]";
+                return "[ACK_READ][NO_SUCH_FILE][disk_no="+disk_no+"][ino="+inst_no+",lid="+leaderId+",blt="+inst_ballot+",tkn="+dialog_no+"]";
             else
                 return super.toString();
         }
