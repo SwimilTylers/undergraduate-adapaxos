@@ -328,14 +328,14 @@ public class AdaPaxosRSM implements Serializable{
                                     metaFsync.set(true);
                                     long leToken = AdaAgents.newToken();
                                     recovery.stateSet(LeaderElectionPerformer.LeaderElectionState.RECOVERED);   // join LeaderElection
-                                    logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader failure][test=2][confirmed][RECOVERED, token="+leToken+"]\n");
+                                    logger.record(true, "diag", "[" + System.currentTimeMillis() + "][leader failure][test=2][confirmed][RECOVERED, token="+leToken+"]\n");
                                     LeaderElectionMessage.LeStart startSignal = new LeaderElectionMessage.LeStart(serverId, leToken, maxReceivedInstance.get());
                                     lMessages.put(startSignal); // init LeaderElection
                                 }
                                 else {  // SLOW_MODE before leader crashed
                                     long leToken = AdaAgents.newToken();
                                     recovery.stateSet(LeaderElectionPerformer.LeaderElectionState.RECOVERING);  // wait for update
-                                    logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader failure][test=2][confirmed][RECOVERING, token="+leToken+"]\n");
+                                    logger.record(true, "diag", "[" + System.currentTimeMillis() + "][leader failure][test=2][confirmed][RECOVERING, token="+leToken+"]\n");
                                     memorySynchronize(leToken); // fetch up-to-date information from disk
                                 }
                             }

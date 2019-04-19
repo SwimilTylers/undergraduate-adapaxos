@@ -299,7 +299,7 @@ public class demo {
                 service.execute(() -> {
                     try {
                         AdaPaxosRSM rsm = AdaPaxosRSM.makeInstance(serverId, 0, 5,
-                                new PseudoRemoteInstanceStore(serverId, stores),
+                                new PseudoRemoteInstanceStore(serverId, stores, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE),
                                 new GenericNetService(serverId),
                                 serverId == 0
                         );
@@ -328,7 +328,7 @@ public class demo {
                 service.execute(() -> {
                     try {
                         AdaPaxosRSM rsm = AdaPaxosRSM.makeInstance(serverId, 0, 5,
-                                new PseudoRemoteInstanceStore(serverId, stores),
+                                new PseudoRemoteInstanceStore(serverId, stores, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE),
                                 new GenericNetService(serverId),
                                 serverId == 0
                         );
@@ -349,7 +349,7 @@ public class demo {
                 service.execute(() -> {
                     try {
                         AdaPaxosRSM rsm = AdaPaxosRSM.makeInstance(serverId, 0, 5,
-                                new PseudoRemoteInstanceStore(serverId, stores),
+                                new PseudoRemoteInstanceStore(serverId, stores, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE),
                                 new GenericNetService(serverId),
                                 serverId == 0
                         );
