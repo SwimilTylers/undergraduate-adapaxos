@@ -9,7 +9,6 @@ import network.message.protocols.GenericClientMessage;
 import network.message.protocols.GenericConnectionMessage;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.module.ConnectionModule;
-import network.service.module.BidirectionalHeartBeatModule;
 import network.service.module.UnidirectionalHeartBeatModule;
 import network.service.receiver.BasicPeerMessageReceiver;
 import network.service.sender.BasicPeerMessageSender;
@@ -123,7 +122,7 @@ public class GenericNetService {
 
         latch.await();
 
-        peerTransDeployment();
+        setPeerMessageProcessor();
 
         onRunning = true;
 
@@ -145,7 +144,7 @@ public class GenericNetService {
         service.shutdown();
     }
 
-    protected void peerTransDeployment(){
+    protected void setPeerMessageProcessor(){
         sender = new BasicPeerMessageSender(netServiceId, peerSize, peers, cModule, logger);
         receiver = new BasicPeerMessageReceiver(netServiceId, sender, cModule, paxosChan, channels, logger);
     }

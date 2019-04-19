@@ -1,6 +1,7 @@
 package network.message.protocols;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * @author : Swimiltylers
@@ -26,6 +27,11 @@ public class LeaderElectionMessage implements Serializable {
             LeDialog_no = leDialog_no;
             LeTicket_local = leTicket_local;
         }
+
+        @Override
+        public String toString() {
+            return "[LE][Start][tkn="+LeDialog_no+"][tkt="+LeTicket_local+"]";
+        }
     }
 
     public static class Propaganda extends LeaderElectionMessage{
@@ -36,6 +42,11 @@ public class LeaderElectionMessage implements Serializable {
             super(fromId, token);
             this.tickets = tickets;
         }
+
+        @Override
+        public String toString() {
+            return "[LE][Propaganda][tkn="+token+",fid="+fromId+"][tks="+ (tickets == null ? "null" : Arrays.toString(tickets)) +"]";
+        }
     }
 
     public static class Vote extends LeaderElectionMessage {
@@ -45,6 +56,11 @@ public class LeaderElectionMessage implements Serializable {
         public Vote(int fromId, long token, int[] tickets) {
             super(fromId, token);
             this.tickets = tickets;
+        }
+
+        @Override
+        public String toString() {
+            return "[LE][Vote][tkn="+token+",fid="+fromId+"][tks="+ (tickets == null ? "null" : Arrays.toString(tickets)) +"]";
         }
     }
 

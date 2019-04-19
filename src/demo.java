@@ -5,6 +5,7 @@ import instance.store.OffsetIndexStore;
 import instance.store.PseudoRemoteInstanceStore;
 import instance.store.TaggedOffsetIndexStore;
 import logger.NaiveLogger;
+import network.service.DelayedNetService;
 import network.service.GenericNetService;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -290,7 +291,25 @@ public class demo {
             }
         }
 
-        static NetworkConfiguration netConfig = new NetworkConfiguration(NetServiceTesting.addr, NetServiceTesting.port, 0);
+        static int[][] delayed = {
+                new int[] {0, 0, 0, 40, 0},
+                new int[] {0, 0, 0, 40, 0},
+                new int[] {0, 0, 0, 40, 0},
+                new int[] {0, 0, 0, 40, 0},
+                new int[] {0, 0, 0, 40, 0}
+        };
+
+        static int[][] resize(int[][] orig, int peerSize){
+            int[][] ret = new int[peerSize][peerSize];
+            for (int i = 0; i < peerSize; i++) {
+                for (int j = 0; j < peerSize; j++) {
+                    ret[i][j] = orig[i][j];
+                }
+            }
+            return ret;
+        }
+
+        static NetworkConfiguration netConfig = new NetworkConfiguration(NetServiceTesting.addr, NetServiceTesting.port, 1, delayed);
 
         static void test0(){
             ExecutorService service = Executors.newCachedThreadPool();
@@ -300,8 +319,7 @@ public class demo {
                     try {
                         AdaPaxosRSM rsm = AdaPaxosRSM.makeInstance(serverId, 0, 5,
                                 new PseudoRemoteInstanceStore(serverId, stores, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE),
-                                new GenericNetService(serverId),
-                                serverId == 0
+                                new GenericNetService(serverId)
                         );
                         rsm.link(netConfig, 4470+serverId*2);
                         rsm.agent();
@@ -323,16 +341,16 @@ public class demo {
 
         static void test1(int totalNum){
             ExecutorService service = Executors.newCachedThreadPool();
+            int[][] local_delay = resize(delayed, totalNum);
             for (int i = 0; i < totalNum; i++) {
                 int serverId = i;
                 service.execute(() -> {
                     try {
                         AdaPaxosRSM rsm = AdaPaxosRSM.makeInstance(serverId, 0, 5,
                                 new PseudoRemoteInstanceStore(serverId, stores, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE),
-                                new GenericNetService(serverId),
-                                serverId == 0
+                                new DelayedNetService(serverId, local_delay[serverId])
                         );
-                        rsm.link(new NetworkConfiguration(Arrays.copyOfRange(NetServiceTesting.addr, 0, totalNum), Arrays.copyOfRange(NetServiceTesting.port, 0, totalNum), 0), 4470+serverId*2);
+                        rsm.link(new NetworkConfiguration(Arrays.copyOfRange(NetServiceTesting.addr, 0, totalNum), Arrays.copyOfRange(NetServiceTesting.port, 0, totalNum), netConfig.initLeaderId, delayed), 4470+serverId*2);
                         rsm.agent();
                         rsm.routine();
                     } catch (Exception e) {
@@ -350,8 +368,7 @@ public class demo {
                     try {
                         AdaPaxosRSM rsm = AdaPaxosRSM.makeInstance(serverId, 0, 5,
                                 new PseudoRemoteInstanceStore(serverId, stores, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE),
-                                new GenericNetService(serverId),
-                                serverId == 0
+                                new GenericNetService(serverId)
                         );
                         rsm.link(netConfig, 4470+serverId*2);
                         rsm.agent();

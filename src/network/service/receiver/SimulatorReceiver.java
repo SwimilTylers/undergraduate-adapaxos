@@ -14,13 +14,13 @@ import java.net.Socket;
 public class SimulatorReceiver implements PeerMessageReceiver{
     private int netServiceId;
 
-    private PeerMessageReceiver receiver;
+    private PeerMessageProcessor processor;
     private SimulatorModule simulator;
 
-    public SimulatorReceiver(int netServiceId, PeerMessageReceiver receiver,
+    public SimulatorReceiver(int netServiceId, PeerMessageProcessor processor,
                              @NotNull SimulatorModule simulator) {
         this.netServiceId = netServiceId;
-        this.receiver = receiver;
+        this.processor = processor;
         this.simulator = simulator;
     }
 
@@ -35,16 +35,11 @@ public class SimulatorReceiver implements PeerMessageReceiver{
                 continue;
             }
             try {
-                messageProcess(msg, id);
+                if (!simulator.crush())
+                    processor.messageProcess(msg, id);
             } catch (InterruptedException e) {
                 break;
             }
         }
-    }
-
-    @Override
-    public void messageProcess(Object msg, int fromId) throws InterruptedException {
-        if (!simulator.crush())
-            receiver.messageProcess(msg, fromId);
     }
 }

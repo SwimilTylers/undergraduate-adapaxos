@@ -44,7 +44,7 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
 
         state = new AtomicReference<>(LeaderElectionState.COMPLETE);
         tickets = new int[peerSize];
-        Arrays.fill(tickets, -1);
+        Arrays.fill(tickets, 0);
     }
 
     @Override
@@ -74,13 +74,13 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
     @Override
     public void handleLEStart(LeaderElectionMessage.LeStart leStart) {
         if (state.compareAndSet(LeaderElectionState.RECOVERED, LeaderElectionState.ON_RUNNING) && serverId == leStart.fromId){    // check if LLE prepared
-            tickets[serverId] = leStart.LeTicket_local;
-            sender.broadcastPeerMessage(new LeaderElectionMessage.Propaganda(serverId, leToken, tickets));
-            logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election][start][ON_RUNNING, token="+leToken+"]\n");
-
             leTicket = leStart.LeTicket_local;
             leToken = leStart.LeDialog_no;
             leCount = 0;
+            tickets[serverId] = leStart.LeTicket_local;
+
+            sender.broadcastPeerMessage(new LeaderElectionMessage.Propaganda(serverId, leToken, tickets));
+            logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election][start][ON_RUNNING, token="+leToken+"]\n");
         }
     }
 
@@ -111,10 +111,10 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
 
             if (leCount >= (peerSize + 1)/2 - 1){     // bare minority
                 int formalLeader = leaderIdPair.get().getValue();
-                int maxTicket = tickets[0];
-                int correspondingServer = 0;
+                int maxTicket = tickets[formalLeader == 0 ? 1 : 0];
+                int correspondingServer = formalLeader == 0 ? 1 : 0;
 
-                for (int i = 1; i < tickets.length; i++) {
+                for (int i = correspondingServer + 1; i < tickets.length; i++) {
                     if (i != formalLeader && tickets[i] > maxTicket){
                         maxTicket = tickets[i];
                         correspondingServer = i;
@@ -122,9 +122,11 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
                 }
 
                 leaderIdPair.set(new Pair<>(leToken, correspondingServer));
-                state.set(LeaderElectionState.COMPLETE);
+
                 logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election][COMPLETE, chosen="+correspondingServer+"]\n");
                 updater.update(leToken, correspondingServer);
+
+                state.set(LeaderElectionState.COMPLETE);
             }
 
 

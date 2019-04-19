@@ -13,9 +13,12 @@ public class NetworkConfiguration implements Serializable {
 
     public final int initLeaderId;
 
-    public NetworkConfiguration(String[] peerAddr, int[] peerPort, int initLeaderId) {
+    public final int[][] delayed;
+
+    public NetworkConfiguration(String[] peerAddr, int[] peerPort, int initLeaderId, int[][] delayed) {
         this.peerAddr = peerAddr;
         this.peerPort = peerPort;
         this.initLeaderId = initLeaderId;
+        this.delayed = delayed;
     }
 }

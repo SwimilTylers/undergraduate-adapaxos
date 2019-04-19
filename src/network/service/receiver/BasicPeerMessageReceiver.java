@@ -22,7 +22,7 @@ import java.util.concurrent.Executors;
  * @author : Swimiltylers
  * @version : 2019/2/26 20:13
  */
-public class BasicPeerMessageReceiver implements PeerMessageReceiver {
+public class BasicPeerMessageReceiver implements PeerMessageReceiver, PeerMessageProcessor {
     private int netServiceId;
 
     private PeerMessageSender sender;

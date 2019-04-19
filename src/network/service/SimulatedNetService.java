@@ -33,7 +33,7 @@ public class SimulatedNetService extends GenericNetService{
     }
 
     @Override
-    protected void peerTransDeployment() {
+    protected void setPeerMessageProcessor() {
         sender = new SimulatorSender(netServiceId, peerSize, new BasicPeerMessageSender(netServiceId, peerSize, peers, cModule, logger), simulator);
         receiver = new SimulatorReceiver(netServiceId, new BasicPeerMessageReceiver(netServiceId, sender, cModule, paxosChan, channels, logger), simulator);
     }

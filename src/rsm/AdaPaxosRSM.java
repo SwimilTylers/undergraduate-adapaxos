@@ -175,11 +175,11 @@ public class AdaPaxosRSM implements Serializable{
     }
 
     @SuppressWarnings("unchecked")
-    public static AdaPaxosRSM makeInstance(final int id, final int epoch, final int peerSize, RemoteInstanceStore remoteStore, GenericNetService net, boolean initAsLeader){
-        AdaPaxosRSM rsm = new AdaPaxosRSM(id, initAsLeader, new NaiveLogger(id));
+    public static AdaPaxosRSM makeInstance(final int id, final int epoch, final int peerSize, RemoteInstanceStore remoteStore, GenericNetService net){
+        AdaPaxosRSM rsm = new AdaPaxosRSM(id, false, new NaiveLogger(id));
         rsm.netConnectionBuild(net, net.getConnectionModule(), peerSize)
                 .instanceSpaceBuild(AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, epoch << 16, 0)
-                .instanceStorageBuild(remoteStore, true, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE)
+                .instanceStorageBuild(remoteStore, false, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE)
                 .messageChanBuild(AdaPaxosParameters.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosParameters.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosParameters.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE);
         return rsm;
     }
@@ -195,9 +195,9 @@ public class AdaPaxosRSM implements Serializable{
         String[] peerAddr = netConfig.peerAddr;
         int[] peerPort = netConfig.peerPort;
         this.nConfig = netConfig;
+        asLeader.set(netConfig.initLeaderId == serverId);
 
         assert peerAddr.length == peerPort.length && peerAddr.length == peerSize;
-        assert !(asLeader.get() && (netConfig.initLeaderId != serverId));
 
         net.setClientChan(cMessages);
         net.setPaxosChan(pMessages);
@@ -229,10 +229,10 @@ public class AdaPaxosRSM implements Serializable{
     public void routine(Runnable... supplement){
         routineOnRunning = new AtomicBoolean(true);
         ExecutorService routines = Executors.newCachedThreadPool();
-        routines.execute(()-> routine_batch(2000, GenericPaxosSMR.DEFAULT_REQUEST_COMPACTING_SIZE));
+        //routines.execute(()-> routine_batch(2000, GenericPaxosSMR.DEFAULT_REQUEST_COMPACTING_SIZE));
         routines.execute(() -> routine_monitor(20, 40, 3, 10, 5000));
-        routines.execute(this::routine_response);
-        routines.execute(() -> routine_backup(5000));
+        //routines.execute(this::routine_response);
+        //routines.execute(() -> routine_backup(5000));
         routines.execute(() -> routine_leadership(5000));
         if (supplement != null && supplement.length != 0) {
             for (Runnable r : supplement)
@@ -315,7 +315,7 @@ public class AdaPaxosRSM implements Serializable{
                             memorySynchronize(AdaAgents.newToken());
                         }
                     }
-                    else if (!recovery.onLeaderElection()){      // carry out leader detection
+                    else if (!asLeader.get() && !recovery.onLeaderElection()){      // carry out leader detection
                         if (recovery.isLeaderSurvive(expire)){
 
                             /* at the first sight out timeout, follower should flush all on-memory instances to disk */
@@ -330,6 +330,7 @@ public class AdaPaxosRSM implements Serializable{
                                     recovery.stateSet(LeaderElectionPerformer.LeaderElectionState.RECOVERED);   // join LeaderElection
                                     logger.record(true, "diag", "[" + System.currentTimeMillis() + "][leader failure][test=2][confirmed][RECOVERED, token="+leToken+"]\n");
                                     LeaderElectionMessage.LeStart startSignal = new LeaderElectionMessage.LeStart(serverId, leToken, maxReceivedInstance.get());
+                                    logger.logFormatted(false, "start leader election", startSignal.toString());
                                     lMessages.put(startSignal); // init LeaderElection
                                 }
                                 else {  // SLOW_MODE before leader crashed
@@ -349,7 +350,7 @@ public class AdaPaxosRSM implements Serializable{
                 int[] crushed = conn.filter(expire);
 
                 if (crushed != null) {
-                    logger.record(false, "diag", "["+System.currentTimeMillis()+"]"+Arrays.toString(crushed) + "\n");
+                    logger.record(false, "diag", "["+System.currentTimeMillis()+"][crashed="+Arrays.toString(crushed) + "]\n");
                     if (crushed.length >= bare_minority){
                         try {
                             Thread.sleep(decisionDelay);
