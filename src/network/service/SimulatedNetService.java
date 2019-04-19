@@ -15,6 +15,7 @@ import java.util.concurrent.BlockingQueue;
  * @author : Swimiltylers
  * @version : 2019/2/26 20:49
  */
+@Deprecated
 public class SimulatedNetService extends GenericNetService{
     private SimulatorModule simulator;
 

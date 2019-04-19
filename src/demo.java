@@ -5,8 +5,9 @@ import instance.store.OffsetIndexStore;
 import instance.store.PseudoRemoteInstanceStore;
 import instance.store.TaggedOffsetIndexStore;
 import logger.NaiveLogger;
-import network.service.DelayedNetService;
 import network.service.GenericNetService;
+import network.service.module.controller.GlobalBipolarController;
+import network.service.sender.BipolarSenderDecider;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import rsm.AdaPaxosRSM;
@@ -292,11 +293,11 @@ public class demo {
         }
 
         static int[][] delayed = {
-                new int[] {0, 0, 0, 40, 0},
-                new int[] {0, 0, 0, 40, 0},
-                new int[] {0, 0, 0, 40, 0},
-                new int[] {0, 0, 0, 40, 0},
-                new int[] {0, 0, 0, 40, 0}
+                new int[] {0, 0, 0, 20, 0},
+                new int[] {0, 0, 0, 20, 0},
+                new int[] {0, 0, 0, 20, 0},
+                new int[] {0, 0, 0, 20, 0},
+                new int[] {0, 0, 0, 20, 0}
         };
 
         static int[][] resize(int[][] orig, int peerSize){
@@ -348,7 +349,7 @@ public class demo {
                     try {
                         AdaPaxosRSM rsm = AdaPaxosRSM.makeInstance(serverId, 0, 5,
                                 new PseudoRemoteInstanceStore(serverId, stores, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE),
-                                new DelayedNetService(serverId, local_delay[serverId])
+                                new GenericNetService(serverId)
                         );
                         rsm.link(new NetworkConfiguration(Arrays.copyOfRange(NetServiceTesting.addr, 0, totalNum), Arrays.copyOfRange(NetServiceTesting.port, 0, totalNum), netConfig.initLeaderId, delayed), 4470+serverId*2);
                         rsm.agent();
@@ -382,6 +383,13 @@ public class demo {
         }
     }
 
+    static class GlobalBipolarControllerTesting{
+        static void test0(){
+            GlobalBipolarController controller = new GlobalBipolarController(5);
+            controller.controlledByFile(new File("control.txt"));
+        }
+    }
+
     public static void main(String[] args) {
         //NetServiceTesting.test2();
         //GenericPaxosSMRTesting.test0();
@@ -390,6 +398,7 @@ public class demo {
         //AdaPaxosRSMTesting.test0();
         AdaPaxosRSMTesting.test1(5);
         //AdaPaxosRSMTesting.test2();
+        //GlobalBipolarControllerTesting.test0();
         //OffsetIndexStoreTesting.test4();
         //Synchronized.main(args);
         //Date date = new Date();

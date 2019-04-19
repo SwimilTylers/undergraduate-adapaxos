@@ -109,26 +109,35 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
 
             logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election]["+vote.toString()+"]\n");
 
-            if (leCount >= (peerSize + 1)/2 - 1){     // bare minority
-                int formalLeader = leaderIdPair.get().getValue();
-                int maxTicket = tickets[formalLeader == 0 ? 1 : 0];
-                int correspondingServer = formalLeader == 0 ? 1 : 0;
+            if (vote.fromId == leaderIdPair.get().getValue()){
+                leaderIdPair.set(new Pair<>(leToken, vote.fromId));
 
-                for (int i = correspondingServer + 1; i < tickets.length; i++) {
-                    if (i != formalLeader && tickets[i] > maxTicket){
-                        maxTicket = tickets[i];
-                        correspondingServer = i;
-                    }
-                }
-
-                leaderIdPair.set(new Pair<>(leToken, correspondingServer));
-
-                logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election][COMPLETE, chosen="+correspondingServer+"]\n");
-                updater.update(leToken, correspondingServer);
+                logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election][COMPLETE, chosen="+vote.fromId+"]\n");
+                updater.update(leToken, vote.fromId);
 
                 state.set(LeaderElectionState.COMPLETE);
             }
+            else {
+                if (leCount >= (peerSize + 1)/2 - 1){     // bare minority
+                    int formalLeader = leaderIdPair.get().getValue();
+                    int maxTicket = tickets[formalLeader == 0 ? 1 : 0];
+                    int correspondingServer = formalLeader == 0 ? 1 : 0;
 
+                    for (int i = correspondingServer + 1; i < tickets.length; i++) {
+                        if (i != formalLeader && tickets[i] > maxTicket){
+                            maxTicket = tickets[i];
+                            correspondingServer = i;
+                        }
+                    }
+
+                    leaderIdPair.set(new Pair<>(leToken, correspondingServer));
+
+                    logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election][COMPLETE, chosen="+correspondingServer+"]\n");
+                    updater.update(leToken, correspondingServer);
+
+                    state.set(LeaderElectionState.COMPLETE);
+                }
+            }
 
         }
     }

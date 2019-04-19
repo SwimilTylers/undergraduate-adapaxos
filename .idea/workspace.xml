@@ -2,23 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/network/service/DelayedNetService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/network/service/DummyNetService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/network/service/receiver/DelayedPeerMessageReceiver.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/network/service/receiver/DummyPeerMessageReceiver.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/network/service/receiver/PeerMessageProcessor.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/network/service/sender/DummyPeerMessageSender.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/control.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/network/BipolarNetService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/network/service/sender/BipolarPeerMessageSender.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/network/service/sender/BipolarSenderDecider.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/agent/recovery/LeaderElectionRecovery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/recovery/LeaderElectionRecovery.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/demo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/demo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/message/protocols/LeaderElectionMessage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/message/protocols/LeaderElectionMessage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/network/service/DelayedNetService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/DelayedNetService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/network/service/GenericNetService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/GenericNetService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/network/service/SimulatedNetService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/SimulatedNetService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/service/receiver/BasicPeerMessageReceiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/receiver/BasicPeerMessageReceiver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/service/receiver/PeerMessageReceiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/receiver/PeerMessageReceiver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/service/receiver/SimulatorReceiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/receiver/SimulatorReceiver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/NetworkConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/NetworkConfiguration.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -40,53 +34,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/demo.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="896">
-              <caret line="352" column="86" selection-start-line="352" selection-start-column="86" selection-end-line="352" selection-end-column="86" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/utils/NetworkConfiguration.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="294">
-              <caret line="21" column="31" selection-start-line="21" selection-start-column="31" selection-end-line="21" selection-end-column="31" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/network/service/DelayedNetService.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="308">
-              <caret line="22" column="5" lean-forward="true" selection-start-line="22" selection-start-column="5" selection-end-line="22" selection-end-column="5" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/network/service/receiver/BasicPeerMessageReceiver.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="448">
-              <caret line="69" column="25" lean-forward="true" selection-start-line="69" selection-start-column="25" selection-end-line="69" selection-end-column="25" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="371">
-              <caret line="195" column="44" selection-start-line="195" selection-start-column="44" selection-end-line="195" selection-end-column="44" />
+            <state relative-caret-position="415">
+              <caret line="398" column="8" lean-forward="true" selection-start-line="398" selection-start-column="8" selection-end-line="398" selection-end-column="8" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -159,14 +111,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/agent/learner/DiskResponder.java" />
-        <option value="$PROJECT_DIR$/src/agent/learner/DiskCommitResponder.java" />
-        <option value="$PROJECT_DIR$/src/agent/learner/CommitUpdater.java" />
-        <option value="$PROJECT_DIR$/src/agent/learner/Learner.java" />
-        <option value="$PROJECT_DIR$/src/instance/PaxosInstance.java" />
-        <option value="$PROJECT_DIR$/src/instance/InstanceStatus.java" />
-        <option value="$PROJECT_DIR$/src/instance/store/TaggedOffsetIndexStore.java" />
-        <option value="$PROJECT_DIR$/src/instance/AdaPaxosInstance.java" />
         <option value="$PROJECT_DIR$/src/network/message/protocols/AdaPaxosMessage.java" />
         <option value="$PROJECT_DIR$/src/rsm/PseudoAdaPaxosRSM.java" />
         <option value="$PROJECT_DIR$/src/agent/acceptor/AdaAcceptor.java" />
@@ -195,7 +139,6 @@
         <option value="$PROJECT_DIR$/src/network/message/protocols/DiskPaxosMessage.java" />
         <option value="$PROJECT_DIR$/src/instance/store/PseudoRemoteInstanceStore.java" />
         <option value="$PROJECT_DIR$/src/network/service/sender/DummyPeerMessageSender.java" />
-        <option value="$PROJECT_DIR$/src/network/service/GenericNetService.java" />
         <option value="$PROJECT_DIR$/src/network/service/receiver/PeerMessageProcessor.java" />
         <option value="$PROJECT_DIR$/src/network/service/receiver/PeerMessageReceiver.java" />
         <option value="$PROJECT_DIR$/src/network/service/receiver/DummyPeerMessageReceiver.java" />
@@ -203,13 +146,22 @@
         <option value="$PROJECT_DIR$/src/network/service/receiver/BasicPeerMessageReceiver.java" />
         <option value="$PROJECT_DIR$/src/network/service/DummyNetService.java" />
         <option value="$PROJECT_DIR$/src/network/message/protocols/LeaderElectionMessage.java" />
-        <option value="$PROJECT_DIR$/src/agent/recovery/LeaderElectionRecovery.java" />
         <option value="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" />
         <option value="$PROJECT_DIR$/src/network/service/sender/DelayedPeerMessageSender.java" />
         <option value="$PROJECT_DIR$/src/network/service/receiver/DelayedPeerMessageReceiver.java" />
         <option value="$PROJECT_DIR$/src/utils/NetworkConfiguration.java" />
-        <option value="$PROJECT_DIR$/src/demo.java" />
+        <option value="$PROJECT_DIR$/src/agent/recovery/LeaderElectionRecovery.java" />
+        <option value="$PROJECT_DIR$/src/network/service/GenericNetService.java" />
+        <option value="$PROJECT_DIR$/src/network/service/sender/BipolarPeerMeesageSender.java" />
+        <option value="$PROJECT_DIR$/src/network/service/sender/BipolarDecider.java" />
+        <option value="$PROJECT_DIR$/src/network/service/sender/BipolarSenderDecider.java" />
+        <option value="$PROJECT_DIR$/src/network/service/sender/BipolarPeerMessageSender.java" />
+        <option value="$PROJECT_DIR$/control.txt" />
+        <option value="$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java" />
         <option value="$PROJECT_DIR$/src/network/service/DelayedNetService.java" />
+        <option value="$PROJECT_DIR$/src/network/service/SimulatedNetService.java" />
+        <option value="$PROJECT_DIR$/src/network/BipolarNetService.java" />
+        <option value="$PROJECT_DIR$/src/demo.java" />
       </list>
     </option>
   </component>
@@ -254,6 +206,12 @@
               <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
               <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="client" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="instance" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -283,6 +241,15 @@
               <item name="network" type="462c0819:PsiDirectoryNode" />
               <item name="service" type="462c0819:PsiDirectoryNode" />
               <item name="module" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="network" type="462c0819:PsiDirectoryNode" />
+              <item name="service" type="462c0819:PsiDirectoryNode" />
+              <item name="module" type="462c0819:PsiDirectoryNode" />
+              <item name="controller" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
@@ -477,14 +444,7 @@
       <workItem from="1555381748505" duration="17739000" />
       <workItem from="1555568769498" duration="13361000" />
       <workItem from="1555640567200" duration="6296000" />
-      <workItem from="1555646901367" duration="8141000" />
-    </task>
-    <task id="LOCAL-00014" summary="Status: untested [4] Start Competitors early ABORT [5] Start Competitors late ABORT&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.rsm&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation">
-      <created>1548920161290</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1548920161290</updated>
+      <workItem from="1555646901367" duration="16910000" />
     </task>
     <task id="LOCAL-00015" summary="Status: untested clientListener&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.rsm&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation">
       <created>1548928504576</created>
@@ -822,11 +782,18 @@
       <option name="project" value="LOCAL" />
       <updated>1555643466503</updated>
     </task>
-    <option name="localTasksCounter" value="63" />
+    <task id="LOCAL-00063" summary="Status: uncontrolled delay&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR">
+      <created>1555662682908</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1555662682909</updated>
+    </task>
+    <option name="localTasksCounter" value="64" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="731668000" />
+    <option name="totallyTimeSpent" value="740437000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -921,7 +888,6 @@
     <ignored-roots>
       <path value="E:" />
     </ignored-roots>
-    <MESSAGE value="Status: AdaAgents&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: AdaPaxosRSM on running &#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: back to init&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: monitor init&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
@@ -946,209 +912,10 @@
     <MESSAGE value="Status: simple-tested recursive disk2mem recovery&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: fix several log format&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: solve overwhelming thread executed by PseudoRemoteInstanceStore&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
-    <option name="LAST_COMMIT_MESSAGE" value="Status: solve overwhelming thread executed by PseudoRemoteInstanceStore&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
+    <MESSAGE value="Status: uncontrolled delay&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
+    <option name="LAST_COMMIT_MESSAGE" value="Status: uncontrolled delay&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/agent/recovery/LeaderElectionResultUpdater.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="9" column="40" selection-start-line="9" selection-start-column="40" selection-end-line="9" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/agent/recovery/LeaderElectionPerformer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="16" column="90" selection-start-line="16" selection-start-column="90" selection-end-line="16" selection-end-column="90" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/utils/AdaPaxosParameters.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="84">
-          <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/utils/AdaAgents.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="112">
-          <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="uml://JAVA/">
-      <provider selected="true" editor-type-id="UmlEditorProvider">
-        <state>
-          <ID>JAVA</ID>
-          <OriginalElement />
-          <nodes>
-            <node x="" y="">rsm.BasicPaxosRSM</node>
-            <node x="" y="">agent.proposer.DiskProposer</node>
-            <node x="" y="">network.message.protocols.LeaderElectionMessage.LeStart</node>
-            <node x="" y="">client.ClientRequest</node>
-            <node x="" y="">instance.store.OffsetIndexStore</node>
-            <node x="" y="">rsm.DiskPaxosRSM</node>
-            <node x="" y="">agent.recovery.LeaderElectionResultUpdater</node>
-            <node x="" y="">network.message.protocols.DiskPaxosMessage.Read</node>
-            <node x="" y="">rsm.GenericPaxosSMR</node>
-            <node x="" y="">network.service.receiver.PeerMessageReceiver</node>
-            <node x="" y="">instance.maintenance.DiskLeaderMaintenance</node>
-            <node x="" y="">rsm.AdaPaxosRSM</node>
-            <node x="" y="">agent.recovery.CrashRecoveryPerformer</node>
-            <node x="" y="">agent.learner.DiskCommitResponder</node>
-            <node x="" y="">instance.StaticPaxosInstance</node>
-            <node x="" y="">network.message.protocols.AdaPaxosMessage</node>
-            <node x="" y="">network.message.protocols.GenericConnectionMessage</node>
-            <node x="" y="">network.message.protocols.GenericConnectionMessage.Beacon</node>
-            <node x="" y="">network.message.protocols.DiskPaxosMessage.ackWrite</node>
-            <node x="" y="">network.message.protocols.DiskPaxosMessage</node>
-            <node x="" y="">network.service.sender.BufferedDiskAcceptorSender</node>
-            <node x="" y="">agent.proposer.AdaProposer</node>
-            <node x="" y="">instance.maintenance.LeaderElectionMaintenance</node>
-            <node x="" y="">agent.acceptor.IntegratedDiskAcceptor</node>
-            <node x="" y="">agent.recovery.VacantInstanceUpdater</node>
-            <node x="" y="">network.service.module.UnidirectionalHeartBeatModule</node>
-            <node x="" y="">agent.recovery.LeaderElectionPerformer.LeaderElectionState</node>
-            <node x="" y="">network.service.module.ConnectionModule</node>
-            <node x="" y="">instance.store.TaggedOffsetIndexStore</node>
-            <node x="" y="">network.service.sender.SimulatorSender</node>
-            <node x="" y="">instance.store.index.OffsetIndexReader</node>
-            <node x="" y="">agent.proposer.GenericProposer</node>
-            <node x="" y="">agent.learner.GenericLearner</node>
-            <node x="" y="">instance.maintenance.HistoryMaintenance.RESTORE_TYPE</node>
-            <node x="" y="">network.message.protocols.GenericPaxosMessage.ackMessageType</node>
-            <node x="" y="">network.message.protocols.GenericClientMessage</node>
-            <node x="" y="">instance.store.index.OffsetIndexWriter</node>
-            <node x="" y="">network.service.SimulatedNetService</node>
-            <node x="" y="">instance.PaxosInstance</node>
-            <node x="" y="">network.message.protocols.GenericPaxosMessage.Commit</node>
-            <node x="" y="">instance.AdaPaxosInstance</node>
-            <node x="" y="">network.message.protocols.GenericPaxosMessage.Prepare</node>
-            <node x="" y="">client.FileIteratorClient</node>
-            <node x="" y="">network.message.protocols.GenericPaxosMessage</node>
-            <node x="" y="">network.message.protocols.LeaderElectionMessage.LESync</node>
-            <node x="" y="">network.service.module.simulator.CrushedSimulator</node>
-            <node x="" y="">network.message.protocols.GenericPaxosMessage.Restore</node>
-            <node x="" y="">network.message.protocols.GenericConnectionMessage.ackBeacon</node>
-            <node x="" y="">network.message.protocols.LeaderElectionMessage.Vote</node>
-            <node x="" y="">instance.store.InstanceStore</node>
-            <node x="" y="">network.service.GenericNetService</node>
-            <node x="" y="">agent.recovery.LeaderElectionPerformer</node>
-            <node x="" y="">network.message.protocols.GenericPaxosMessage.ackPrepare</node>
-            <node x="" y="">network.message.protocols.GenericClientMessage.Updated</node>
-            <node x="" y="">utils.AdaPaxosParameters</node>
-            <node x="" y="">agent.proposer.DiskResponder</node>
-            <node x="" y="">instance.store.RemoteInstanceStore</node>
-            <node x="" y="">agent.acceptor.DiskAcceptor</node>
-            <node x="" y="">network.message.protocols.LeaderElectionMessage.Propaganda</node>
-            <node x="" y="">utils.AdaPaxosParameters.RSM</node>
-            <node x="" y="">agent.recovery.LeaderElectionRecovery</node>
-            <node x="" y="">agent.learner.Learner</node>
-            <node x="" y="">agent.acceptor.GenericAcceptor</node>
-            <node x="" y="">agent.learner.AdaLearner</node>
-            <node x="" y="">network.message.protocols.DiskPaxosMessage.DiskStatus</node>
-            <node x="" y="">utils.AdaAgents</node>
-            <node x="" y="">instance.InstanceStatus</node>
-            <node x="" y="">logger.NaiveLogger</node>
-            <node x="" y="">instance.store.index.OffsetIndexTable</node>
-            <node x="" y="">network.service.module.BidirectionalHeartBeatModule.NodeMonitor</node>
-            <node x="" y="">network.service.module.BidirectionalHeartBeatModule</node>
-            <node x="" y="">network.service.module.simulator.DelayedSimulator</node>
-            <node x="" y="">network.message.protocols.GenericPaxosMessage.ackAccept</node>
-            <node x="" y="">instance.maintenance.LeaderMaintenance</node>
-            <node x="" y="">agent.learner.DiskLearner</node>
-            <node x="" y="">network.service.sender.ParallelPeerMessageSender</node>
-            <node x="" y="">network.service.receiver.BasicPeerMessageReceiver</node>
-            <node x="" y="">network.message.protocols.GenericClientMessage.ackPropose</node>
-            <node x="" y="">network.message.protocols.GenericPaxosMessage.ackSync</node>
-            <node x="" y="">network.message.protocols.DiskPaxosMessage.Write</node>
-            <node x="" y="">agent.learner.CommitUpdater</node>
-            <node x="" y="">network.service.sender.BasicPeerMessageSender</node>
-            <node x="" y="">network.message.protocols.LeaderElectionMessage</node>
-            <node x="" y="">network.message.protocols.Distinguishable</node>
-            <node x="" y="">network.message.protocols.GenericPaxosMessage.Sync</node>
-            <node x="" y="">logger.DummyLogger</node>
-            <node x="" y="">network.message.protocols.DiskPaxosMessage.ackRead</node>
-            <node x="" y="">utils.NetworkConfiguration</node>
-            <node x="" y="">demo</node>
-            <node x="" y="">instance.maintenance.AdaRecoveryMaintenance</node>
-            <node x="" y="">network.service.module.simulator.SimulatorModule</node>
-            <node x="" y="">network.message.protocols.TaggedMessage</node>
-            <node x="" y="">network.service.sender.PeerMessageSender</node>
-            <node x="" y="">instance.maintenance.HistoryMaintenance</node>
-            <node x="" y="">agent.recovery.AdaRecovery</node>
-            <node x="" y="">instance.maintenance.AdaLeaderMaintenance</node>
-            <node x="" y="">logger.PaxosLogger</node>
-            <node x="" y="">network.message.protocols.DiskPaxosMessage.PackedMessage</node>
-            <node x="" y="">agent.acceptor.Acceptor</node>
-            <node x="" y="">instance.store.PseudoRemoteInstanceStore</node>
-            <node x="" y="">rsm.PseudoAdaPaxosRSM</node>
-            <node x="" y="">network.message.protocols.GenericPaxosMessage.Accept</node>
-            <node x="" y="">agent.recovery.DiskCommitVacantResponder</node>
-            <node x="" y="">instance.store.DummyStore</node>
-            <node x="" y="">network.service.receiver.SimulatorReceiver</node>
-            <node x="" y="">agent.proposer.Proposer</node>
-            <node x="" y="">agent.acceptor.AdaAcceptor</node>
-            <node x="" y="">network.message.protocols.GenericClientMessage.Propose</node>
-          </nodes>
-          <notes />
-          <edges />
-          <settings layout="Hierarchic Group" zoom="0.9503649635036496" x="334.0" y="323.0" />
-          <SelectedNodes />
-          <Categories>
-            <Category>Fields</Category>
-            <Category>Constructors</Category>
-            <Category>Methods</Category>
-            <Category>Properties</Category>
-            <Category>Inner Classes</Category>
-          </Categories>
-          <SCOPE>All</SCOPE>
-          <VISIBILITY>private</VISIBILITY>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Top-Level Package.png">
-      <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/store/RemoteInstanceStore.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="140">
-          <caret line="15" column="7" selection-start-line="15" selection-start-column="7" selection-end-line="15" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/module/BidirectionalHeartBeatModule.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="485">
-          <caret line="150" column="26" selection-start-line="150" selection-start-column="26" selection-end-line="150" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/sender/BufferedDiskAcceptorSender.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-98">
-          <caret line="15" column="13" selection-start-line="15" selection-start-column="13" selection-end-line="15" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/sender/ParallelPeerMessageSender.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="350">
-          <caret line="30" column="35" lean-forward="true" selection-start-line="30" selection-start-column="35" selection-end-line="30" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/instance/maintenance/AdaRecoveryMaintenance.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="504">
-          <caret line="36" column="38" selection-start-line="36" selection-start-column="38" selection-end-line="36" selection-end-column="38" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-0.log">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -1187,9 +954,6 @@
           <caret line="134" column="51" selection-start-line="134" selection-start-column="51" selection-end-line="134" selection-end-column="51" />
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-3.diagnosis">
-      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-4.diagnosis">
       <provider selected="true" editor-type-id="text-editor" />
@@ -1277,13 +1041,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-2.diagnosis">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="14">
-          <caret line="1" selection-start-line="1" selection-end-line="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-0.commit.log">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -1295,16 +1052,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="625">
           <caret line="49" column="5" selection-start-line="49" selection-start-column="5" selection-end-line="49" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/agent/recovery/LeaderElectionRecovery.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="499">
-          <caret line="122" selection-start-line="122" selection-end-line="122" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1333,23 +1080,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-2.heartbeat">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="25382">
-          <caret line="1813" column="21" selection-start-line="1813" selection-start-column="21" selection-end-line="1813" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-0.diagnosis">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-0.heartbeat">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4914">
-          <caret line="427" column="22" selection-start-line="427" selection-start-column="10" selection-end-line="427" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/network/service/sender/DelayedPeerMessageSender.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="443">
@@ -1370,53 +1100,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/demo.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="896">
-          <caret line="352" column="86" selection-start-line="352" selection-start-column="86" selection-end-line="352" selection-end-column="86" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-1.heartbeat">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-885">
-          <caret line="391" selection-start-line="391" selection-end-line="391" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-1.diagnosis">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/DelayedNetService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="308">
-          <caret line="22" column="5" lean-forward="true" selection-start-line="22" selection-start-column="5" selection-end-line="22" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/utils/NetworkConfiguration.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="294">
-          <caret line="21" column="31" selection-start-line="21" selection-start-column="31" selection-end-line="21" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/GenericNetService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-84">
-          <caret line="106" column="8" selection-start-line="106" selection-start-column="8" selection-end-line="143" selection-end-column="27" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="371">
@@ -1427,10 +1110,167 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-2.heartbeat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-280">
+          <caret line="745" column="21" selection-start-line="745" selection-start-column="21" selection-end-line="745" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-4.heartbeat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-462" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-1.heartbeat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2128">
+          <caret line="391" selection-start-line="391" selection-end-line="391" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/utils/NetworkConfiguration.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="294">
+          <caret line="21" column="31" selection-start-line="21" selection-start-column="31" selection-end-line="21" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/network/service/receiver/BasicPeerMessageReceiver.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="448">
-          <caret line="69" column="25" lean-forward="true" selection-start-line="69" selection-start-column="25" selection-end-line="69" selection-end-column="25" />
+          <caret line="69" column="25" selection-start-line="69" selection-start-column="25" selection-end-line="69" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/agent/recovery/LeaderElectionRecovery.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="499">
+          <caret line="140" selection-start-line="140" selection-end-line="140" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-3.heartbeat">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-0.diagnosis">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-2.diagnosis">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-3.diagnosis">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-1.diagnosis">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-0.heartbeat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-8736">
+          <caret line="228" selection-start-line="228" selection-end-line="228" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/sender/BipolarSenderDecider.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="140">
+          <caret line="10" column="1" lean-forward="true" selection-start-line="10" selection-start-column="1" selection-end-line="10" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/sender/BipolarPeerMessageSender.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="350">
+          <caret line="25" column="5" lean-forward="true" selection-start-line="25" selection-start-column="5" selection-end-line="25" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_144/src.zip!/java/lang/Integer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="140">
+          <caret line="579" column="48" selection-start-line="579" selection-start-column="48" selection-end-line="579" selection-end-column="48" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_144/src.zip!/java/lang/NumberFormatException.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="319">
+          <caret line="64" column="15" selection-start-line="64" selection-start-column="15" selection-end-line="64" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/client/FileIteratorClient.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="12" column="13" selection-start-line="12" selection-start-column="13" selection-end-line="12" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/control.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="16" selection-start-column="16" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/SimulatedNetService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="17" column="11" selection-start-line="17" selection-start-column="11" selection-end-line="17" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="415">
+          <caret line="45" column="84" lean-forward="true" selection-start-line="45" selection-start-column="84" selection-end-line="45" selection-end-column="84" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/DelayedNetService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="201">
+          <caret line="16" column="22" lean-forward="true" selection-start-line="16" selection-start-column="22" selection-end-line="16" selection-end-column="22" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/BipolarNetService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="364">
+          <caret line="26" column="1" lean-forward="true" selection-start-line="26" selection-start-column="1" selection-end-line="26" selection-end-column="1" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/GenericNetService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="379">
+          <caret line="252" column="9" lean-forward="true" selection-start-line="252" selection-start-column="9" selection-end-line="252" selection-end-column="9" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/demo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="415">
+          <caret line="398" column="8" lean-forward="true" selection-start-line="398" selection-start-column="8" selection-end-line="398" selection-end-column="8" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

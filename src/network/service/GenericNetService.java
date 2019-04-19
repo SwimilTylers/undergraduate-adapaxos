@@ -41,7 +41,7 @@ public class GenericNetService {
     protected PeerMessageReceiver receiver;
 
     public static final int DEFAULT_BEACON_INTERVAL = 10;
-    private int beaconItv = DEFAULT_BEACON_INTERVAL;
+    protected int beaconItv = DEFAULT_BEACON_INTERVAL;
 
     protected ConnectionModule cModule;
 
@@ -119,6 +119,7 @@ public class GenericNetService {
         service.execute(() -> connectToPeers(latch));
         service.execute(() -> waitingForPeers(latch));
 
+        service.shutdown();
 
         latch.await();
 
@@ -129,6 +130,18 @@ public class GenericNetService {
         if (listenService == null)
             listenService = Executors.newCachedThreadPool();
 
+        openPeerListener();
+
+        startBeacon();
+    }
+
+    protected void startBeacon(){
+        Thread beaconThread = new Thread(this::beacon);
+        beaconThread.setPriority(Thread.MAX_PRIORITY);
+        beaconThread.start();
+    }
+
+    protected void openPeerListener(){
         for (int i = 0; i < peerSize; i++) {
             if (i != netServiceId){
                 int id = i;
@@ -136,12 +149,6 @@ public class GenericNetService {
                 listenService.execute(() -> receiver.listenToPeers(socket, id));
             }
         }
-
-        Thread beaconThread = new Thread(this::beacon);
-        beaconThread.setPriority(Thread.MAX_PRIORITY);
-        beaconThread.start();
-
-        service.shutdown();
     }
 
     protected void setPeerMessageProcessor(){
@@ -232,7 +239,7 @@ public class GenericNetService {
         channels.add(new Pair<>(signal, chan));
     }
 
-    private void beacon(){
+    protected void beacon(){
         while (onRunning){
             logger.record(false, "hb", cModule.toString());
             GenericConnectionMessage.Beacon beacon = cModule.makeBeacon(System.currentTimeMillis());
