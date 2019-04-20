@@ -2,23 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/network/service/module/controller/BipolarStateDecider.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/network/service/module/controller/BipolarStateReminder.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/network/service/receiver/BipolarPeerMessageReceiver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/control.txt" beforeDir="false" afterPath="$PROJECT_DIR$/control.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/demo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/demo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/instance/store/PseudoRemoteInstanceStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/instance/store/PseudoRemoteInstanceStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/BipolarNetService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/BipolarNetService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/service/receiver/BasicPeerMessageReceiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/receiver/BasicPeerMessageReceiver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/service/receiver/DelayedPeerMessageReceiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/receiver/DelayedPeerMessageReceiver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/service/receiver/DummyPeerMessageReceiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/receiver/DummyPeerMessageReceiver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/service/receiver/PeerMessageProcessor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/receiver/PeerMessageProcessor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/service/receiver/SimulatorReceiver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/receiver/SimulatorReceiver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/service/sender/BipolarPeerMessageSender.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/sender/BipolarPeerMessageSender.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/NetworkConfiguration.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/NetworkConfiguration.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -40,51 +26,38 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/logs/server-0.diagnosis">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="210">
+              <caret line="15" column="14" selection-start-line="15" selection-start-column="1" selection-end-line="15" selection-end-column="14" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/logs/server-1.diagnosis">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="28">
+              <caret line="2" column="28" lean-forward="true" selection-start-line="2" selection-start-column="28" selection-end-line="2" selection-end-column="28" />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/demo.java">
+        <entry file="file://$PROJECT_DIR$/logs/server-2.diagnosis">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="509">
-              <caret line="348" column="103" lean-forward="true" selection-start-line="348" selection-start-column="103" selection-end-line="348" selection-end-column="103" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="-233">
+              <caret line="1" column="14" selection-start-line="1" selection-start-column="1" selection-end-line="1" selection-end-column="14" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
+        <entry file="file://$PROJECT_DIR$/logs/server-4.diagnosis">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="485">
-              <caret line="256" lean-forward="true" selection-start-line="256" selection-end-line="256" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="177">
-              <caret line="29" column="27" lean-forward="true" selection-start-line="29" selection-start-column="27" selection-end-line="29" selection-end-column="27" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#2625#2626#0" expanded="true" />
-                <element signature="e#2686#2687#0" expanded="true" />
-                <element signature="e#2076#2077#0" expanded="true" />
-                <element signature="e#2114#2115#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/control.txt">
-          <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="13" selection-start-column="13" selection-end-column="13" />
+            <state relative-caret-position="196">
+              <caret line="14" column="14" selection-start-line="14" selection-start-column="1" selection-end-line="14" selection-end-column="14" />
             </state>
           </provider>
         </entry>
@@ -102,10 +75,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>rere</find>
-      <find>eyey</find>
-      <find>##########@@@@@@!!!!!!!!</find>
-      <find>pathSeparator</find>
       <find>wait</find>
       <find>poll</find>
       <find>StaticPaxosInstance</find>
@@ -132,6 +101,10 @@
       <find>rec</find>
       <find>diagnosis</find>
       <find>diag</find>
+      <find>155574228</find>
+      <find>1555742284057</find>
+      <find>15557422840</find>
+      <find>155574277721</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -198,13 +171,13 @@
         <option value="$PROJECT_DIR$/src/network/service/BipolarNetService.java" />
         <option value="$PROJECT_DIR$/src/network/service/receiver/SimulatorReceiver.java" />
         <option value="$PROJECT_DIR$/src/instance/store/PseudoRemoteInstanceStore.java" />
-        <option value="$PROJECT_DIR$/control.txt" />
         <option value="$PROJECT_DIR$/src/network/service/module/controller/BipolarStateDecider.java" />
         <option value="$PROJECT_DIR$/src/network/service/module/controller/ControllableMachine.java" />
         <option value="$PROJECT_DIR$/src/network/service/module/controller/BipolarStateReminder.java" />
         <option value="$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java" />
-        <option value="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" />
         <option value="$PROJECT_DIR$/src/demo.java" />
+        <option value="$PROJECT_DIR$/control.txt" />
+        <option value="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" />
       </list>
     </option>
   </component>
@@ -297,6 +270,15 @@
               <item name="network" type="462c0819:PsiDirectoryNode" />
               <item name="service" type="462c0819:PsiDirectoryNode" />
               <item name="module" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="network" type="462c0819:PsiDirectoryNode" />
+              <item name="service" type="462c0819:PsiDirectoryNode" />
+              <item name="module" type="462c0819:PsiDirectoryNode" />
+              <item name="connection" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
@@ -501,14 +483,7 @@
       <workItem from="1555640567200" duration="6296000" />
       <workItem from="1555646901367" duration="17837000" />
       <workItem from="1555730726614" duration="764000" />
-      <workItem from="1555731677043" duration="6304000" />
-    </task>
-    <task id="LOCAL-00016" summary="Status: fix up some sequence map&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.rsm&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation">
-      <created>1548947502272</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1548947502272</updated>
+      <workItem from="1555731677043" duration="14015000" />
     </task>
     <task id="LOCAL-00017" summary="Status: single machine&#10;&#10;Working on:&#10;&#10;* Echo.scmodel&#10;* Echo.rsm&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation">
       <created>1549100243062</created>
@@ -846,11 +821,18 @@
       <option name="project" value="LOCAL" />
       <updated>1555687005172</updated>
     </task>
-    <option name="localTasksCounter" value="65" />
+    <task id="LOCAL-00065" summary="Status: BipolarStateDecider &amp; BipolarStateReminder&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR">
+      <created>1555738258458</created>
+      <option name="number" value="00065" />
+      <option name="presentableId" value="LOCAL-00065" />
+      <option name="project" value="LOCAL" />
+      <updated>1555738258459</updated>
+    </task>
+    <option name="localTasksCounter" value="66" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="748432000" />
+    <option name="totallyTimeSpent" value="756143000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -863,7 +845,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49858356" visible="true" weight="0.3424933" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -945,7 +926,6 @@
     <ignored-roots>
       <path value="E:" />
     </ignored-roots>
-    <MESSAGE value="Status: back to init&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: monitor init&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: runtime mode switch is Ok. We find that 'updateConsecutiveCommit' causes deadlock in an uncertain way. &#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: solve 'updateConsecutiveCommit' &#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
@@ -970,19 +950,10 @@
     <MESSAGE value="Status: solve overwhelming thread executed by PseudoRemoteInstanceStore&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: uncontrolled delay&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: BipolarSenderDecider&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
-    <option name="LAST_COMMIT_MESSAGE" value="Status: BipolarSenderDecider&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
+    <MESSAGE value="Status: BipolarStateDecider &amp; BipolarStateReminder&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
+    <option name="LAST_COMMIT_MESSAGE" value="Status: BipolarStateDecider &amp; BipolarStateReminder&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/logs/server-2.commit.log">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/sender/DummyPeerMessageSender.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="84">
-          <caret line="6" column="8" selection-start-line="6" selection-start-column="8" selection-end-line="6" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/network/service/receiver/PeerMessageReceiver.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="112">
@@ -1044,26 +1015,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/module/UnidirectionalHeartBeatModule.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="961">
-          <caret line="84" column="57" selection-start-line="84" selection-start-column="57" selection-end-line="84" selection-end-column="57" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#2048#2049#0" expanded="true" />
-            <element signature="e#2072#2073#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/network/service/sender/DelayedPeerMessageSender.java" />
-    <entry file="file://$PROJECT_DIR$/logs/server-2.heartbeat">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-280">
-          <caret line="745" column="21" selection-start-line="745" selection-start-column="21" selection-end-line="745" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-4.heartbeat">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-462" />
@@ -1124,13 +1076,6 @@
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-0.heartbeat">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="14">
-          <caret line="228" selection-start-line="228" selection-end-line="228" />
         </state>
       </provider>
     </entry>
@@ -1248,17 +1193,6 @@
         <state relative-caret-position="-2856" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-1.diagnosis">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-5796" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-2.diagnosis">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-3.diagnosis">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/network/service/module/controller/BipolarStateDecider.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="112">
@@ -1273,19 +1207,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-4.diagnosis">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-0.diagnosis">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/control.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="13" selection-start-column="13" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/network/service/module/controller/BipolarStateReminder.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="56">
@@ -1293,10 +1214,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/module/connection/UnidirectionalHeartBeatModule.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="154">
+          <caret line="11" column="13" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/module/connection/ConnectionModule.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="8" column="17" selection-start-line="8" selection-start-column="17" selection-end-line="8" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/module/connection/BidirectionalHeartBeatModule.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="14" column="13" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="177">
-          <caret line="29" column="27" lean-forward="true" selection-start-line="29" selection-start-column="27" selection-end-line="29" selection-end-column="27" />
+          <caret line="29" column="27" selection-start-line="29" selection-start-column="27" selection-end-line="29" selection-end-column="27" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="e#2625#2626#0" expanded="true" />
@@ -1307,23 +1252,79 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
+    <entry file="file://$PROJECT_DIR$/src/demo.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="485">
-          <caret line="256" lean-forward="true" selection-start-line="256" selection-end-line="256" />
+        <state relative-caret-position="4816">
+          <caret line="348" column="103" selection-start-line="348" selection-start-column="103" selection-end-line="348" selection-end-column="103" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/demo.java">
+    <entry file="file://$PROJECT_DIR$/logs/server-0.heartbeat">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="509">
-          <caret line="348" column="103" lean-forward="true" selection-start-line="348" selection-start-column="103" selection-end-line="348" selection-end-column="103" />
+        <state relative-caret-position="1764">
+          <caret line="228" selection-start-line="228" selection-end-line="228" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/control.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret selection-end-line="8" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="311">
+          <caret line="246" column="10" selection-start-line="246" selection-start-column="10" selection-end-line="246" selection-end-column="10" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-0.diagnosis">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="15" column="14" selection-start-line="15" selection-start-column="1" selection-end-line="15" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-1.diagnosis">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="28">
+          <caret line="2" column="28" lean-forward="true" selection-start-line="2" selection-start-column="28" selection-end-line="2" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-3.diagnosis">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="14" column="14" selection-start-line="14" selection-start-column="1" selection-end-line="14" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-4.diagnosis">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="14" column="14" selection-start-line="14" selection-start-column="1" selection-end-line="14" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-2.heartbeat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-29">
+          <caret line="331" column="22" selection-start-line="331" selection-start-column="10" selection-end-line="331" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-2.diagnosis">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-233">
+          <caret line="1" column="14" selection-start-line="1" selection-start-column="1" selection-end-line="1" selection-end-column="14" />
         </state>
       </provider>
     </entry>

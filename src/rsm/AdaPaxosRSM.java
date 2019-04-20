@@ -42,7 +42,6 @@ public class AdaPaxosRSM implements Serializable {
     protected int serverId;
     protected NetworkConfiguration nConfig;
     transient protected AtomicBoolean asLeader;
-    transient volatile int crtLeader;
 
     /* net and connect */
     protected int peerSize;
@@ -86,6 +85,7 @@ public class AdaPaxosRSM implements Serializable {
     /* misc */
     transient protected PaxosLogger logger;
     transient protected AtomicBoolean routineOnRunning;
+    transient protected Runnable[] supplementRoutines;
 
 
     protected AdaPaxosRSM(final int serverId,
@@ -94,10 +94,6 @@ public class AdaPaxosRSM implements Serializable {
 
         this.serverId = serverId;
         this.asLeader = new AtomicBoolean(initAsLeader);
-        if (initAsLeader)
-            crtLeader = serverId;
-        else
-            crtLeader = -1;
         this.logger = logger;
 
         this.restoredQueue = new ConcurrentLinkedQueue<>();
@@ -121,7 +117,7 @@ public class AdaPaxosRSM implements Serializable {
 
         instanceSpace = new AtomicReferenceArray<>(sizeInstanceSpace);
         crtInstBallot = new AtomicInteger(initInstBallot);
-        maxReceivedInstance = new AtomicInteger(0);
+        maxReceivedInstance = new AtomicInteger(initFsyncInstance);
         //maxSendInstance = new AtomicInteger(0);
 
         consecutiveCommit = new AtomicInteger(0);
@@ -236,7 +232,9 @@ public class AdaPaxosRSM implements Serializable {
         routines.execute(this::routine_response);
         //routines.execute(() -> routine_backup(5000));
         routines.execute(() -> routine_leadership(5000));
+
         if (supplement != null && supplement.length != 0) {
+            supplementRoutines = supplement;
             for (Runnable r : supplement)
                 routines.execute(r);
         }
@@ -245,7 +243,9 @@ public class AdaPaxosRSM implements Serializable {
 
     public void routine(BipolarStateReminder reminder, BipolarStateDecider decider, Runnable... supplement){
         routine(supplement);
-        new Thread(() -> thread_bipolar(reminder, decider)).start();
+        Thread t = new Thread(() -> thread_bipolar(reminder, decider));
+        //t.setPriority(Thread.MAX_PRIORITY);
+        t.start();
     }
 
     /* protected-access routine func, including:
@@ -330,6 +330,9 @@ public class AdaPaxosRSM implements Serializable {
                             //fileSynchronize();
 
                             Thread.sleep(decisionDelay);
+                            if (!routineOnRunning.get())
+                                break;
+
                             if (recovery.isLeaderSurvive(expire)){  // leader crash confirmed, running into FAST_MODE
                                 if (!forceFsync.getAndSet(false)){   // FAST_MODE before leader crashed
                                     metaFsync.set(true);
@@ -364,6 +367,9 @@ public class AdaPaxosRSM implements Serializable {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
+
+                        if (!routineOnRunning.get())
+                            break;
 
                         crushed = conn.filter(expire);
                         if (crushed != null && crushed.length >= bare_minority) {
@@ -550,17 +556,6 @@ public class AdaPaxosRSM implements Serializable {
         }
     }
 
-    protected void thread_bipolar(final BipolarStateReminder reminder, final BipolarStateDecider decider){
-        int lastState = decider.decide();
-        while (reminder.remind() >= 0){
-            int crtState = decider.decide();
-            if (lastState != crtState){
-                logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[state change]["+lastState+"->"+crtState+"]\n");
-                lastState = crtState;
-            }
-        }
-    }
-
     /* protected-access sync & recovery func */
 
     protected void fileSynchronize(){
@@ -667,6 +662,27 @@ public class AdaPaxosRSM implements Serializable {
                 lMessages.put(startSignal);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    protected void thread_bipolar(final BipolarStateReminder reminder, final BipolarStateDecider decider){
+        int lastState = decider.decide();
+        while (reminder.remind() >= 0){
+            int crtState = decider.decide();
+            if (lastState != crtState){
+                lastState = crtState;
+                if (crtState == 0){
+                    logger.record(false, "diag", "[" + System.currentTimeMillis() + "][state change][1->0]\n");
+                    routineOnRunning.set(false);
+                    asLeader.set(false);
+                }
+                else {
+                    logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[state change][0->1][tkt="+fsyncInitInstance.get()+",init_lid="+nConfig.initLeaderId+"]\n");
+                    instanceSpaceBuild(instanceSpace.length(), crtInstBallot.get(), fsyncInitInstance.get());
+                    agent();
+                    routine(supplementRoutines);
+                }
             }
         }
     }
