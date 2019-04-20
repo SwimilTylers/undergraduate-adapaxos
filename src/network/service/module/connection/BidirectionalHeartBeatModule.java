@@ -1,11 +1,9 @@
-package network.service.module;
+package network.service.module.connection;
 
 import com.sun.istack.internal.NotNull;
 import network.message.protocols.GenericConnectionMessage;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReferenceArray;

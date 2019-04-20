@@ -35,7 +35,7 @@ public class DelayedPeerMessageReceiver implements PeerMessageReceiver {
                 try {
                     Object msg = (new ObjectInputStream(chan.getInputStream())).readObject();
                     processor.messageProcess(msg, id);
-                } catch (IOException | ClassNotFoundException | InterruptedException e) {
+                } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
             }

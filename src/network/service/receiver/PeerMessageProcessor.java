@@ -7,5 +7,5 @@ package network.service.receiver;
 
 @FunctionalInterface
 public interface PeerMessageProcessor {
-    void messageProcess(Object msg, int fromId) throws InterruptedException;
+    void messageProcess(Object msg, int fromId);
 }

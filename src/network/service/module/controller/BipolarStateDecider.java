@@ -1,4 +1,4 @@
-package network.service.sender;
+package network.service.module.controller;
 
 /**
  * @author : Swimiltylers
@@ -6,6 +6,6 @@ package network.service.sender;
  */
 
 @FunctionalInterface
-public interface BipolarSenderDecider {
+public interface BipolarStateDecider {
     int decide();
 }

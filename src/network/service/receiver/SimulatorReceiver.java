@@ -34,12 +34,8 @@ public class SimulatorReceiver implements PeerMessageReceiver{
                 System.out.println("ERROR [server "+netServiceId+"]: " + e.getMessage());
                 continue;
             }
-            try {
-                if (!simulator.crush())
-                    processor.messageProcess(msg, id);
-            } catch (InterruptedException e) {
-                break;
-            }
+            if (!simulator.crush())
+                processor.messageProcess(msg, id);
         }
     }
 }

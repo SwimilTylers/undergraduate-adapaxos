@@ -8,7 +8,7 @@ import instance.store.RemoteInstanceStore;
 import logger.PaxosLogger;
 import network.message.protocols.DiskPaxosMessage;
 import network.message.protocols.GenericPaxosMessage;
-import network.service.module.ConnectionModule;
+import network.service.module.connection.ConnectionModule;
 import network.service.sender.PeerMessageSender;
 
 import java.util.concurrent.atomic.*;

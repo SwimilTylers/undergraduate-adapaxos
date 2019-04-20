@@ -7,7 +7,7 @@ import network.message.protocols.Distinguishable;
 import network.message.protocols.GenericConnectionMessage;
 import network.message.protocols.GenericPaxosMessage;
 import network.message.protocols.TaggedMessage;
-import network.service.module.ConnectionModule;
+import network.service.module.connection.ConnectionModule;
 import network.service.sender.PeerMessageSender;
 
 import java.io.IOException;
@@ -79,7 +79,7 @@ public class BasicPeerMessageReceiver implements PeerMessageReceiver, PeerMessag
 
     @SuppressWarnings("unchecked")
     @Override
-    public void messageProcess(final Object wrapped, int fromId) throws InterruptedException {
+    public void messageProcess(final Object wrapped, int fromId) {
         long tag = ((TaggedMessage) wrapped).tag;
         final Object msg = ((TaggedMessage) wrapped).load;
 

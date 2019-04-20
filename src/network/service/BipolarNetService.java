@@ -1,9 +1,10 @@
-package network;
+package network.service;
 
-import network.service.GenericNetService;
 import network.service.module.controller.GlobalBipolarController;
+import network.service.receiver.BipolarPeerMessageReceiver;
+import network.service.receiver.DummyPeerMessageReceiver;
+import network.service.receiver.PeerMessageProcessor;
 import network.service.sender.BipolarPeerMessageSender;
-import network.service.sender.BipolarSenderDecider;
 import network.service.sender.DummyPeerMessageSender;
 import network.service.sender.PeerMessageSender;
 
@@ -23,5 +24,6 @@ public class BipolarNetService extends GenericNetService {
     protected void setPeerMessageProcessor() {
         super.setPeerMessageProcessor();
         sender = new BipolarPeerMessageSender(new PeerMessageSender[]{new DummyPeerMessageSender(), sender}, controller.getDecider(netServiceId));
+        receiver = new BipolarPeerMessageReceiver(new PeerMessageProcessor[]{new DummyPeerMessageReceiver(), (PeerMessageProcessor) receiver}, controller.getDecider(netServiceId));
     }
 }

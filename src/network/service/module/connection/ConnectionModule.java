@@ -1,4 +1,4 @@
-package network.service.module;
+package network.service.module.connection;
 
 import network.message.protocols.GenericConnectionMessage;
 

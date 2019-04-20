@@ -4,7 +4,7 @@ import com.sun.istack.internal.NotNull;
 import logger.PaxosLogger;
 import network.message.protocols.GenericConnectionMessage;
 import network.message.protocols.TaggedMessage;
-import network.service.module.ConnectionModule;
+import network.service.module.connection.ConnectionModule;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;

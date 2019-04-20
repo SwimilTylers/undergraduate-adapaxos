@@ -3,7 +3,7 @@ package agent.recovery;
 import javafx.util.Pair;
 import logger.PaxosLogger;
 import network.message.protocols.LeaderElectionMessage;
-import network.service.module.ConnectionModule;
+import network.service.module.connection.ConnectionModule;
 import network.service.sender.PeerMessageSender;
 
 import java.util.Arrays;

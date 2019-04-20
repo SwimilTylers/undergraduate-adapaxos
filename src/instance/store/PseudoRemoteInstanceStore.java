@@ -47,6 +47,11 @@ public class PseudoRemoteInstanceStore implements RemoteInstanceStore{
         private static InstanceStoreRequest read(long token, int disk_no, int access_id, int inst_id){
             return new InstanceStoreRequest(false, token, disk_no, access_id, inst_id, null);
         }
+
+        @Override
+        public String toString() {
+            return "[" + (isWrite ? "STORE" : "FETCH") + "][dno="+disk_no+",aid="+access_id+",ino="+inst_id+"][tkn="+token+"][inst="+(isWrite ? instance.toString() : "")+"]";
+        }
     }
 
     public PseudoRemoteInstanceStore(int thisId, InstanceStore[] stores, int maxProcessingSize) {

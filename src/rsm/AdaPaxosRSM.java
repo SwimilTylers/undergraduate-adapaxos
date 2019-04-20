@@ -17,7 +17,9 @@ import logger.NaiveLogger;
 import logger.PaxosLogger;
 import network.message.protocols.*;
 import network.service.GenericNetService;
-import network.service.module.ConnectionModule;
+import network.service.module.connection.ConnectionModule;
+import network.service.module.controller.BipolarStateDecider;
+import network.service.module.controller.BipolarStateReminder;
 import utils.AdaAgents;
 import utils.AdaPaxosParameters;
 import utils.NetworkConfiguration;
@@ -33,7 +35,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
  * @author : Swimiltylers
  * @version : 2019/3/14 18:19
  */
-public class AdaPaxosRSM implements Serializable{
+public class AdaPaxosRSM implements Serializable {
     private static final long serialVersionUID = -1904538218951667113L;
 
     /* unique identity */
@@ -179,7 +181,7 @@ public class AdaPaxosRSM implements Serializable{
         AdaPaxosRSM rsm = new AdaPaxosRSM(id, false, new NaiveLogger(id));
         rsm.netConnectionBuild(net, net.getConnectionModule(), peerSize)
                 .instanceSpaceBuild(AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, epoch << 16, 0)
-                .instanceStorageBuild(remoteStore, false, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE)
+                .instanceStorageBuild(remoteStore, true, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE)
                 .messageChanBuild(AdaPaxosParameters.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosParameters.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosParameters.RSM.DEFAULT_MESSAGE_SIZE, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE);
         return rsm;
     }
@@ -231,7 +233,7 @@ public class AdaPaxosRSM implements Serializable{
         ExecutorService routines = Executors.newCachedThreadPool();
         //routines.execute(()-> routine_batch(2000, GenericPaxosSMR.DEFAULT_REQUEST_COMPACTING_SIZE));
         routines.execute(() -> routine_monitor(20, 40, 3, 10, 5000));
-        //routines.execute(this::routine_response);
+        routines.execute(this::routine_response);
         //routines.execute(() -> routine_backup(5000));
         routines.execute(() -> routine_leadership(5000));
         if (supplement != null && supplement.length != 0) {
@@ -239,6 +241,11 @@ public class AdaPaxosRSM implements Serializable{
                 routines.execute(r);
         }
         routines.shutdown();
+    }
+
+    public void routine(BipolarStateReminder reminder, BipolarStateDecider decider, Runnable... supplement){
+        routine(supplement);
+        new Thread(() -> thread_bipolar(reminder, decider)).start();
     }
 
     /* protected-access routine func, including:
@@ -539,6 +546,17 @@ public class AdaPaxosRSM implements Serializable{
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    protected void thread_bipolar(final BipolarStateReminder reminder, final BipolarStateDecider decider){
+        int lastState = decider.decide();
+        while (reminder.remind() >= 0){
+            int crtState = decider.decide();
+            if (lastState != crtState){
+                logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[state change]["+lastState+"->"+crtState+"]\n");
+                lastState = crtState;
             }
         }
     }

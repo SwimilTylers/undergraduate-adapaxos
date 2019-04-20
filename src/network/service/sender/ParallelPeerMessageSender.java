@@ -1,7 +1,7 @@
 package network.service.sender;
 
 import logger.PaxosLogger;
-import network.service.module.ConnectionModule;
+import network.service.module.connection.ConnectionModule;
 
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;

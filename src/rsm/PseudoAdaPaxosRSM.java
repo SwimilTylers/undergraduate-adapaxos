@@ -8,7 +8,7 @@ import logger.NaiveLogger;
 import logger.PaxosLogger;
 import network.message.protocols.AdaPaxosMessage;
 import network.service.GenericNetService;
-import network.service.module.ConnectionModule;
+import network.service.module.connection.ConnectionModule;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;

@@ -1,14 +1,16 @@
 package network.service.sender;
 
+import network.service.module.controller.BipolarStateDecider;
+
 /**
  * @author : Swimiltylers
  * @version : 2019/4/19 17:34
  */
 public class BipolarPeerMessageSender implements PeerMessageSender{
     private final PeerMessageSender[] bipolar;
-    private final BipolarSenderDecider decider;
+    private final BipolarStateDecider decider;
 
-    public BipolarPeerMessageSender(PeerMessageSender[] bipolar, BipolarSenderDecider decider) {
+    public BipolarPeerMessageSender(PeerMessageSender[] bipolar, BipolarStateDecider decider) {
         this.bipolar = bipolar;
         this.decider = decider;
     }
