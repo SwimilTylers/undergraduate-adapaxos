@@ -7,6 +7,8 @@ import network.service.module.connection.ConnectionModule;
 import network.service.sender.PeerMessageSender;
 
 import java.util.Arrays;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -23,6 +25,8 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
 
     private AtomicReference<Pair<Long, Integer>> leaderIdPair;
     private AtomicReference<LeaderElectionState> state;
+
+    private Queue<LeaderElectionMessage> residual;
 
     private int leTicket;
     private long leToken;
@@ -48,6 +52,8 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
         Arrays.fill(tickets, 0);
         leVotes = new int[peerSize];
         Arrays.fill(leVotes, 0);
+
+        residual = new ConcurrentLinkedQueue<>();
     }
 
     @Override
@@ -75,6 +81,27 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
     }
 
     @Override
+    public void handleResidualLEMessages(long restartExpire) {
+        LeaderElectionState s = state.get();
+        if (s != LeaderElectionState.RECOVERING) {
+            while (!residual.isEmpty()) {
+                LeaderElectionMessage msg = residual.poll();
+                if (msg instanceof LeaderElectionMessage.Propaganda)
+                    handleLEPropagandaInternal(s, (LeaderElectionMessage.Propaganda) msg);
+            }
+            if (s == LeaderElectionState.ON_RUNNING){
+                long crt = System.currentTimeMillis();
+                if (crt - leToken > restartExpire){
+                    leToken = crt;
+                    sender.broadcastPeerMessage(new LeaderElectionMessage.Propaganda(serverId, leToken, tickets));
+                    logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election][restart][ON_RUNNING, token="+leToken+"]\n");
+
+                }
+            }
+        }
+    }
+
+    @Override
     public void handleLEStart(LeaderElectionMessage.LeStart leStart) {
         if (state.compareAndSet(LeaderElectionState.RECOVERED, LeaderElectionState.ON_RUNNING) && serverId == leStart.fromId){    // check if LLE prepared
             leTicket = leStart.LeTicket_local;
@@ -92,17 +119,30 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
     public void handleLEPropaganda(LeaderElectionMessage.Propaganda propaganda) {
         LeaderElectionState s = state.get();
         if (s != LeaderElectionState.RECOVERING){
-            tickets[serverId] = s == LeaderElectionState.COMPLETE ? maxRecvInstance.get() : leTicket;
-            for (int i = 0; i < tickets.length; i++) {
-                tickets[i] = Integer.max(tickets[i], propaganda.tickets[i]);
+            handleLEPropagandaInternal(s, propaganda);
+            while (!residual.isEmpty()) {
+                LeaderElectionMessage msg = residual.poll();
+                if (msg instanceof LeaderElectionMessage.Propaganda)
+                    handleLEPropagandaInternal(s, (LeaderElectionMessage.Propaganda) msg);
             }
-            int[] votes = new int[peerSize];
-            Arrays.fill(votes, 0);
-            if (s == LeaderElectionState.COMPLETE)
-                votes[leaderIdPair.get().getValue()] = 1;
-            logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election]["+propaganda.toString()+"]\n");
-            sender.sendPeerMessage(propaganda.fromId, new LeaderElectionMessage.Vote(serverId, propaganda.token, tickets, votes));
         }
+        else {
+            logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election][residual]["+propaganda.toString()+"]\n");
+            residual.offer(propaganda);
+        }
+    }
+
+    private void handleLEPropagandaInternal(LeaderElectionState crtState, LeaderElectionMessage.Propaganda propaganda){
+        tickets[serverId] = crtState == LeaderElectionState.COMPLETE ? maxRecvInstance.get() : leTicket;
+        for (int i = 0; i < tickets.length; i++) {
+            tickets[i] = Integer.max(tickets[i], propaganda.tickets[i]);
+        }
+        int[] votes = new int[peerSize];
+        Arrays.fill(votes, 0);
+        if (crtState == LeaderElectionState.COMPLETE)
+            votes[leaderIdPair.get().getValue()] = 1;
+        logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election]["+propaganda.toString()+"]\n");
+        sender.sendPeerMessage(propaganda.fromId, new LeaderElectionMessage.Vote(serverId, propaganda.token, tickets, votes));
     }
 
     @Override

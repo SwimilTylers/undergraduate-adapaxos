@@ -12,6 +12,8 @@ public interface LeaderElectionPerformer {
     void stateSet(LeaderElectionState set);
     boolean stateCompareAndSet(LeaderElectionState expect, LeaderElectionState set);
 
+    void handleResidualLEMessages(long restartExpire);
+
     void handleLEStart(LeaderElectionMessage.LeStart leStart);
     void handleLEPropaganda(LeaderElectionMessage.Propaganda propaganda);
     void handleLEVote(LeaderElectionMessage.Vote vote, LeaderElectionResultUpdater updater);

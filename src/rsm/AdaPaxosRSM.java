@@ -227,11 +227,11 @@ public class AdaPaxosRSM implements Serializable {
     public void routine(Runnable... supplement){
         routineOnRunning = new AtomicBoolean(true);
         ExecutorService routines = Executors.newCachedThreadPool();
-        routines.execute(()-> routine_batch(1000, GenericPaxosSMR.DEFAULT_REQUEST_COMPACTING_SIZE));
-        routines.execute(() -> routine_monitor(20, 40, 3, 10, 5000));
+        //routines.execute(()-> routine_batch(1000, GenericPaxosSMR.DEFAULT_REQUEST_COMPACTING_SIZE));
+        routines.execute(() -> routine_monitor(20, 40, 3, 10));
         routines.execute(this::routine_response);
-        routines.execute(() -> routine_backup(5000));
-        routines.execute(() -> routine_leadership(5000));
+        //routines.execute(() -> routine_backup(5000));
+        routines.execute(() -> routine_leadership(500));
 
         if (supplement != null && supplement.length != 0) {
             supplementRoutines = supplement;
@@ -299,7 +299,7 @@ public class AdaPaxosRSM implements Serializable {
         }
     }
 
-    protected void routine_monitor(final int monitorItv, final int expire, final int stability, final int decisionDelay, final int LEDeadline){
+    protected void routine_monitor(final int monitorItv, final int expire, final int stability, final int decisionDelay){
         final int bare_majority = (peerSize+1)/2;
         final int bare_minority = peerSize - bare_majority;
 
@@ -550,6 +550,8 @@ public class AdaPaxosRSM implements Serializable {
                         recovery.handleLEVote(cast, (tk, id) -> asLeader.set(id == serverId));
                     }
                 }
+                else
+                    recovery.handleResidualLEMessages(leadershipItv * 2);
             } catch (Exception e) {
                 e.printStackTrace();
             }
