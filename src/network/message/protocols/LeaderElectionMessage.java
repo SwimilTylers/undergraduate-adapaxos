@@ -52,15 +52,17 @@ public class LeaderElectionMessage implements Serializable {
     public static class Vote extends LeaderElectionMessage {
         private static final long serialVersionUID = 3554427274394541688L;
         public final int[] tickets;
+        public final int[] votes;
 
-        public Vote(int fromId, long token, int[] tickets) {
+        public Vote(int fromId, long token, int[] tickets, int[] votes) {
             super(fromId, token);
             this.tickets = tickets;
+            this.votes = votes;
         }
 
         @Override
         public String toString() {
-            return "[LE][Vote][tkn="+token+",fid="+fromId+"][tks="+ (tickets == null ? "null" : Arrays.toString(tickets)) +"]";
+            return "[LE][Vote][tkn="+token+",fid="+fromId+"][tks="+ (tickets == null ? "null" : Arrays.toString(tickets)) +"][votes="+ (votes == null ? "null" : Arrays.toString(votes)) + "]";
         }
     }
 

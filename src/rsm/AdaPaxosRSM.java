@@ -227,10 +227,10 @@ public class AdaPaxosRSM implements Serializable {
     public void routine(Runnable... supplement){
         routineOnRunning = new AtomicBoolean(true);
         ExecutorService routines = Executors.newCachedThreadPool();
-        //routines.execute(()-> routine_batch(2000, GenericPaxosSMR.DEFAULT_REQUEST_COMPACTING_SIZE));
+        routines.execute(()-> routine_batch(1000, GenericPaxosSMR.DEFAULT_REQUEST_COMPACTING_SIZE));
         routines.execute(() -> routine_monitor(20, 40, 3, 10, 5000));
         routines.execute(this::routine_response);
-        //routines.execute(() -> routine_backup(5000));
+        routines.execute(() -> routine_backup(5000));
         routines.execute(() -> routine_leadership(5000));
 
         if (supplement != null && supplement.length != 0) {

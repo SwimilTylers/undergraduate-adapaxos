@@ -27,6 +27,7 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
     private int leTicket;
     private long leToken;
     private int leCount;
+    private int[] leVotes;
 
     private AtomicInteger maxRecvInstance;
     private int[] tickets;
@@ -45,6 +46,8 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
         state = new AtomicReference<>(LeaderElectionState.COMPLETE);
         tickets = new int[peerSize];
         Arrays.fill(tickets, 0);
+        leVotes = new int[peerSize];
+        Arrays.fill(leVotes, 0);
     }
 
     @Override
@@ -77,6 +80,7 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
             leTicket = leStart.LeTicket_local;
             leToken = leStart.LeDialog_no;
             leCount = 0;
+            Arrays.fill(leVotes, 0);
             tickets[serverId] = leStart.LeTicket_local;
 
             sender.broadcastPeerMessage(new LeaderElectionMessage.Propaganda(serverId, leToken, tickets));
@@ -92,8 +96,12 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
             for (int i = 0; i < tickets.length; i++) {
                 tickets[i] = Integer.max(tickets[i], propaganda.tickets[i]);
             }
+            int[] votes = new int[peerSize];
+            Arrays.fill(votes, 0);
+            if (s == LeaderElectionState.COMPLETE)
+                votes[leaderIdPair.get().getValue()] = 1;
             logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election]["+propaganda.toString()+"]\n");
-            sender.sendPeerMessage(propaganda.fromId, new LeaderElectionMessage.Vote(serverId, propaganda.token, tickets));
+            sender.sendPeerMessage(propaganda.fromId, new LeaderElectionMessage.Vote(serverId, propaganda.token, tickets, votes));
         }
     }
 
@@ -105,6 +113,7 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
 
             for (int i = 0; i < tickets.length; i++) {
                 tickets[i] = Integer.max(tickets[i], vote.tickets[i]);
+                leVotes[i] = leVotes[i] + vote.votes[i];
             }
 
             logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election]["+vote.toString()+"]\n");
@@ -124,9 +133,15 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
                     int correspondingServer = formalLeader == 0 ? 1 : 0;
 
                     for (int i = correspondingServer + 1; i < tickets.length; i++) {
-                        if (i != formalLeader && tickets[i] > maxTicket){
-                            maxTicket = tickets[i];
-                            correspondingServer = i;
+                        if (i != formalLeader){
+                            if (tickets[i] > maxTicket) {
+                                maxTicket = tickets[i];
+                                correspondingServer = i;
+                            }
+                            else if (tickets[i] == maxTicket && leVotes[i] > leVotes[correspondingServer]) {
+                                maxTicket = tickets[i];
+                                correspondingServer = i;
+                            }
                         }
                     }
 
