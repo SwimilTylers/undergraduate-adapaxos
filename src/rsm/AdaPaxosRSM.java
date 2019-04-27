@@ -700,6 +700,14 @@ public class AdaPaxosRSM implements Serializable {
                     logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[state change][0->1][tkt="+fsyncInitInstance.get()+",init_lid="+nConfig.initLeaderId+"]\n");
                     instanceSpaceBuild(instanceSpace.length(), crtInstBallot.get(), fsyncInitInstance.get());
                     agent(leProvider);
+
+                    forceFsync.set(true);
+
+                    long leToken = AdaAgents.newToken();
+                    recovery.stateSet(LeaderElectionPerformer.LeaderElectionState.RECOVERING);  // wait for update
+                    logger.record(true, "diag", "[" + System.currentTimeMillis() + "][recovery][test=2][confirmed][RECOVERING, token="+leToken+"]\n");
+                    memorySynchronize(leToken); // fetch up-to-date information from disk
+
                     routine(supplementRoutines);
                 }
             }
