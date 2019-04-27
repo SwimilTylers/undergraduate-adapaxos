@@ -36,7 +36,7 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
                        AtomicReferenceArray<AdaRecoveryMaintenance> recoveryList,
                        LeaderElectionProvider leController,
                        PaxosLogger logger) {
-        super(serverId, peerSize, leaderId, leController, maxRecvInstance, sender, conn, logger);
+        super(serverId, peerSize, leaderId, sender, conn, logger);
         this.remoteStore = remoteStore;
         this.diskSize = remoteStore.getDiskSize();
         this.serverId = serverId;

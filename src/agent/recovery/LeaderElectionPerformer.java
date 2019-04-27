@@ -10,17 +10,14 @@ import network.service.module.controller.LeaderElectionProvider;
 public interface LeaderElectionPerformer {
     boolean onLeaderElection();
     boolean isLeaderSurvive(final int expire);
-    void stateSet(LeaderElectionState set);
-    boolean stateCompareAndSet(LeaderElectionState expect, LeaderElectionState set);
 
-    void handleResidualLEMessages(long restartExpire);
+    void markFileSyncComplete(LeaderElectionResultUpdater updater);
+    void markLeaderChosen(int chosen, LeaderElectionResultUpdater updater);
 
-    void handleLEStart(LeaderElectionMessage.LeStart leStart);
-    void handleLEPropaganda(LeaderElectionMessage.Propaganda propaganda);
-    void handleLEVote(LeaderElectionMessage.Vote vote, LeaderElectionResultUpdater updater);
+    void markLeaderElection(boolean isFsync, long token);
     void handleLEForce(LeaderElectionMessage.LEForce force, LeaderElectionResultUpdater updater);
 
     enum LeaderElectionState{
-        COMPLETE, ON_RUNNING, RECOVERED, RECOVERING
+        COMPLETE, WAITING, RECOVERED, RECOVERING
     }
 }

@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -27,37 +28,20 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
     private AtomicReference<Pair<Long, Integer>> leaderIdPair;
     private AtomicReference<LeaderElectionState> state;
 
-    private Queue<LeaderElectionMessage> residual;
-
-    private LeaderElectionProvider LEController;
-
-    private int leTicket;
-    private long leToken;
-    private int leCount;
-    private int[] leVotes;
-
-    private AtomicInteger maxRecvInstance;
-    private int[] tickets;
-
+    private AtomicLong leToken;
     private PaxosLogger logger;
 
-    public LeaderElectionRecovery(int serverId, int peerSize, int leaderId, LeaderElectionProvider leController, AtomicInteger maxRecvInstance, PeerMessageSender sender, ConnectionModule conn, PaxosLogger logger) {
+    public LeaderElectionRecovery(int serverId, int peerSize, int leaderId, PeerMessageSender sender, ConnectionModule conn, PaxosLogger logger) {
         this.serverId = serverId;
         this.peerSize = peerSize;
-        LEController = leController;
         this.conn = conn;
         this.sender = sender;
         this.leaderIdPair = new AtomicReference<>(new Pair<>(0L, leaderId));
-        this.maxRecvInstance = maxRecvInstance;
         this.logger = logger;
 
         state = new AtomicReference<>(LeaderElectionState.COMPLETE);
-        tickets = new int[peerSize];
-        Arrays.fill(tickets, 0);
-        leVotes = new int[peerSize];
-        Arrays.fill(leVotes, 0);
+        leToken = new AtomicLong();
 
-        residual = new ConcurrentLinkedQueue<>();
     }
 
     @Override
@@ -74,146 +58,62 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
             return conn.survive(leader, expire);
     }
 
-    @Override
-    public void stateSet(LeaderElectionState set) {
-        state.set(set);
+    private void completeSequence(LeaderElectionResultUpdater updater){
+        Pair<Long, Integer> leader = leaderIdPair.get();
+        updater.update(leader.getKey(), leader.getValue());
+        logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election][COMPLETE, chosen=" + leader.getValue() + "]\n");
     }
 
     @Override
-    public boolean stateCompareAndSet(LeaderElectionState expect, LeaderElectionState set) {
-        return state.compareAndSet(expect, set);
-    }
-
-    @Override
-    public void handleResidualLEMessages(long restartExpire) {
-        if (LEController == null) {
-            LeaderElectionState s = state.get();
-            if (s != LeaderElectionState.RECOVERING) {
-                while (!residual.isEmpty()) {
-                    LeaderElectionMessage msg = residual.poll();
-                    if (msg instanceof LeaderElectionMessage.Propaganda)
-                        handleLEPropagandaInternal(s, (LeaderElectionMessage.Propaganda) msg);
-                }
-                if (s == LeaderElectionState.ON_RUNNING) {
-                    long crt = System.currentTimeMillis();
-                    if (crt - leToken > restartExpire) {
-                        leToken = crt;
-                        sender.broadcastPeerMessage(new LeaderElectionMessage.Propaganda(serverId, leToken, tickets));
-                        logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election][restart][ON_RUNNING, token=" + leToken + "]\n");
-
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    public void handleLEStart(LeaderElectionMessage.LeStart leStart) {
-        if (state.compareAndSet(LeaderElectionState.RECOVERED, LeaderElectionState.ON_RUNNING) && serverId == leStart.fromId){    // check if LLE prepared
-            leTicket = leStart.LeTicket_local;
-            leToken = leStart.LeDialog_no;
-            leCount = 0;
-            Arrays.fill(leVotes, 0);
-            tickets[serverId] = leStart.LeTicket_local;
-
-            if (LEController == null)
-                sender.broadcastPeerMessage(new LeaderElectionMessage.Propaganda(serverId, leToken, tickets));
+    public void markFileSyncComplete(LeaderElectionResultUpdater updater) {
+        LeaderElectionState formerState = state.getAndUpdate(oldState -> {
+            if (oldState == LeaderElectionState.RECOVERING)
+                return LeaderElectionState.RECOVERED;
+            else if (oldState == LeaderElectionState.WAITING)
+                return LeaderElectionState.COMPLETE;
             else
-                LEController.provide(new LeaderElectionMessage.LEOffer(serverId, leToken, leTicket));
-            logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election][start][ON_RUNNING, token="+leToken+"]\n");
+                return oldState;
+        });
+
+        if (formerState == LeaderElectionState.WAITING){
+            completeSequence(updater);
         }
     }
 
     @Override
-    public void handleLEPropaganda(LeaderElectionMessage.Propaganda propaganda) {
-        LeaderElectionState s = state.get();
-        if (s != LeaderElectionState.RECOVERING){
-            handleLEPropagandaInternal(s, propaganda);
-            while (!residual.isEmpty()) {
-                LeaderElectionMessage msg = residual.poll();
-                if (msg instanceof LeaderElectionMessage.Propaganda)
-                    handleLEPropagandaInternal(s, (LeaderElectionMessage.Propaganda) msg);
-            }
-        }
-        else {
-            logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election][residual]["+propaganda.toString()+"]\n");
-            residual.offer(propaganda);
-        }
-    }
+    public void markLeaderChosen(int chosen, LeaderElectionResultUpdater updater) {
+        if (state.get() != LeaderElectionState.COMPLETE){
+            leaderIdPair.set(new Pair<>(leToken.get(), chosen));
 
-    private void handleLEPropagandaInternal(LeaderElectionState crtState, LeaderElectionMessage.Propaganda propaganda){
-        tickets[serverId] = crtState == LeaderElectionState.COMPLETE ? maxRecvInstance.get() : leTicket;
-        for (int i = 0; i < tickets.length; i++) {
-            tickets[i] = Integer.max(tickets[i], propaganda.tickets[i]);
-        }
-        int[] votes = new int[peerSize];
-        Arrays.fill(votes, 0);
-        if (crtState == LeaderElectionState.COMPLETE)
-            votes[leaderIdPair.get().getValue()] = 1;
-        logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election]["+propaganda.toString()+"]\n");
-        sender.sendPeerMessage(propaganda.fromId, new LeaderElectionMessage.Vote(serverId, propaganda.token, tickets, votes));
-    }
-
-    @Override
-    public void handleLEVote(LeaderElectionMessage.Vote vote, LeaderElectionResultUpdater updater) {
-        if (state.get() == LeaderElectionState.ON_RUNNING && leToken == vote.token){
-
-            ++leCount;
-
-            for (int i = 0; i < tickets.length; i++) {
-                tickets[i] = Integer.max(tickets[i], vote.tickets[i]);
-                leVotes[i] = leVotes[i] + vote.votes[i];
-            }
-
-            logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election]["+vote.toString()+"]\n");
-
-            if (vote.fromId == leaderIdPair.get().getValue()){
-                leaderIdPair.set(new Pair<>(leToken, vote.fromId));
-
-                logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election][COMPLETE, chosen="+vote.fromId+"]\n");
-                updater.update(leToken, vote.fromId);
-
-                state.set(LeaderElectionState.COMPLETE);
-            }
-            else {
-                if (leCount >= (peerSize + 1)/2 - 1){     // bare minority
-                    int formalLeader = leaderIdPair.get().getValue();
-                    int maxTicket = tickets[formalLeader == 0 ? 1 : 0];
-                    int correspondingServer = formalLeader == 0 ? 1 : 0;
-
-                    for (int i = correspondingServer + 1; i < tickets.length; i++) {
-                        if (i != formalLeader){
-                            if (tickets[i] > maxTicket) {
-                                maxTicket = tickets[i];
-                                correspondingServer = i;
-                            }
-                            else if (tickets[i] == maxTicket && leVotes[i] > leVotes[correspondingServer]) {
-                                maxTicket = tickets[i];
-                                correspondingServer = i;
-                            }
-                        }
-                    }
-
-                    leaderIdPair.set(new Pair<>(leToken, correspondingServer));
-
-                    logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election][COMPLETE, chosen="+correspondingServer+"]\n");
-                    updater.update(leToken, correspondingServer);
-
-                    state.set(LeaderElectionState.COMPLETE);
+            LeaderElectionState newState = state.updateAndGet(oldState -> {
+                if (oldState == LeaderElectionState.RECOVERED)
+                    return LeaderElectionState.COMPLETE;
+                else if (oldState == LeaderElectionState.RECOVERING) {
+                    if (chosen != serverId)
+                        return LeaderElectionState.COMPLETE;
+                    else
+                        return LeaderElectionState.WAITING;
                 }
-            }
+                else
+                    return oldState;
+            });
 
+            if (newState == LeaderElectionState.COMPLETE) {
+                completeSequence(updater);
+            }
         }
+    }
+
+    @Override
+    public void markLeaderElection(boolean isFsync, long leToken) {
+        this.leToken.set(leToken);
+        state.set(isFsync ? LeaderElectionState.RECOVERING : LeaderElectionState.RECOVERED);
     }
 
     @Override
     public void handleLEForce(LeaderElectionMessage.LEForce force, LeaderElectionResultUpdater updater) {
-        if (state.get() == LeaderElectionState.ON_RUNNING && leToken == force.token){
-            leaderIdPair.set(new Pair<>(leToken, force.leaderId));
-            logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election][COMPLETE, chosen="+force.leaderId+"]\n");
-            updater.update(leToken, force.leaderId);
-
-            state.set(LeaderElectionState.COMPLETE);
+        if (leToken.get() == force.token){
+            markLeaderChosen(force.leaderId, updater);
         }
     }
 }

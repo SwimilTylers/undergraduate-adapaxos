@@ -56,7 +56,7 @@ public class GlobalLeaderElectionController {
     public void LEDecision(){
         List<Pair<LeaderElectionMessage.LEOffer, BlockingQueue<LeaderElectionMessage>>> ackList = new ArrayList<>();
         int[] tickets = new int[peerSize];
-        Arrays.fill(tickets, 0);
+        Arrays.fill(tickets, -1);
 
         while (true){
             try {
@@ -89,7 +89,7 @@ public class GlobalLeaderElectionController {
                         });
 
                         ackList.clear();
-                        Arrays.fill(tickets, 0);
+                        Arrays.fill(tickets, -1);
                     }
                 }
             } catch (InterruptedException e) {

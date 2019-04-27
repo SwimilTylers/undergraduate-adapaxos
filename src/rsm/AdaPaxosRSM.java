@@ -257,7 +257,7 @@ public class AdaPaxosRSM implements Serializable {
     public void routine(BipolarStateReminder reminder, BipolarStateDecider decider, Runnable... supplement){
         routine(supplement);
         Thread t = new Thread(() -> thread_bipolar(reminder, decider));
-        t.setPriority(Thread.MAX_PRIORITY);
+        //t.setPriority(Thread.MAX_PRIORITY);
         t.start();
     }
 
@@ -295,6 +295,7 @@ public class AdaPaxosRSM implements Serializable {
             if (!requestList.isEmpty()) {
                 ClientRequest[] cmd = requestList.toArray(new ClientRequest[0]);
                 if (asLeader.get()){
+                    //while (recovery.onLeaderElection()) {}  // TODO: 2019/4/27 reenterLock
                     int inst_no = maxReceivedInstance.getAndIncrement();
                     proposer.handleRequests(inst_no, crtInstBallot.get(), cmd);
                     logger.logFormatted(true, "init a proposal");
@@ -340,25 +341,26 @@ public class AdaPaxosRSM implements Serializable {
 
                             /* at the first sight out timeout, follower should flush all on-memory instances to disk */
                             logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader failure][test=1]\n");
-                            //fileSynchronize();
+                            if (!forceFsync.get())
+                                fileSynchronize();
 
                             Thread.sleep(decisionDelay);
-                            if (!routineOnRunning.get())
-                                break;
 
                             if (recovery.isLeaderSurvive(expire)){  // leader crash confirmed, running into FAST_MODE
-                                if (!forceFsync.getAndSet(false)){   // FAST_MODE before leader crashed
+                                if (!routineOnRunning.get())
+                                    break;
+
+                                if (!forceFsync.get()){   // FAST_MODE before leader crashed
                                     metaFsync.set(true);
                                     long leToken = AdaAgents.newToken();
-                                    recovery.stateSet(LeaderElectionPerformer.LeaderElectionState.RECOVERED);   // join LeaderElection
+                                    recovery.markLeaderElection(false, leToken);
+                                    leProvider.provide(new LeaderElectionMessage.LEOffer(serverId, leToken, maxReceivedInstance.get()));
                                     logger.record(true, "diag", "[" + System.currentTimeMillis() + "][leader failure][test=2][confirmed][RECOVERED, token="+leToken+"]\n");
-                                    LeaderElectionMessage.LeStart startSignal = new LeaderElectionMessage.LeStart(serverId, leToken, maxReceivedInstance.get());
-                                    logger.logFormatted(false, "start leader election", startSignal.toString());
-                                    lMessages.put(startSignal); // init LeaderElection
                                 }
                                 else {  // SLOW_MODE before leader crashed
                                     long leToken = AdaAgents.newToken();
-                                    recovery.stateSet(LeaderElectionPerformer.LeaderElectionState.RECOVERING);  // wait for update
+                                    recovery.markLeaderElection(true, leToken);
+                                    leProvider.provide(new LeaderElectionMessage.LEOffer(serverId, leToken, fsyncInitInstance.get()));
                                     logger.record(true, "diag", "[" + System.currentTimeMillis() + "][leader failure][test=2][confirmed][RECOVERING, token="+leToken+"]\n");
                                     memorySynchronize(leToken); // fetch up-to-date information from disk
                                 }
@@ -549,26 +551,10 @@ public class AdaPaxosRSM implements Serializable {
         while (routineOnRunning.get()){
             try {
                 LeaderElectionMessage msg = lMessages.poll(leadershipItv, TimeUnit.MILLISECONDS);
-                if (msg != null){
-                    if (msg instanceof LeaderElectionMessage.LeStart){
-                        LeaderElectionMessage.LeStart cast = (LeaderElectionMessage.LeStart) msg;
-                        recovery.handleLEStart(cast);
-                    }
-                    if (msg instanceof LeaderElectionMessage.Propaganda){
-                        LeaderElectionMessage.Propaganda cast = (LeaderElectionMessage.Propaganda) msg;
-                        recovery.handleLEPropaganda(cast);
-                    }
-                    else if (msg instanceof LeaderElectionMessage.Vote){
-                        LeaderElectionMessage.Vote cast = (LeaderElectionMessage.Vote) msg;
-                        recovery.handleLEVote(cast, (tk, id) -> asLeader.set(id == serverId));
-                    }
-                    else if (msg instanceof LeaderElectionMessage.LEForce){
-                        LeaderElectionMessage.LEForce cast = (LeaderElectionMessage.LEForce) msg;
-                        recovery.handleLEForce(cast, (tk, id) -> asLeader.set(id == serverId));
-                    }
+                if (msg instanceof LeaderElectionMessage.LEForce){
+                    LeaderElectionMessage.LEForce cast = (LeaderElectionMessage.LEForce) msg;
+                    recovery.handleLEForce(cast, (tk, id) -> asLeader.set(id == serverId));
                 }
-                else
-                    recovery.handleResidualLEMessages(leadershipItv * 2);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -674,15 +660,7 @@ public class AdaPaxosRSM implements Serializable {
     }
 
     protected void finishDisk2Mem(long dialog_no, int vacant_no){
-        if (recovery.stateCompareAndSet(LeaderElectionPerformer.LeaderElectionState.RECOVERING,
-                LeaderElectionPerformer.LeaderElectionState.RECOVERED)){    // join LeaderElection
-            LeaderElectionMessage.LeStart startSignal = new LeaderElectionMessage.LeStart(serverId, dialog_no, vacant_no-1);
-            try {
-                lMessages.put(startSignal);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        recovery.markFileSyncComplete((token, leaderId) -> asLeader.set(leaderId == serverId));
     }
 
     protected void thread_bipolar(final BipolarStateReminder reminder, final BipolarStateDecider decider){
@@ -698,14 +676,16 @@ public class AdaPaxosRSM implements Serializable {
                 }
                 else {
                     logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[state change][0->1][tkt="+fsyncInitInstance.get()+",init_lid="+nConfig.initLeaderId+"]\n");
-                    instanceSpaceBuild(instanceSpace.length(), crtInstBallot.get(), fsyncInitInstance.get());
+                    instanceSpaceBuild(instanceSpace.length(), crtState << 16, 0);
                     agent(leProvider);
 
                     forceFsync.set(true);
 
                     long leToken = AdaAgents.newToken();
-                    recovery.stateSet(LeaderElectionPerformer.LeaderElectionState.RECOVERING);  // wait for update
-                    logger.record(true, "diag", "[" + System.currentTimeMillis() + "][recovery][test=2][confirmed][RECOVERING, token="+leToken+"]\n");
+                    recovery.markLeaderElection(forceFsync.get(), leToken);
+                    leProvider.provide(new LeaderElectionMessage.LEOffer(serverId, leToken, 0));
+
+                    logger.record(true, "diag", "[" + System.currentTimeMillis() + "][recovery][confirmed][RECOVERING, token="+leToken+"]\n");
                     memorySynchronize(leToken); // fetch up-to-date information from disk
 
                     routine(supplementRoutines);
