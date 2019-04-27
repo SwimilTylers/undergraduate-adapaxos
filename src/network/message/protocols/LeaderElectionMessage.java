@@ -66,15 +66,23 @@ public class LeaderElectionMessage implements Serializable {
         }
     }
 
-    public static class LESync extends LeaderElectionMessage {
-        private static final long serialVersionUID = 3554427274394541688L;
-        public final int[] tickets;
-        public final boolean asLeader;
+    public static class LEOffer extends LeaderElectionMessage{
+        private static final long serialVersionUID = 7905747041438510087L;
+        public final int ticket;
 
-        public LESync(int fromId, long token, int[] tickets, boolean asLeader) {
+        public LEOffer(int fromId, long token, int ticket) {
             super(fromId, token);
-            this.tickets = tickets;
-            this.asLeader = asLeader;
+            this.ticket = ticket;
+        }
+    }
+
+    public static class LEForce extends LeaderElectionMessage {
+        private static final long serialVersionUID = 3554427274394541688L;
+        public final int leaderId;
+
+        public LEForce(int fromId, long token, int leaderId) {
+            super(fromId, token);
+            this.leaderId = leaderId;
         }
     }
 }

@@ -1,6 +1,7 @@
 package agent.recovery;
 
 import network.message.protocols.LeaderElectionMessage;
+import network.service.module.controller.LeaderElectionProvider;
 
 /**
  * @author : Swimiltylers
@@ -17,6 +18,7 @@ public interface LeaderElectionPerformer {
     void handleLEStart(LeaderElectionMessage.LeStart leStart);
     void handleLEPropaganda(LeaderElectionMessage.Propaganda propaganda);
     void handleLEVote(LeaderElectionMessage.Vote vote, LeaderElectionResultUpdater updater);
+    void handleLEForce(LeaderElectionMessage.LEForce force, LeaderElectionResultUpdater updater);
 
     enum LeaderElectionState{
         COMPLETE, ON_RUNNING, RECOVERED, RECOVERING

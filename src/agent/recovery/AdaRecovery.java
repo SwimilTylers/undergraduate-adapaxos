@@ -9,6 +9,7 @@ import logger.PaxosLogger;
 import network.message.protocols.DiskPaxosMessage;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.module.connection.ConnectionModule;
+import network.service.module.controller.LeaderElectionProvider;
 import network.service.sender.PeerMessageSender;
 
 import java.util.concurrent.atomic.*;
@@ -33,8 +34,9 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
                        AtomicInteger maxRecvInstance,
                        RemoteInstanceStore remoteStore, AtomicReferenceArray<AdaPaxosInstance> instanceSpace,
                        AtomicReferenceArray<AdaRecoveryMaintenance> recoveryList,
+                       LeaderElectionProvider leController,
                        PaxosLogger logger) {
-        super(serverId, peerSize, leaderId, maxRecvInstance, sender, conn, logger);
+        super(serverId, peerSize, leaderId, leController, maxRecvInstance, sender, conn, logger);
         this.remoteStore = remoteStore;
         this.diskSize = remoteStore.getDiskSize();
         this.serverId = serverId;

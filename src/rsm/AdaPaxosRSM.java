@@ -20,6 +20,8 @@ import network.service.GenericNetService;
 import network.service.module.connection.ConnectionModule;
 import network.service.module.controller.BipolarStateDecider;
 import network.service.module.controller.BipolarStateReminder;
+import network.service.module.controller.GlobalLeaderElectionController;
+import network.service.module.controller.LeaderElectionProvider;
 import utils.AdaAgents;
 import utils.AdaPaxosParameters;
 import utils.NetworkConfiguration;
@@ -86,6 +88,7 @@ public class AdaPaxosRSM implements Serializable {
     transient protected PaxosLogger logger;
     transient protected AtomicBoolean routineOnRunning;
     transient protected Runnable[] supplementRoutines;
+    transient protected LeaderElectionProvider leProvider = null;
 
 
     protected AdaPaxosRSM(final int serverId,
@@ -218,10 +221,20 @@ public class AdaPaxosRSM implements Serializable {
     }
 
     public void agent(){
+        agent((LeaderElectionProvider) null);
+    }
+
+    public void agent(GlobalLeaderElectionController LEController){
+        agent(LEController.getLEProvider(serverId, lMessages));
+    }
+
+    public void agent(LeaderElectionProvider provider){
+        this.leProvider = provider;
+
         proposer = new AdaProposer(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
         acceptor = new AdaAcceptor(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
         learner = new AdaLearner(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
-        recovery = new AdaRecovery(serverId, peerSize, nConfig.initLeaderId, net.getPeerMessageSender(), net.getConnectionModule(), maxReceivedInstance, remoteStore, instanceSpace, recoveryList, logger);
+        recovery = new AdaRecovery(serverId, peerSize, nConfig.initLeaderId, net.getPeerMessageSender(), net.getConnectionModule(), maxReceivedInstance, remoteStore, instanceSpace, recoveryList, leProvider, logger);
     }
 
     public void routine(Runnable... supplement){
@@ -231,7 +244,7 @@ public class AdaPaxosRSM implements Serializable {
         routines.execute(() -> routine_monitor(20, 40, 3, 10));
         routines.execute(this::routine_response);
         //routines.execute(() -> routine_backup(5000));
-        routines.execute(() -> routine_leadership(500));
+        routines.execute(() -> routine_leadership(2000));
 
         if (supplement != null && supplement.length != 0) {
             supplementRoutines = supplement;
@@ -244,7 +257,7 @@ public class AdaPaxosRSM implements Serializable {
     public void routine(BipolarStateReminder reminder, BipolarStateDecider decider, Runnable... supplement){
         routine(supplement);
         Thread t = new Thread(() -> thread_bipolar(reminder, decider));
-        //t.setPriority(Thread.MAX_PRIORITY);
+        t.setPriority(Thread.MAX_PRIORITY);
         t.start();
     }
 
@@ -549,6 +562,10 @@ public class AdaPaxosRSM implements Serializable {
                         LeaderElectionMessage.Vote cast = (LeaderElectionMessage.Vote) msg;
                         recovery.handleLEVote(cast, (tk, id) -> asLeader.set(id == serverId));
                     }
+                    else if (msg instanceof LeaderElectionMessage.LEForce){
+                        LeaderElectionMessage.LEForce cast = (LeaderElectionMessage.LEForce) msg;
+                        recovery.handleLEForce(cast, (tk, id) -> asLeader.set(id == serverId));
+                    }
                 }
                 else
                     recovery.handleResidualLEMessages(leadershipItv * 2);
@@ -682,7 +699,7 @@ public class AdaPaxosRSM implements Serializable {
                 else {
                     logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[state change][0->1][tkt="+fsyncInitInstance.get()+",init_lid="+nConfig.initLeaderId+"]\n");
                     instanceSpaceBuild(instanceSpace.length(), crtInstBallot.get(), fsyncInitInstance.get());
-                    agent();
+                    agent(leProvider);
                     routine(supplementRoutines);
                 }
             }

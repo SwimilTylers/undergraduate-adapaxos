@@ -11,14 +11,13 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author : Swimiltylers
  * @version : 2019/4/19 22:20
  */
-public class GlobalBipolarController {
-    private int peerSize;
+public class GlobalBipolarController extends GlobalLeaderElectionController{
     private AtomicReference<int[]> bipolarArray;
     private AtomicInteger stateCount;
     private AtomicBoolean onRunning;
 
-    public GlobalBipolarController(int peerSize){
-        this.peerSize = peerSize;
+    public GlobalBipolarController(int peerSize, int offerSize, int initLeader){
+        super(peerSize, offerSize, initLeader);
         bipolarArray = new AtomicReference<>();
         onRunning = new AtomicBoolean(true);
         stateCount = new AtomicInteger(0);
@@ -45,6 +44,7 @@ public class GlobalBipolarController {
                         on[scanner.nextInt()] = 1;
                     System.out.println("[controller][bipolar="+Arrays.toString(on)+"]");
 
+                    stateUpdate(on);
                     bipolarArray.set(on);
 
                     return ++i;

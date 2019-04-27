@@ -334,7 +334,8 @@ public class demo {
 
         static void test1(int totalNum){
             ExecutorService service = Executors.newCachedThreadPool();
-            GlobalBipolarController controller = new GlobalBipolarController(totalNum);
+            GlobalBipolarController controller = new GlobalBipolarController(totalNum, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, netConfig.initLeaderId);
+            service.execute(controller::LEDecision);
             service.execute(() -> controller.controlledByFile(new File("control.txt")));
             for (int i = 0; i < totalNum; i++) {
                 int serverId = i;
@@ -345,7 +346,7 @@ public class demo {
                                 new BipolarNetService(serverId, controller)
                         );
                         rsm.link(new NetworkConfiguration(Arrays.copyOfRange(NetServiceTesting.addr, 0, totalNum), Arrays.copyOfRange(NetServiceTesting.port, 0, totalNum), netConfig.initLeaderId), 4470+serverId*2);
-                        rsm.agent();
+                        rsm.agent(controller);
                         rsm.routine(controller.getReminder(serverId), controller.getDecider(serverId));
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -378,7 +379,7 @@ public class demo {
 
     static class GlobalBipolarControllerTesting{
         static void test0(){
-            GlobalBipolarController controller = new GlobalBipolarController(5);
+            GlobalBipolarController controller = new GlobalBipolarController(5, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, 0);
             controller.controlledByFile(new File("control.txt"));
         }
     }

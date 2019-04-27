@@ -4,6 +4,7 @@ import javafx.util.Pair;
 import logger.PaxosLogger;
 import network.message.protocols.LeaderElectionMessage;
 import network.service.module.connection.ConnectionModule;
+import network.service.module.controller.LeaderElectionProvider;
 import network.service.sender.PeerMessageSender;
 
 import java.util.Arrays;
@@ -28,6 +29,8 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
 
     private Queue<LeaderElectionMessage> residual;
 
+    private LeaderElectionProvider LEController;
+
     private int leTicket;
     private long leToken;
     private int leCount;
@@ -38,9 +41,10 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
 
     private PaxosLogger logger;
 
-    public LeaderElectionRecovery(int serverId, int peerSize, int leaderId, AtomicInteger maxRecvInstance, PeerMessageSender sender, ConnectionModule conn, PaxosLogger logger) {
+    public LeaderElectionRecovery(int serverId, int peerSize, int leaderId, LeaderElectionProvider leController, AtomicInteger maxRecvInstance, PeerMessageSender sender, ConnectionModule conn, PaxosLogger logger) {
         this.serverId = serverId;
         this.peerSize = peerSize;
+        LEController = leController;
         this.conn = conn;
         this.sender = sender;
         this.leaderIdPair = new AtomicReference<>(new Pair<>(0L, leaderId));
@@ -82,20 +86,22 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
 
     @Override
     public void handleResidualLEMessages(long restartExpire) {
-        LeaderElectionState s = state.get();
-        if (s != LeaderElectionState.RECOVERING) {
-            while (!residual.isEmpty()) {
-                LeaderElectionMessage msg = residual.poll();
-                if (msg instanceof LeaderElectionMessage.Propaganda)
-                    handleLEPropagandaInternal(s, (LeaderElectionMessage.Propaganda) msg);
-            }
-            if (s == LeaderElectionState.ON_RUNNING){
-                long crt = System.currentTimeMillis();
-                if (crt - leToken > restartExpire){
-                    leToken = crt;
-                    sender.broadcastPeerMessage(new LeaderElectionMessage.Propaganda(serverId, leToken, tickets));
-                    logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election][restart][ON_RUNNING, token="+leToken+"]\n");
+        if (LEController == null) {
+            LeaderElectionState s = state.get();
+            if (s != LeaderElectionState.RECOVERING) {
+                while (!residual.isEmpty()) {
+                    LeaderElectionMessage msg = residual.poll();
+                    if (msg instanceof LeaderElectionMessage.Propaganda)
+                        handleLEPropagandaInternal(s, (LeaderElectionMessage.Propaganda) msg);
+                }
+                if (s == LeaderElectionState.ON_RUNNING) {
+                    long crt = System.currentTimeMillis();
+                    if (crt - leToken > restartExpire) {
+                        leToken = crt;
+                        sender.broadcastPeerMessage(new LeaderElectionMessage.Propaganda(serverId, leToken, tickets));
+                        logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election][restart][ON_RUNNING, token=" + leToken + "]\n");
 
+                    }
                 }
             }
         }
@@ -110,7 +116,10 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
             Arrays.fill(leVotes, 0);
             tickets[serverId] = leStart.LeTicket_local;
 
-            sender.broadcastPeerMessage(new LeaderElectionMessage.Propaganda(serverId, leToken, tickets));
+            if (LEController == null)
+                sender.broadcastPeerMessage(new LeaderElectionMessage.Propaganda(serverId, leToken, tickets));
+            else
+                LEController.provide(new LeaderElectionMessage.LEOffer(serverId, leToken, leTicket));
             logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election][start][ON_RUNNING, token="+leToken+"]\n");
         }
     }
@@ -194,6 +203,17 @@ public class LeaderElectionRecovery implements LeaderElectionPerformer{
                 }
             }
 
+        }
+    }
+
+    @Override
+    public void handleLEForce(LeaderElectionMessage.LEForce force, LeaderElectionResultUpdater updater) {
+        if (state.get() == LeaderElectionState.ON_RUNNING && leToken == force.token){
+            leaderIdPair.set(new Pair<>(leToken, force.leaderId));
+            logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader election][COMPLETE, chosen="+force.leaderId+"]\n");
+            updater.update(leToken, force.leaderId);
+
+            state.set(LeaderElectionState.COMPLETE);
         }
     }
 }
