@@ -187,11 +187,11 @@ public class AdaPaxosRSM implements Serializable {
     /* public-access deployment func, including:
     * - link: connection establishment of both net and remote-disk */
 
-    public void link(NetworkConfiguration netConfig, final int clientPort) throws InterruptedException {
-        link(netConfig, clientPort, AdaPaxosParameters.RSM.DEFAULT_LINK_STABLE_WAITING);
+    public void link(NetworkConfiguration netConfig) throws InterruptedException {
+        link(netConfig, AdaPaxosParameters.RSM.DEFAULT_LINK_STABLE_WAITING);
     }
 
-    public void link(NetworkConfiguration netConfig, final int clientPort, int stableWaits) throws InterruptedException {
+    public void link(NetworkConfiguration netConfig, int stableWaits) throws InterruptedException {
         String[] peerAddr = netConfig.peerAddr;
         int[] peerPort = netConfig.peerPort;
         this.nConfig = netConfig;
@@ -210,7 +210,7 @@ public class AdaPaxosRSM implements Serializable {
 
         net.connect(peerAddr, peerPort);
         conn = net.getConnectionModule();
-        net.openClientListener(clientPort);
+        net.openClientListener(netConfig.externalPort[serverId]);
 
         remoteStore.connect(dMessages);
 

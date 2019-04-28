@@ -8,14 +8,19 @@ import java.io.Serializable;
  */
 public class NetworkConfiguration implements Serializable {
     private static final long serialVersionUID = 2285355545467176038L;
+    public final int peerSize;
+
     public final String[] peerAddr;
     public final int[] peerPort;
+    public final int[] externalPort;
 
     public final int initLeaderId;
 
-    public NetworkConfiguration(String[] peerAddr, int[] peerPort, int initLeaderId) {
+    public NetworkConfiguration(int peerSize, String[] peerAddr, int[] peerPort, int[] externalPort, int initLeaderId) {
+        this.peerSize = peerSize;
         this.peerAddr = peerAddr;
         this.peerPort = peerPort;
+        this.externalPort = externalPort;
         this.initLeaderId = initLeaderId;
     }
 }

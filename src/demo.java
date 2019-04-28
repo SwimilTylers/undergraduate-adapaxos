@@ -302,7 +302,9 @@ public class demo {
             return ret;
         }
 
-        static NetworkConfiguration netConfig = new NetworkConfiguration(NetServiceTesting.addr, NetServiceTesting.port, 1);
+        static int[] clientPorts = new int[] {4470, 4472, 4474, 4476, 4478};
+
+        static NetworkConfiguration netConfig = new NetworkConfiguration(5, NetServiceTesting.addr, NetServiceTesting.port, clientPorts, 1);
 
         static void test0(){
             ExecutorService service = Executors.newCachedThreadPool();
@@ -314,7 +316,7 @@ public class demo {
                                 new PseudoRemoteInstanceStore(serverId, stores, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE),
                                 new GenericNetService(serverId)
                         );
-                        rsm.link(netConfig, 4470+serverId*2);
+                        rsm.link(netConfig);
                         rsm.agent();
                         rsm.routine();
                     } catch (Exception e) {
@@ -337,6 +339,11 @@ public class demo {
             GlobalBipolarController controller = new GlobalBipolarController(totalNum, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, netConfig.initLeaderId);
             service.execute(controller::LEDecision);
             service.execute(() -> controller.controlledByFile(new File("control.txt")));
+            NetworkConfiguration localNet = new NetworkConfiguration(totalNum,
+                    Arrays.copyOfRange(NetServiceTesting.addr, 0, totalNum),
+                    Arrays.copyOfRange(NetServiceTesting.port, 0, totalNum),
+                    Arrays.copyOfRange(clientPorts, 0, totalNum),
+                    netConfig.initLeaderId);
             for (int i = 0; i < totalNum; i++) {
                 int serverId = i;
                 service.execute(() -> {
@@ -345,7 +352,7 @@ public class demo {
                                 new PseudoRemoteInstanceStore(serverId, stores, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE),
                                 new BipolarNetService(serverId, controller)
                         );
-                        rsm.link(new NetworkConfiguration(Arrays.copyOfRange(NetServiceTesting.addr, 0, totalNum), Arrays.copyOfRange(NetServiceTesting.port, 0, totalNum), netConfig.initLeaderId), 4470+serverId*2);
+                        rsm.link(localNet);
                         rsm.agent(controller);
                         rsm.routine(controller.getReminder(serverId), controller.getDecider(serverId));
                     } catch (Exception e) {
@@ -365,7 +372,7 @@ public class demo {
                                 new PseudoRemoteInstanceStore(serverId, stores, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE),
                                 new GenericNetService(serverId)
                         );
-                        rsm.link(netConfig, 4470+serverId*2);
+                        rsm.link(netConfig);
                         rsm.agent();
                         if (serverId != 0)
                             rsm.routine();
