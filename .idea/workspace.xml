@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="Status: complicated state transformation in LEADER_ELECTION&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR">
+    <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -25,16 +26,34 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-6165">
-              <caret line="182" column="56" selection-start-line="182" selection-start-column="56" selection-end-line="182" selection-end-column="56" />
+            <state relative-caret-position="513">
+              <caret line="325" column="93" lean-forward="true" selection-start-line="325" selection-start-column="93" selection-end-line="325" selection-end-column="93" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#8756#8757#0" expanded="true" />
                 <element signature="e#8808#8809#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/logs/server-1.log">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="369">
+              <caret line="542" lean-forward="true" selection-start-line="542" selection-end-line="542" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-168">
+              <caret line="33" column="47" selection-start-line="33" selection-start-column="47" selection-end-line="33" selection-end-column="47" />
             </state>
           </provider>
         </entry>
@@ -51,20 +70,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/logs/server-4.diagnosis">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="224">
-              <caret line="16" column="14" selection-start-line="16" selection-start-column="1" selection-end-line="16" selection-end-column="14" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/logs/server-3.diagnosis">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="196">
-              <caret line="14" column="14" selection-start-line="14" selection-start-column="1" selection-end-line="14" selection-end-column="14" />
+            <state relative-caret-position="252">
+              <caret line="18" column="14" selection-start-line="18" selection-start-column="1" selection-end-line="18" selection-end-column="14" />
             </state>
           </provider>
         </entry>
@@ -178,13 +188,13 @@
         <option value="$PROJECT_DIR$/src/network/service/module/controller/BipolarLeaderController.java" />
         <option value="$PROJECT_DIR$/src/network/service/module/controller/BipolarStateArrayDecider.java" />
         <option value="$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java" />
-        <option value="$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java" />
         <option value="$PROJECT_DIR$/src/demo.java" />
         <option value="$PROJECT_DIR$/src/agent/recovery/LeaderElectionPerformer.java" />
         <option value="$PROJECT_DIR$/src/agent/recovery/LeaderElectionRecovery.java" />
         <option value="$PROJECT_DIR$/src/network/service/module/controller/GlobalLeaderElectionController.java" />
-        <option value="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" />
         <option value="$PROJECT_DIR$/logs/server-0.diagnosis" />
+        <option value="$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java" />
+        <option value="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" />
       </list>
     </option>
   </component>
@@ -207,11 +217,6 @@
             <path>
               <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
               <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
-              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
-              <item name="logs" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
@@ -506,14 +511,7 @@
       <workItem from="1555730726614" duration="764000" />
       <workItem from="1555731677043" duration="17433000" />
       <workItem from="1555816047354" duration="1818000" />
-      <workItem from="1556426565360" duration="1761000" />
-    </task>
-    <task id="LOCAL-00021" summary="Status: set interface&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation">
-      <created>1550137402285</created>
-      <option name="number" value="00021" />
-      <option name="presentableId" value="LOCAL-00021" />
-      <option name="project" value="LOCAL" />
-      <updated>1550137402285</updated>
+      <workItem from="1556426565360" duration="6898000" />
     </task>
     <task id="LOCAL-00022" summary="Status: inner class&#10;&#10;Working on:&#10;&#10;# Echo.scmodel&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation">
       <created>1550140243217</created>
@@ -851,11 +849,18 @@
       <option name="project" value="LOCAL" />
       <updated>1556379073368</updated>
     </task>
-    <option name="localTasksCounter" value="70" />
+    <task id="LOCAL-00070" summary="Status: tested complicated state transformation in LEADER_ELECTION&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR">
+      <created>1556428354919</created>
+      <option name="number" value="00070" />
+      <option name="presentableId" value="LOCAL-00070" />
+      <option name="project" value="LOCAL" />
+      <updated>1556428354920</updated>
+    </task>
+    <option name="localTasksCounter" value="71" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="792398000" />
+    <option name="totallyTimeSpent" value="797535000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -870,7 +875,7 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49858356" visible="true" weight="0.36193028" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49858356" visible="true" weight="0.28150135" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -950,7 +955,6 @@
     <ignored-roots>
       <path value="E:" />
     </ignored-roots>
-    <MESSAGE value="Status: replace Thread.sleep(backupItv) with fsyncQueue.poll(backupItv, TimeUnit.Millis)&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: replace Thread.sleep(backupItv) with fsyncQueue.poll(backupItv, TimeUnit.MILLISECONDS)&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: monotonic&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: start de-localStorage&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
@@ -975,7 +979,8 @@
     <MESSAGE value="Status: start delicate recovery&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: fsync delay&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: complicated state transformation in LEADER_ELECTION&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
-    <option name="LAST_COMMIT_MESSAGE" value="Status: complicated state transformation in LEADER_ELECTION&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
+    <MESSAGE value="Status: tested complicated state transformation in LEADER_ELECTION&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
+    <option name="LAST_COMMIT_MESSAGE" value="Status: tested complicated state transformation in LEADER_ELECTION&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1118,13 +1123,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="336">
-          <caret line="36" column="59" selection-start-line="36" selection-start-column="59" selection-end-line="36" selection-end-column="59" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="126">
@@ -1264,18 +1262,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-1.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="347">
-          <caret line="542" lean-forward="true" selection-start-line="542" selection-end-line="542" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-0.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-8865" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/control.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="112">
@@ -1300,36 +1286,22 @@
     <entry file="file://$PROJECT_DIR$/logs/server-0.commit.log">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-0.diagnosis">
+    <entry file="file://$PROJECT_DIR$/logs/server-0.log">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="579">
-          <caret line="134" column="14" selection-start-line="134" selection-start-column="1" selection-end-line="134" selection-end-column="14" />
-        </state>
+        <state relative-caret-position="-6421" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
+    <entry file="file://$PROJECT_DIR$/logs/server-0.diagnosis">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-6165">
-          <caret line="182" column="56" selection-start-line="182" selection-start-column="56" selection-end-line="182" selection-end-column="56" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#8756#8757#0" expanded="true" />
-            <element signature="e#8808#8809#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="714">
+          <caret line="51" column="14" selection-start-line="51" selection-start-column="1" selection-end-line="51" selection-end-column="14" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-1.diagnosis">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="366">
-          <caret line="141" column="14" selection-start-line="141" selection-start-column="1" selection-end-line="141" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-2.diagnosis">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="126">
-          <caret line="9" column="14" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="14" />
+        <state relative-caret-position="-1918">
+          <caret line="139" column="14" selection-start-line="139" selection-start-column="1" selection-end-line="139" selection-end-column="14" />
         </state>
       </provider>
     </entry>
@@ -1343,17 +1315,50 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-2.diagnosis">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="154">
+          <caret line="11" column="14" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-3.diagnosis">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="14" column="14" selection-start-line="14" selection-start-column="1" selection-end-line="14" selection-end-column="14" />
+        <state relative-caret-position="579">
+          <caret line="101" column="14" selection-start-line="101" selection-start-column="1" selection-end-line="101" selection-end-column="14" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-4.diagnosis">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="224">
-          <caret line="16" column="14" selection-start-line="16" selection-start-column="1" selection-end-line="16" selection-end-column="14" />
+        <state relative-caret-position="252">
+          <caret line="18" column="14" selection-start-line="18" selection-start-column="1" selection-end-line="18" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-1.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="369">
+          <caret line="542" lean-forward="true" selection-start-line="542" selection-end-line="542" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-168">
+          <caret line="33" column="47" selection-start-line="33" selection-start-column="47" selection-end-line="33" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="513">
+          <caret line="325" column="93" lean-forward="true" selection-start-line="325" selection-start-column="93" selection-end-line="325" selection-end-column="93" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#8756#8757#0" expanded="true" />
+            <element signature="e#8808#8809#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

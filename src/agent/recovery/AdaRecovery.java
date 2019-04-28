@@ -34,7 +34,6 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
                        AtomicInteger maxRecvInstance,
                        RemoteInstanceStore remoteStore, AtomicReferenceArray<AdaPaxosInstance> instanceSpace,
                        AtomicReferenceArray<AdaRecoveryMaintenance> recoveryList,
-                       LeaderElectionProvider leController,
                        PaxosLogger logger) {
         super(serverId, peerSize, leaderId, sender, conn, logger);
         this.remoteStore = remoteStore;
@@ -80,7 +79,7 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
                     if (unit.readCount[ackRead.disk_no] == peerSize)
                         ++unit.diskCount;
 
-                    unit.recovered = unit.diskCount == diskSize;
+                    unit.recovered = unit.diskCount == diskSize;    // TODO: 2019/4/28 half of disk is sufficient
                 }
 
                 return unit;
@@ -106,7 +105,7 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
                     if (unit.readCount[ackRead.disk_no] == peerSize)
                         ++unit.diskCount;
 
-                    unit.recovered = unit.diskCount == diskSize;
+                    unit.recovered = unit.diskCount == diskSize;    // TODO: 2019/4/28 half of disk is sufficient
                 }
 
                 return unit;
