@@ -404,8 +404,8 @@ public class demo {
         //DiskPaxosSMRTesting.test1();
         //AdaPaxosRSMTesting.deleteDir("store");
         //AdaPaxosRSMTesting.test0();
-        AdaPaxosRSMTesting.test1(5);
-        //AdaPaxosRSMTesting.test2();
+        //AdaPaxosRSMTesting.test1(5);
+        AdaPaxosRSMTesting.test2();
         //GlobalBipolarControllerTesting.test0();
         //OffsetIndexStoreTesting.test4();
         //Synchronized.main(args);
