@@ -16,10 +16,16 @@ public class ClientRequest implements Serializable {
     public final String clientSocketDescription;
     private transient final Socket clientSocket;
 
-    public ClientRequest(@NotNull GenericClientMessage.Propose proposal, @NotNull Socket socket){
+    public ClientRequest(GenericClientMessage.Propose proposal, Socket socket){
         exec = proposal.exec;
         clientSocket = socket;
         clientSocketDescription = socket.toString();
+    }
+
+    public ClientRequest(GenericClientMessage.Propose proposal, String desc){
+        exec = proposal.exec;
+        clientSocket = null;
+        clientSocketDescription = desc;
     }
 
     public Socket getLocalClientSocket() {

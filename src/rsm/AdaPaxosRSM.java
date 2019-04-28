@@ -6,6 +6,8 @@ import agent.learner.AdaLearner;
 import agent.proposer.AdaProposer;
 import agent.recovery.AdaRecovery;
 import client.ClientRequest;
+import client.grs.GRSMessageGetter;
+import client.grs.GRSMessageReporter;
 import instance.AdaPaxosInstance;
 import instance.InstanceStatus;
 import instance.maintenance.AdaRecoveryMaintenance;
@@ -88,6 +90,8 @@ public class AdaPaxosRSM implements Serializable {
     transient protected AtomicBoolean routineOnRunning;
     transient protected Runnable[] supplementRoutines;
     transient protected LeaderElectionProvider leProvider = null;
+    transient protected GRSMessageGetter mGetter = null;
+    transient protected GRSMessageReporter mReporter = null;
 
 
     protected AdaPaxosRSM(final int serverId,
@@ -239,7 +243,7 @@ public class AdaPaxosRSM implements Serializable {
     public void routine(Runnable... supplement){
         routineOnRunning = new AtomicBoolean(true);
         ExecutorService routines = Executors.newCachedThreadPool();
-        routines.execute(() -> routine_nonBatch(2000));
+        routines.execute(() -> routine_grsBatch(200));
         //routines.execute(()-> routine_batch(1000, GenericPaxosSMR.DEFAULT_REQUEST_COMPACTING_SIZE));
         routines.execute(() -> routine_monitor(20, 40, 3, 10));
         routines.execute(this::routine_response);
@@ -254,7 +258,10 @@ public class AdaPaxosRSM implements Serializable {
         routines.shutdown();
     }
 
-    public void routine(BipolarStateReminder reminder, BipolarStateDecider decider, Runnable... supplement){
+    public void routine(GRSMessageGetter mGetter, GRSMessageReporter mReporter, BipolarStateReminder reminder, BipolarStateDecider decider, Runnable... supplement){
+        this.mGetter = mGetter;
+        this.mReporter = mReporter;
+
         routine(supplement);
         Thread t = new Thread(() -> thread_bipolar(reminder, decider));
         //t.setPriority(Thread.MAX_PRIORITY);
@@ -328,6 +335,24 @@ public class AdaPaxosRSM implements Serializable {
                                 fileSynchronize(inst_no);
                         }
                     }
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    protected void routine_grsBatch(final int batchItv){
+        while (routineOnRunning.get()){
+            try {
+                if (!recovery.onLeaderElection() && asLeader.get()) {
+                    ClientRequest[] cmd = new ClientRequest[]{mGetter.request()};
+                    int inst_no = maxReceivedInstance.getAndIncrement();
+                    proposer.handleRequests(inst_no, crtInstBallot.get(), cmd);
+                    logger.logFormatted(true, "init a proposal", "cmd=\"" + cmd[0] + "\"");
+                    if (forceFsync.get())
+                        fileSynchronize(inst_no);
+                    Thread.sleep(batchItv);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -481,7 +506,7 @@ public class AdaPaxosRSM implements Serializable {
                         acceptor.handleAccept(cast);
                     } else if (msg instanceof GenericPaxosMessage.ackAccept) {
                         GenericPaxosMessage.ackAccept cast = (GenericPaxosMessage.ackAccept) msg;
-                        learner.handleAckAccept(cast, i->updateConsecutiveCommit());
+                        learner.handleAckAccept(cast, this::grsCommit);
                     } else if (msg instanceof GenericPaxosMessage.Commit) {
                         GenericPaxosMessage.Commit cast = (GenericPaxosMessage.Commit) msg;
                         learner.handleCommit(cast, i->updateConsecutiveCommit());
@@ -511,9 +536,9 @@ public class AdaPaxosRSM implements Serializable {
                             update = proposer.respond_ackRead((DiskPaxosMessage.ackRead) dmsg);
                     } else if (learner.isValidMessage(dmsg.inst_no, dmsg.dialog_no)) {
                         if (dmsg instanceof DiskPaxosMessage.ackWrite)
-                            update = learner.respond_ackWrite((DiskPaxosMessage.ackWrite) dmsg, i->updateConsecutiveCommit());
+                            update = learner.respond_ackWrite((DiskPaxosMessage.ackWrite) dmsg, this::grsCommit);
                         else if (dmsg instanceof DiskPaxosMessage.ackRead)
-                            update = learner.respond_ackRead((DiskPaxosMessage.ackRead) dmsg, i->updateConsecutiveCommit());
+                            update = learner.respond_ackRead((DiskPaxosMessage.ackRead) dmsg, this::grsCommit);
                     } else if (recovery.isValidMessage(dmsg.inst_no, dmsg.dialog_no)){
                         if (dmsg instanceof DiskPaxosMessage.ackRead)
                             update = recovery.respond_ackRead((DiskPaxosMessage.ackRead) dmsg, i->updateConsecutiveCommit(), this::finishDisk2Mem);
@@ -687,6 +712,15 @@ public class AdaPaxosRSM implements Serializable {
         }
         consecutiveCommit.set(iter);
         logger.logFormatted(false, "consecutive-commit", "upto="+iter);
+    }
+
+    protected void grsCommit(int commit_no){
+        if (mReporter != null) {
+            ClientRequest[] requests = instanceSpace.get(commit_no).requests;
+            for (ClientRequest request : requests)
+                mReporter.report(request.exec, InstanceStatus.COMMITTED);
+        }
+        updateConsecutiveCommit();
     }
 
     protected void finishDisk2Mem(long dialog_no, int vacant_no){

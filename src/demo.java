@@ -1,4 +1,5 @@
 import client.FileIteratorClient;
+import client.grs.GlobalRequestStatistics;
 import instance.StaticPaxosInstance;
 import instance.store.InstanceStore;
 import instance.store.OffsetIndexStore;
@@ -354,7 +355,7 @@ public class demo {
                         );
                         rsm.link(localNet);
                         rsm.agent(controller);
-                        rsm.routine(controller.getReminder(serverId), controller.getDecider(serverId));
+                        rsm.routine(null, null, controller.getReminder(serverId), controller.getDecider(serverId));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -363,19 +364,25 @@ public class demo {
         }
 
         static void test2(){
+            deleteDir("store");
             ExecutorService service = Executors.newCachedThreadPool();
+            GlobalBipolarController controller = new GlobalBipolarController(5, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, netConfig.initLeaderId);
+            service.execute(controller::LEDecision);
+            service.execute(() -> controller.controlledByFile(new File("control.txt")));
+
+            GlobalRequestStatistics grs = new GlobalRequestStatistics();
+
             for (int i = 0; i < 5; i++) {
                 int serverId = i;
                 service.execute(() -> {
                     try {
                         AdaPaxosRSM rsm = AdaPaxosRSM.makeInstance(serverId, 0, 5,
                                 new PseudoRemoteInstanceStore(serverId, stores, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE),
-                                new GenericNetService(serverId)
+                                new BipolarNetService(serverId, controller)
                         );
                         rsm.link(netConfig);
-                        rsm.agent();
-                        if (serverId != 0)
-                            rsm.routine();
+                        rsm.agent(controller);
+                        rsm.routine(grs.getMessageGetter(serverId), grs.getMessageReporter(serverId), controller.getReminder(serverId), controller.getDecider(serverId));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
