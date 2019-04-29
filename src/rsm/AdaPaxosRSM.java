@@ -243,9 +243,9 @@ public class AdaPaxosRSM implements Serializable {
     public void routine(Runnable... supplement){
         routineOnRunning = new AtomicBoolean(true);
         ExecutorService routines = Executors.newCachedThreadPool();
-        routines.execute(() -> routine_grsBatch(1000));
+        routines.execute(() -> routine_grsBatch(300));
         //routines.execute(()-> routine_batch(1000, GenericPaxosSMR.DEFAULT_REQUEST_COMPACTING_SIZE));
-        routines.execute(() -> routine_monitor(20, 40, 3, 10));
+        routines.execute(() -> routine_monitor(20, 70, 3, 10));
         routines.execute(this::routine_response);
         routines.execute(() -> routine_backup(5000));
         routines.execute(() -> routine_leadership(2000));
@@ -346,12 +346,15 @@ public class AdaPaxosRSM implements Serializable {
         while (routineOnRunning.get()){
             try {
                 if (!recovery.onLeaderElection() && asLeader.get()) {
-                    ClientRequest[] cmd = new ClientRequest[]{mGetter.request()};
-                    int inst_no = maxReceivedInstance.getAndIncrement();
-                    proposer.handleRequests(inst_no, crtInstBallot.get(), cmd);
-                    logger.logFormatted(true, "init a proposal", "cmd=\"" + cmd[0] + "\"");
-                    if (forceFsync.get())
-                        fileSynchronize(inst_no);
+                    ClientRequest recv = mGetter.request();
+                    if (recv != null) {
+                        ClientRequest[] cmd = new ClientRequest[]{recv};
+                        int inst_no = maxReceivedInstance.getAndIncrement();
+                        proposer.handleRequests(inst_no, crtInstBallot.get(), cmd);
+                        logger.logFormatted(true, "init a proposal", "cmd=\"" + recv + "\"");
+                        if (forceFsync.get())
+                            fileSynchronize(inst_no);
+                    }
                     Thread.sleep(batchItv);
                 }
             } catch (InterruptedException e) {
@@ -375,7 +378,7 @@ public class AdaPaxosRSM implements Serializable {
                             forceFsync.set(true);
                             metaFsync.set(true);
                             logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=true][received]\n");
-                            fileSynchronize();
+                            //fileSynchronize();
                         } else {
                             forceFsync.set(false);
                             metaFsync.set(true);

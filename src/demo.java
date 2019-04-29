@@ -337,7 +337,7 @@ public class demo {
 
         static void test1(int totalNum){
             ExecutorService service = Executors.newCachedThreadPool();
-            GlobalBipolarController controller = new GlobalBipolarController(totalNum, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, netConfig.initLeaderId);
+            GlobalBipolarController controller = new GlobalBipolarController(totalNum, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, netConfig.initLeaderId, null);
             service.execute(controller::LEDecision);
             service.execute(() -> controller.controlledByFile(new File("control.txt")));
             NetworkConfiguration localNet = new NetworkConfiguration(totalNum,
@@ -365,12 +365,13 @@ public class demo {
 
         static void test2(){
             deleteDir("store");
-            ExecutorService service = Executors.newCachedThreadPool();
-            GlobalBipolarController controller = new GlobalBipolarController(5, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, netConfig.initLeaderId);
-            service.execute(controller::LEDecision);
-            service.execute(() -> controller.controlledByFile(new File("control.txt")));
 
             GlobalRequestStatistics grs = new GlobalRequestStatistics();
+
+            ExecutorService service = Executors.newCachedThreadPool();
+            GlobalBipolarController controller = new GlobalBipolarController(5, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, netConfig.initLeaderId, grs);
+            service.execute(controller::LEDecision);
+            service.execute(() -> controller.controlledByFile(new File("control.txt")));
 
             for (int i = 0; i < 5; i++) {
                 int serverId = i;
@@ -393,7 +394,7 @@ public class demo {
 
     static class GlobalBipolarControllerTesting{
         static void test0(){
-            GlobalBipolarController controller = new GlobalBipolarController(5, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, 0);
+            GlobalBipolarController controller = new GlobalBipolarController(5, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, 0, null);
             controller.controlledByFile(new File("control.txt"));
         }
     }

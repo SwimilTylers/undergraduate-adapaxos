@@ -1,9 +1,8 @@
 package network.service.module.controller;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import client.grs.GlobalRequestStatistics;
+
+import java.io.*;
 import java.util.Arrays;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -19,8 +18,11 @@ public class GlobalBipolarController extends GlobalLeaderElectionController{
     private AtomicInteger stateCount;
     private AtomicBoolean onRunning;
 
-    public GlobalBipolarController(int peerSize, int offerSize, int initLeader){
+    private GlobalRequestStatistics grs;
+
+    public GlobalBipolarController(int peerSize, int offerSize, int initLeader, GlobalRequestStatistics grs){
         super(peerSize, offerSize, initLeader);
+        this.grs = grs;
         bipolarArray = new AtomicReference<>();
         onRunning = new AtomicBoolean(true);
         stateCount = new AtomicInteger(0);
@@ -54,6 +56,15 @@ public class GlobalBipolarController extends GlobalLeaderElectionController{
                 });
 
                 Thread.sleep(Integer.valueOf(pair[3]));
+            }
+            if (grs != null) {
+                FileWriter writer = new FileWriter("conclusion.txt");
+                String conclusion = grs.makeConclusion(2000);
+                writer.write("conclusion = " + System.currentTimeMillis() + "\n\n");
+                writer.write(conclusion);
+                writer.write("\n\n============================================\n\n\n");
+                writer.flush();
+                writer.close();
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();

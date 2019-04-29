@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="Status: prepare for triggeredClient Testing&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR">
-      <change afterPath="$PROJECT_DIR$/src/client/grs/GRSMessageGetter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/client/grs/GRSMessageReporter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/client/grs/GlobalRequestStatistics.java" afterDir="false" />
+    <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/client/ClientRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/client/ClientRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/client/grs/GlobalRequestStatistics.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/client/grs/GlobalRequestStatistics.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/demo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/demo.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" afterDir="false" />
@@ -32,10 +29,70 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/client/ClientRequest.java">
+        <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="280">
-              <caret line="24" column="10" selection-start-line="24" selection-start-column="10" selection-end-line="24" selection-end-column="10" />
+            <state relative-caret-position="2772">
+              <caret line="380" column="30" selection-start-line="380" selection-start-column="30" selection-end-line="380" selection-end-column="30" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/client/grs/GlobalRequestStatistics.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="555">
+              <caret line="81" selection-start-line="81" selection-end-line="81" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/conclusion.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="308">
+              <caret line="22" column="73" selection-start-line="22" selection-start-column="73" selection-end-line="22" selection-end-column="73" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/logs/server-3.diagnosis">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="210">
+              <caret line="15" column="9" lean-forward="true" selection-start-line="15" selection-start-column="9" selection-end-line="15" selection-end-column="9" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/logs/server-0.diagnosis">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="294">
+              <caret line="21" column="14" selection-start-line="21" selection-start-column="1" selection-end-line="21" selection-end-column="14" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/logs/server-0.log">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-591">
+              <caret line="738" column="45" selection-start-line="738" selection-start-column="32" selection-end-line="738" selection-end-column="45" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/logs/server-4.diagnosis">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="378">
+              <caret line="27" column="14" selection-start-line="27" selection-start-column="1" selection-end-line="27" selection-end-column="14" />
             </state>
           </provider>
         </entry>
@@ -43,78 +100,26 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-5">
-              <caret line="19" column="36" lean-forward="true" selection-start-line="19" selection-start-column="36" selection-end-line="19" selection-end-column="36" />
+            <state relative-caret-position="840">
+              <caret line="67" column="13" selection-start-line="67" selection-start-column="13" selection-end-line="67" selection-end-column="13" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#2611#2612#0" expanded="true" />
+                <element signature="e#2672#2673#0" expanded="true" />
+                <element signature="e#2733#2734#0" expanded="true" />
+                <element signature="e#2778#2779#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/client/grs/GRSMessageGetter.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="42">
-              <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/network/service/module/controller/GlobalLeaderElectionController.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-131">
-              <caret line="23" column="11" selection-start-line="23" selection-start-column="11" selection-end-line="23" selection-end-column="11" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/demo.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="625">
-              <caret line="366" column="31" selection-start-line="366" selection-start-column="31" selection-end-line="366" selection-end-column="31" />
+            <state relative-caret-position="4830">
+              <caret line="373" column="88" selection-start-line="373" selection-start-column="88" selection-end-line="373" selection-end-column="88" />
               <folding>
                 <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/utils/AdaAgents.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="112">
-              <caret line="9" column="13" selection-start-line="9" selection-start-column="13" selection-end-line="9" selection-end-column="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/agent/recovery/LeaderElectionRecovery.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-271">
-              <caret line="60" column="26" selection-start-line="60" selection-start-column="26" selection-end-line="60" selection-end-column="26" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/client/TriggeredClient.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="23">
-              <caret line="27" column="70" selection-start-line="27" selection-start-column="70" selection-end-line="27" selection-end-column="70" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#634#635#0" expanded="true" />
-                <element signature="e#687#688#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -133,11 +138,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>submit</find>
-      <find>new</find>
-      <find>subInst</find>
-      <find>SYNC</find>
-      <find>msync</find>
       <find>remote store</find>
       <find>1555146250</find>
       <find>15551468711</find>
@@ -163,6 +163,11 @@
       <find>155637425558</find>
       <find>hb</find>
       <find>15563763295</find>
+      <find>155645911671</find>
+      <find>15564591193</find>
+      <find>155645910459</find>
+      <find>155645912266</find>
+      <find>1556463735710</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -221,21 +226,21 @@
         <option value="$PROJECT_DIR$/src/network/service/module/controller/BipolarStateArrayDecider.java" />
         <option value="$PROJECT_DIR$/src/agent/recovery/LeaderElectionPerformer.java" />
         <option value="$PROJECT_DIR$/src/agent/recovery/LeaderElectionRecovery.java" />
-        <option value="$PROJECT_DIR$/logs/server-0.diagnosis" />
         <option value="$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java" />
         <option value="$PROJECT_DIR$/src/utils/NetworkConfiguration.java" />
         <option value="$PROJECT_DIR$/src/client/TriggeredClient.java" />
         <option value="$PROJECT_DIR$/src/network/service/module/controller/BipolarClientTrigger.java" />
         <option value="$PROJECT_DIR$/src/network/service/module/controller/LeaderAcknowledgement.java" />
         <option value="$PROJECT_DIR$/src/network/service/module/controller/GlobalLeaderElectionController.java" />
-        <option value="$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java" />
         <option value="$PROJECT_DIR$/src/client/grs/GRSMessageReporter.java" />
         <option value="$PROJECT_DIR$/src/client/grs/GRSRequest.java" />
         <option value="$PROJECT_DIR$/src/client/grs/GRSMessageGetter.java" />
         <option value="$PROJECT_DIR$/src/client/ClientRequest.java" />
-        <option value="$PROJECT_DIR$/src/client/grs/GlobalRequestStatistics.java" />
-        <option value="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" />
+        <option value="$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java" />
         <option value="$PROJECT_DIR$/src/demo.java" />
+        <option value="$PROJECT_DIR$/src/client/grs/GlobalRequestStatistics.java" />
+        <option value="$PROJECT_DIR$/logs/server-0.diagnosis" />
+        <option value="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" />
       </list>
     </option>
   </component>
@@ -316,6 +321,12 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="instance" type="462c0819:PsiDirectoryNode" />
               <item name="store" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
+              <item name="adapaxos" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="logger" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="adapaxos" type="b2602c69:ProjectViewProjectNode" />
@@ -559,21 +570,8 @@
       <workItem from="1555730726614" duration="764000" />
       <workItem from="1555731677043" duration="17433000" />
       <workItem from="1555816047354" duration="1818000" />
-      <workItem from="1556426565360" duration="19676000" />
-    </task>
-    <task id="LOCAL-00024" summary="Status: disk-paxos: normal case&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation">
-      <created>1550230635631</created>
-      <option name="number" value="00024" />
-      <option name="presentableId" value="LOCAL-00024" />
-      <option name="project" value="LOCAL" />
-      <updated>1550230635631</updated>
-    </task>
-    <task id="LOCAL-00025" summary="Status: disk-paxos normal case tested, with DummyStore&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation">
-      <created>1550486737566</created>
-      <option name="number" value="00025" />
-      <option name="presentableId" value="LOCAL-00025" />
-      <option name="project" value="LOCAL" />
-      <updated>1550486737566</updated>
+      <workItem from="1556426565360" duration="24763000" />
+      <workItem from="1556519604612" duration="4051000" />
     </task>
     <task id="LOCAL-00026" summary="Status: tested OffsetIndexStore&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;* Echo.agent&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation">
       <created>1550561600772</created>
@@ -904,11 +902,25 @@
       <option name="project" value="LOCAL" />
       <updated>1556435912564</updated>
     </task>
-    <option name="localTasksCounter" value="73" />
+    <task id="LOCAL-00073" summary="Status: prepare for GRS Testing&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR">
+      <created>1556458829979</created>
+      <option name="number" value="00073" />
+      <option name="presentableId" value="LOCAL-00073" />
+      <option name="project" value="LOCAL" />
+      <updated>1556458829979</updated>
+    </task>
+    <task id="LOCAL-00074" summary="Status: seems working fine, but with too many false alert&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR">
+      <created>1556460128697</created>
+      <option name="number" value="00074" />
+      <option name="presentableId" value="LOCAL-00074" />
+      <option name="project" value="LOCAL" />
+      <updated>1556460128698</updated>
+    </task>
+    <option name="localTasksCounter" value="75" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="810313000" />
+    <option name="totallyTimeSpent" value="819451000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -923,7 +935,7 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49858356" visible="true" weight="0.28150135" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49858356" visible="true" weight="0.2855228" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -1003,9 +1015,6 @@
     <ignored-roots>
       <path value="E:" />
     </ignored-roots>
-    <MESSAGE value="Status: on de-localStorage&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
-    <MESSAGE value="Status: de-localStorage-lized&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
-    <MESSAGE value="Status: start decouple disk and machine&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: beaconThread.setPriority(Thread.MAX_PRIORITY); drop expire to 60 ms&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: eager fsync -&gt; hesitate fsync&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: recovery&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
@@ -1028,7 +1037,10 @@
     <MESSAGE value="Status: stable when backing-up&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: TriggeredClient&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
     <MESSAGE value="Status: prepare for triggeredClient Testing&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
-    <option name="LAST_COMMIT_MESSAGE" value="Status: prepare for triggeredClient Testing&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
+    <MESSAGE value="Status: prepare for GRS Testing&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
+    <MESSAGE value="Status: seen works fine, but with too many false alert&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
+    <MESSAGE value="Status: seems working fine, but with too many false alert&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
+    <option name="LAST_COMMIT_MESSAGE" value="Status: seems working fine, but with too many false alert&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1049,51 +1061,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/logs/server-3.net.log">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-3.paxos.log">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-3.store">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-3.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2856" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/sender/BipolarPeerMessageSender.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="350">
-          <caret line="25" column="5" lean-forward="true" selection-start-line="25" selection-start-column="5" selection-end-line="25" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/module/connection/BidirectionalHeartBeatModule.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="112">
-          <caret line="14" column="13" selection-start-line="14" selection-start-column="13" selection-end-line="14" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-3.heartbeat">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/module/controller/LeaderElectionProvider.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="154">
-          <caret line="11" column="54" lean-forward="true" selection-start-line="11" selection-start-column="54" selection-end-line="11" selection-end-column="54" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/module/controller/BipolarStateReminder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="56">
-          <caret line="4" column="29" lean-forward="true" selection-start-line="4" selection-start-column="29" selection-end-line="4" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/network/service/module/controller/BipolarStateArrayDecider.java" />
     <entry file="file://$PROJECT_DIR$/src/network/service/module/controller/BipolarStateDecider.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -1156,13 +1123,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-4.heartbeat">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-11250">
-          <caret line="7486" column="35" selection-start-line="7486" selection-start-column="35" selection-end-line="7486" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/network/service/module/connection/UnidirectionalHeartBeatModule.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="966">
@@ -1183,20 +1143,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-1.heartbeat">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="417">
-          <caret line="8161" column="22" selection-start-line="8161" selection-start-column="22" selection-end-line="8161" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/control.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="112">
-          <caret line="8" column="15" selection-start-line="8" selection-start-column="15" selection-end-line="8" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-2.heartbeat">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="95522">
@@ -1208,49 +1154,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="80738">
           <caret line="5767" column="22" selection-start-line="5767" selection-start-column="10" selection-end-line="5767" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-0.commit.log">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-0.log">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-6421" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-0.diagnosis">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="714">
-          <caret line="51" column="14" selection-start-line="51" selection-start-column="1" selection-end-line="51" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-1.diagnosis">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1918">
-          <caret line="139" column="14" selection-start-line="139" selection-start-column="1" selection-end-line="139" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-2.diagnosis">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="154">
-          <caret line="11" column="14" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-3.diagnosis">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="579">
-          <caret line="101" column="14" selection-start-line="101" selection-start-column="1" selection-end-line="101" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-4.diagnosis">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="252">
-          <caret line="18" column="14" selection-start-line="18" selection-start-column="1" selection-end-line="18" selection-end-column="14" />
         </state>
       </provider>
     </entry>
@@ -1304,26 +1207,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/agent/recovery/LeaderElectionRecovery.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-271">
-          <caret line="60" column="26" selection-start-line="60" selection-start-column="26" selection-end-line="60" selection-end-column="26" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/module/controller/GlobalClientTrigger.java">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/module/controller/LeaderAcknowledgement.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="112">
-          <caret line="8" column="32" lean-forward="true" selection-start-line="8" selection-start-column="32" selection-end-line="8" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/module/controller/GlobalClientTrigger.java" />
+    <entry file="file://$PROJECT_DIR$/src/network/service/module/controller/LeaderAcknowledgement.java" />
     <entry file="file://$PROJECT_DIR$/src/client/grs/GRSMessageReporter.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="126">
@@ -1331,45 +1216,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/client/grs/GRSRequest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="14" column="59" selection-start-line="14" selection-start-column="22" selection-end-line="14" selection-end-column="59" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#319#320#0" expanded="true" />
-            <element signature="e#358#359#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/client/grs/GRSMessageGetter.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="42">
-          <caret line="3" lean-forward="true" selection-start-line="3" selection-end-line="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-5">
-          <caret line="19" column="36" lean-forward="true" selection-start-line="19" selection-start-column="36" selection-end-line="19" selection-end-column="36" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/client/grs/GlobalRequestStatistics.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="462">
-          <caret line="41" column="10" lean-forward="true" selection-start-line="41" selection-start-column="10" selection-end-line="41" selection-end-column="10" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/src/client/grs/GRSRequest.java" />
     <entry file="file://$PROJECT_DIR$/src/utils/AdaAgents.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="112">
@@ -1377,22 +1224,25 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="94">
-          <caret line="258" column="5" lean-forward="true" selection-start-line="258" selection-start-column="5" selection-end-line="258" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#8756#8757#0" expanded="true" />
-            <element signature="e#8808#8809#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/client/ClientRequest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="280">
           <caret line="24" column="10" selection-start-line="24" selection-start-column="10" selection-end-line="24" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-0.commit.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-168" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/agent/recovery/LeaderElectionRecovery.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-271">
+          <caret line="60" column="26" selection-start-line="60" selection-start-column="26" selection-end-line="60" selection-end-column="26" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1406,13 +1256,164 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/client/grs/GRSMessageGetter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="42">
+          <caret line="3" selection-start-line="3" selection-end-line="3" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-1.commit.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-378" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-3.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1344" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-4.heartbeat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="97">
+          <caret line="11527" column="22" selection-start-line="11527" selection-start-column="10" selection-end-line="11527" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-4.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-45769" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-1.heartbeat">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-29">
+          <caret line="19159" column="22" selection-start-line="19159" selection-start-column="10" selection-end-line="19159" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-3.commit.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-756" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-2.commit.log">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-2.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-12418">
+          <caret line="385" column="76" selection-start-line="385" selection-start-column="76" selection-end-line="385" selection-end-column="76" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/logger/NaiveLogger.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1120">
+          <caret line="116" column="13" selection-start-line="116" selection-start-column="13" selection-end-line="116" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-4.commit.log">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="840">
+          <caret line="67" column="13" selection-start-line="67" selection-start-column="13" selection-end-line="67" selection-end-column="13" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#2611#2612#0" expanded="true" />
+            <element signature="e#2672#2673#0" expanded="true" />
+            <element signature="e#2733#2734#0" expanded="true" />
+            <element signature="e#2778#2779#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/demo.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="625">
-          <caret line="366" column="31" selection-start-line="366" selection-start-column="31" selection-end-line="366" selection-end-column="31" />
+        <state relative-caret-position="4830">
+          <caret line="373" column="88" selection-start-line="373" selection-start-column="88" selection-end-line="373" selection-end-column="88" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-1.diagnosis">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="462">
+          <caret line="102" column="14" selection-start-line="102" selection-start-column="1" selection-end-line="102" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-2.diagnosis">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="182">
+          <caret line="13" column="14" selection-start-line="13" selection-start-column="1" selection-end-line="13" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/conclusion.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="308">
+          <caret line="22" column="73" selection-start-line="22" selection-start-column="73" selection-end-line="22" selection-end-column="73" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-4.diagnosis">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="378">
+          <caret line="27" column="14" selection-start-line="27" selection-start-column="1" selection-end-line="27" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/control.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="28">
+          <caret line="2" column="9" lean-forward="true" selection-start-line="2" selection-start-column="9" selection-end-line="2" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-0.diagnosis">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="294">
+          <caret line="21" column="14" selection-start-line="21" selection-start-column="1" selection-end-line="21" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-0.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-591">
+          <caret line="738" column="45" selection-start-line="738" selection-start-column="32" selection-end-line="738" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/client/grs/GlobalRequestStatistics.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="555">
+          <caret line="81" selection-start-line="81" selection-end-line="81" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2772">
+          <caret line="380" column="30" selection-start-line="380" selection-start-column="30" selection-end-line="380" selection-end-column="30" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-3.diagnosis">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="15" column="9" lean-forward="true" selection-start-line="15" selection-start-column="9" selection-end-line="15" selection-end-column="9" />
         </state>
       </provider>
     </entry>
