@@ -16,7 +16,7 @@ public class GlobalRequestStatistics {
     static class GRSEntry{
         InstanceStatus status;
         int requestLeader;
-        int firstCommitLeader;
+        int firstCommitLeader = -1;
 
         int verified;
 

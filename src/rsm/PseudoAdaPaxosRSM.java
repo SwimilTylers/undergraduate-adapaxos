@@ -164,12 +164,6 @@ public class PseudoAdaPaxosRSM extends GenericPaxosSMR{
 
     protected void adaPaxosMessageHandler(){
         AdaPaxosMessage msg = aMessages.poll();
-        if (msg != null){
-            if (msg.fsync && !slowMode.get())
-                switchToDisk();
-            else if (!msg.fsync && slowMode.get())
-                switchToMemory();
-        }
     }
 
 

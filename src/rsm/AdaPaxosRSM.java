@@ -374,16 +374,24 @@ public class AdaPaxosRSM implements Serializable {
                 try {
                     AdaPaxosMessage message = aMessages.poll(monitorItv, TimeUnit.MILLISECONDS);
                     if (message != null) {
-                        if (message.fsync) {
-                            forceFsync.set(true);
-                            metaFsync.set(true);
-                            logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=true][received]\n");
-                            //fileSynchronize();
-                        } else {
-                            forceFsync.set(false);
-                            metaFsync.set(true);
-                            logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=false][received]\n");
-                            memorySynchronize(AdaAgents.newToken());
+                        if (message instanceof AdaPaxosMessage.StateTransformation){
+                            AdaPaxosMessage.StateTransformation st = (AdaPaxosMessage.StateTransformation) message;
+                            if (st.fsync) {
+                                forceFsync.set(true);
+                                metaFsync.set(true);
+                                logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=true][received]\n");
+                                //fileSynchronize();
+                            } else {
+                                forceFsync.set(false);
+                                metaFsync.set(true);
+                                logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=false][received]\n");
+                                memorySynchronize(AdaAgents.newToken());
+                            }
+                        }
+                        else if (message instanceof AdaPaxosMessage.SyncInitFsync){
+                            AdaPaxosMessage.SyncInitFsync sif = (AdaPaxosMessage.SyncInitFsync) message;
+                            int to = fsyncInitInstance.updateAndGet(i -> Integer.max(i, sif.initFsync));
+                            logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[INIT_FSYNC][to="+to+"]\n");
                         }
                     }
                     else if (!asLeader.get() && !recovery.onLeaderElection()){      // carry out leader detection
@@ -444,7 +452,7 @@ public class AdaPaxosRSM implements Serializable {
                                 int ballot = crtInstBallot.incrementAndGet();
                                 metaFsync.set(true);
                                 logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=true][new ballot=" + ballot + "]\n");
-                                net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(true, maxReceivedInstance.get()));
+                                net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage.StateTransformation(true, maxReceivedInstance.get()));
                                 fileSynchronize();
                             }
                         }
@@ -461,7 +469,7 @@ public class AdaPaxosRSM implements Serializable {
                                 int ballot = crtInstBallot.incrementAndGet();
                                 metaFsync.set(true);
                                 logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=false][new ballot=" + ballot + "]\n");
-                                net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(false, maxReceivedInstance.get()));
+                                net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage.StateTransformation(false, maxReceivedInstance.get()));
                             }
                         }
                     }
@@ -474,7 +482,7 @@ public class AdaPaxosRSM implements Serializable {
                             int ballot = crtInstBallot.incrementAndGet();
                             metaFsync.set(true);
                             logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[FSYNC=false][new ballot=" + ballot + "]\n");
-                            net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage(false, maxReceivedInstance.get()));
+                            net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage.StateTransformation(false, maxReceivedInstance.get()));
                         }
                     }
                 }
@@ -520,9 +528,6 @@ public class AdaPaxosRSM implements Serializable {
                         GenericPaxosMessage.ackSync cast = (GenericPaxosMessage.ackSync) msg;
                         recovery.handleAckSync(cast, i->updateConsecutiveCommit(), this::finishDisk2Mem);
                     }
-
-                    if (forceFsync.get())
-                        fileSynchronize(msg.inst_no);
                 }
 
                 DiskPaxosMessage dmsg = dMessages.poll();
@@ -546,8 +551,6 @@ public class AdaPaxosRSM implements Serializable {
                         if (dmsg instanceof DiskPaxosMessage.ackRead)
                             update = recovery.respond_ackRead((DiskPaxosMessage.ackRead) dmsg, i->updateConsecutiveCommit(), this::finishDisk2Mem);
                     }
-                    if (forceFsync.get() && update)
-                        fileSynchronize(dmsg.inst_no);
                 }
             }
         } catch (Exception e){
@@ -653,6 +656,7 @@ public class AdaPaxosRSM implements Serializable {
             }
         }
         fsyncInitInstance.set(inst_no);
+        net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage.SyncInitFsync(inst_no));
         int fsyncInit_end = inst_no;
         for (; inst_no < maxReceivedInstance.get(); inst_no++) {
             if (!fsyncSignature[inst_no]){
@@ -727,7 +731,8 @@ public class AdaPaxosRSM implements Serializable {
     }
 
     protected void finishDisk2Mem(long dialog_no, int vacant_no){
-        fsyncInitInstance.set(consecutiveCommit.get());
+        int to = fsyncInitInstance.updateAndGet(i -> Integer.max(consecutiveCommit.get(), i));
+        logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[INIT_FSYNC][to="+to+"]\n");
         recovery.markFileSyncComplete((token, leaderId) -> asLeader.set(leaderId == serverId));
     }
 
@@ -744,7 +749,7 @@ public class AdaPaxosRSM implements Serializable {
                 }
                 else {
                     logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[state change][0->1][tkt="+fsyncInitInstance.get()+",init_lid="+nConfig.initLeaderId+"]\n");
-                    instanceSpaceBuild(instanceSpace.length(), crtState << 16, 0);
+                    instanceSpaceBuild(instanceSpace.length(), reminder.remind() << 16, 0);
                     agent(leProvider);
 
                     forceFsync.set(true);
