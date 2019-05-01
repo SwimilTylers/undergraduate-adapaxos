@@ -323,8 +323,6 @@ public class AdaPaxosRSM implements Serializable {
                     int inst_no = maxReceivedInstance.getAndIncrement();
                     proposer.handleRequests(inst_no, crtInstBallot.get(), cmd);
                     logger.logFormatted(true, "init a proposal");
-                    if (forceFsync.get())
-                        fileSynchronize(inst_no);
                 }
             }
 
@@ -348,8 +346,6 @@ public class AdaPaxosRSM implements Serializable {
                             int inst_no = maxReceivedInstance.getAndIncrement();
                             proposer.handleRequests(inst_no, crtInstBallot.get(), cmd);
                             logger.logFormatted(true, "init a proposal", "cmd=\""+recv+"\"");
-                            if (forceFsync.get())
-                                fileSynchronize(inst_no);
                         }
                     }
                 }
@@ -368,9 +364,7 @@ public class AdaPaxosRSM implements Serializable {
                         AdaPaxosInstance inst = instanceSpace.get(restart_no);
                         if (inst == null || inst.status != InstanceStatus.COMMITTED){
                             proposer.restartRequests(restart_no, crtInstBallot.get());
-                            logger.logFormatted(true, "restart a proposal", "inst_no=\"" + restart_no + "\"");
-                            if (forceFsync.get())
-                                fileSynchronize(restart_no);
+                            logger.logFormatted(true, "restart a proposal", "inst_no=" + restart_no + "");
                         }
                     }
                     else{
@@ -379,9 +373,7 @@ public class AdaPaxosRSM implements Serializable {
                             ClientRequest[] cmd = new ClientRequest[]{recv};
                             int inst_no = maxReceivedInstance.getAndIncrement();
                             proposer.handleRequests(inst_no, crtInstBallot.get(), cmd);
-                            logger.logFormatted(true, "init a proposal", "cmd=\"" + recv + "\"");
-                            if (forceFsync.get())
-                                fileSynchronize(inst_no);
+                            logger.logFormatted(true, "init a proposal", "inst_no=" + inst_no,  "cmd=\"" + recv + "\"");
                         }
                         Thread.sleep(batchItv);
                     }

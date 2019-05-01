@@ -11,6 +11,7 @@ import network.message.protocols.GenericPaxosMessage;
 import network.service.sender.PeerMessageSender;
 import utils.AdaAgents;
 
+import java.util.Arrays;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReferenceArray;
@@ -24,6 +25,7 @@ import static utils.AdaAgents.broadcastOnDisks;
 public class AdaLearner implements Learner, DiskCommitResponder {
     private final int serverId;
     private final int peerSize;
+    private final int diskSize;
 
     private final PeerMessageSender sender;
     private final RemoteInstanceStore remoteStore;
@@ -46,6 +48,7 @@ public class AdaLearner implements Learner, DiskCommitResponder {
         this.peerSize = peerSize;
         this.sender = sender;
         this.remoteStore = remoteStore;
+        this.diskSize = remoteStore.getDiskSize();
         this.instanceSpace = instanceSpace;
         this.restoreRequests = restoreRequests;
         this.forceFsync = forceFsync;
@@ -159,9 +162,15 @@ public class AdaLearner implements Learner, DiskCommitResponder {
             AdaPaxosInstance inst = instanceSpace.updateAndGet(ackWrite.inst_no, instance -> {
                 instance = AdaPaxosInstance.copy(instance);
                 boolean check = ackWrite.status == DiskPaxosMessage.DiskStatus.WRITE_SUCCESS;
-                instance.lmu.writeSign[ackWrite.disk_no] = check;
-                if (check && instance.lmu.readCount[ackWrite.disk_no] == peerSize-1){
-                    ++instance.lmu.response;
+                if (!instance.lmu.writeSign[ackWrite.disk_no] && check) {
+                    instance.lmu.writeSign[ackWrite.disk_no] = true;
+                    Arrays.fill(instance.lmu.readCount, 0);
+                    for (int disk_no = 0; disk_no < diskSize; disk_no++) {
+                        for (int access_id = 0; access_id < peerSize; access_id++) {
+                            if (access_id != serverId)
+                                remoteStore.launchRemoteFetch(ackWrite.dialog_no, disk_no, access_id, ackWrite.inst_no);
+                        }
+                    }
                 }
                 return instance;
             });
@@ -169,7 +178,7 @@ public class AdaLearner implements Learner, DiskCommitResponder {
             /* accumulating until reach Paxos threshold
              * BROADCASTING_ACCEPT activated only once in each Paxos period (only in PREPARING status) */
 
-            if (inst.lmu.response > peerSize/2) {
+            if (inst.lmu.response > diskSize/2) {
                 furtherStep(ackWrite.inst_no, updater);
                 return true;
             }
@@ -195,7 +204,7 @@ public class AdaLearner implements Learner, DiskCommitResponder {
 
                 /* accumulating until reach Paxos threshold
                  * BROADCASTING_ACCEPT activated only once in each Paxos period (only in PREPARING status) */
-                if (inst.lmu.response > peerSize/2) {
+                if (inst.lmu.response > diskSize/2) {
                     furtherStep(ackRead.inst_no, updater);
                     return true;
                 }
@@ -211,6 +220,25 @@ public class AdaLearner implements Learner, DiskCommitResponder {
                      * There must be only ONE leader in the network ! */
 
                     return true;
+                }
+                else {
+                    inst = instanceSpace.updateAndGet(ackRead.inst_no, instance -> {
+                        instance = AdaPaxosInstance.copy(instance);
+
+                        ++instance.lmu.readCount[ackRead.disk_no];
+                        if (instance.lmu.writeSign[ackRead.disk_no]
+                                && instance.lmu.readCount[ackRead.disk_no] == peerSize - 1) {
+                            ++instance.lmu.response;
+                        }
+                        return instance;
+                    });
+
+                    /* accumulating until reach Paxos threshold
+                     * BROADCASTING_ACCEPT activated only once in each Paxos period (only in PREPARING status) */
+                    if (inst.lmu.response > diskSize/2) {
+                        furtherStep(ackRead.inst_no, updater);
+                        return true;
+                    }
                 }
             }
         }
@@ -234,7 +262,7 @@ public class AdaLearner implements Learner, DiskCommitResponder {
             sender.broadcastPeerMessage(sendOut);
         }
         else {
-            broadcastOnDisks(inst.lmu.token, inst_no, inst, serverId, peerSize, remoteStore);
+            broadcastOnDisks(inst.lmu.token, inst_no, inst, diskSize, remoteStore);
         }
 
         updater.update(inst_no);

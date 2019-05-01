@@ -26,6 +26,7 @@ import static utils.AdaAgents.broadcastOnDisks;
 public class AdaProposer implements Proposer, DiskResponder {
     private final int serverId;
     private final int peerSize;
+    private final int diskSize;
 
     private final PeerMessageSender sender;
     private final RemoteInstanceStore remoteStore;
@@ -48,6 +49,7 @@ public class AdaProposer implements Proposer, DiskResponder {
         this.peerSize = peerSize;
         this.sender = sender;
         this.remoteStore = remoteStore;
+        this.diskSize = remoteStore.getDiskSize();
         this.instanceSpace = instanceSpace;
         this.restoreRequests = restoreRequests;
         this.forceFsync = forceFsync;
@@ -84,7 +86,7 @@ public class AdaProposer implements Proposer, DiskResponder {
         }
         else {
             logger.logFormatted(false, ""+System.currentTimeMillis(), "prepare="+inst_no, "fsync=true");
-            broadcastOnDisks(token, inst_no, inst, serverId, peerSize, remoteStore);
+            broadcastOnDisks(token, inst_no, inst, diskSize, remoteStore);
         }
     }
 
@@ -150,7 +152,7 @@ public class AdaProposer implements Proposer, DiskResponder {
                     sender.broadcastPeerMessage(new GenericPaxosMessage.Commit(ackPrepare.inst_no, serverId, inst.crtInstBallot, inst.requests));
                 }
                 else {
-                    broadcastOnDisks(inst.lmu.token, ackPrepare.inst_no, inst, serverId, peerSize, remoteStore);
+                    broadcastOnDisks(inst.lmu.token, ackPrepare.inst_no, inst, diskSize, remoteStore);
                 }
             }
             else if (ackPrepare.type == GenericPaxosMessage.ackMessageType.ABORT){  // abort case
@@ -180,10 +182,17 @@ public class AdaProposer implements Proposer, DiskResponder {
             AdaPaxosInstance inst = instanceSpace.updateAndGet(ackWrite.inst_no, instance -> {
                 instance = AdaPaxosInstance.copy(instance);
                 boolean check = ackWrite.status == DiskPaxosMessage.DiskStatus.WRITE_SUCCESS;
-                instance.lmu.writeSign[ackWrite.disk_no] = check;
-                if (check && instance.lmu.readCount[ackWrite.disk_no] == peerSize-1){
-                    ++instance.lmu.response;
+                if (!instance.lmu.writeSign[ackWrite.disk_no] && check){
+                    instance.lmu.writeSign[ackWrite.disk_no] = true;
+                    Arrays.fill(instance.lmu.readCount, 0);
+                    for (int disk_no = 0; disk_no < diskSize; disk_no++) {
+                        for (int access_id = 0; access_id < peerSize; access_id++) {
+                            if (access_id != serverId)
+                                remoteStore.launchRemoteFetch(ackWrite.dialog_no, disk_no, access_id, ackWrite.inst_no);
+                        }
+                    }
                 }
+
                 return instance;
             });
 
@@ -234,17 +243,8 @@ public class AdaProposer implements Proposer, DiskResponder {
                     return false;
                 }
                 else {
-                    instanceSpace.updateAndGet(ackRead.inst_no, instance -> {   // early-restore case
+                    inst = instanceSpace.updateAndGet(ackRead.inst_no, instance -> {
                         instance = AdaPaxosInstance.copy(instance);
-
-                        instance.hmu = HistoryMaintenance.restoreHelper(
-                                instance.hmu,
-                                HistoryMaintenance.RESTORE_TYPE.EARLY,
-                                restoreRequests,
-                                ackRead.accessId,
-                                ackRead.inst_ballot,
-                                ackRead.load.requests
-                        );
 
                         ++instance.lmu.readCount[ackRead.disk_no];
                         if (instance.lmu.writeSign[ackRead.disk_no]
@@ -287,7 +287,7 @@ public class AdaProposer implements Proposer, DiskResponder {
         }
         else {
             System.out.println("tikz");
-            broadcastOnDisks(inst.lmu.token, inst_no, inst, serverId, peerSize, remoteStore);
+            broadcastOnDisks(inst.lmu.token, inst_no, inst, diskSize, remoteStore);
         }
     }
 }

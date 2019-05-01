@@ -27,7 +27,11 @@ public class TaggedOffsetIndexStore extends OffsetIndexStore{
             tags.put(key, new Pair<>(inst_ballot, instance.status));
             return super.store(access_id, inst_id, instance);
         }
-        else if (tags.get(key).getKey() <= inst_ballot && !InstanceStatus.earlierThan(tags.get(key).getValue(), instance.status)){
+        else if (tags.get(key).getKey() == inst_ballot && !InstanceStatus.earlierThan(tags.get(key).getValue(), instance.status)){
+            tags.replace(key, new Pair<>(inst_ballot, instance.status));
+            return super.store(access_id, inst_id, instance);
+        }
+        else if (tags.get(key).getKey() < inst_ballot){
             tags.replace(key, new Pair<>(inst_ballot, instance.status));
             return super.store(access_id, inst_id, instance);
         }
