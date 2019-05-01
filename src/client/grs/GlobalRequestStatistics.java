@@ -2,11 +2,14 @@ package client.grs;
 
 import client.ClientRequest;
 import instance.InstanceStatus;
+import javafx.util.Pair;
 import network.message.protocols.GenericClientMessage;
 
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author : Swimiltylers
@@ -18,7 +21,7 @@ public class GlobalRequestStatistics {
         int requestLeader;
         int firstCommitLeader = -1;
 
-        int verified;
+        int verified = -99;
 
         long ts_start;
         long ts_commit;
@@ -39,16 +42,21 @@ public class GlobalRequestStatistics {
     private ConcurrentHashMap<String, GRSEntry> statistics;
     private AtomicBoolean conclude;
     private Random rnd;
+    private GRSInstanceAnalytical[] analytics;
+    private AtomicInteger lastMGetter;
 
-    public GlobalRequestStatistics() {
+    public GlobalRequestStatistics(int peerSize) {
         this.statistics = new ConcurrentHashMap<>();
         this.rnd = new Random();
         this.conclude = new AtomicBoolean(false);
+        analytics = new GRSInstanceAnalytical[peerSize];
+        lastMGetter = new AtomicInteger();
     }
 
     public GRSMessageGetter getMessageGetter(int serverId){
         return () -> {
             if (!conclude.get()) {
+                lastMGetter.set(serverId);
                 String request = String.format("%x", rnd.nextLong());
                 statistics.put(request, new GRSEntry(serverId));
                 return new ClientRequest(new GenericClientMessage.Propose(request), "global request statistics");
@@ -72,10 +80,22 @@ public class GlobalRequestStatistics {
     public String makeConclusion(int timeout) throws InterruptedException {
         conclude.set(true);
         Thread.sleep(timeout);
+
+        List<Pair<String, InstanceStatus>> analyze = analytics[lastMGetter.get()].analyze();
+        for (int i = 0; i < analyze.size(); i++) {
+            Pair<String, InstanceStatus> pair = analyze.get(i);
+            if (pair != null)
+                statistics.get(pair.getKey()).verified = (pair.getValue() == InstanceStatus.COMMITTED) ? i : -i;
+        }
+
         StringBuilder builder = new StringBuilder();
 
         builder.append(String.format("%-16s\t%-9s", "REQUEST", "STATUS")).append("\tRL\tCL\tVD\t").append(String.format("%-13s\t%-13s\t%s", "START_TS", "COMMIT_TS", "ITV")).append("\n\n");
         statistics.forEach((request, grsEntry) -> builder.append(String.format("%-16s\t", request)).append(grsEntry).append("\n"));
         return builder.toString();
+    }
+
+    public void setAnalytic(int serverId, GRSInstanceAnalytical analytic){
+        analytics[serverId] = analytic;
     }
 }

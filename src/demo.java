@@ -366,7 +366,7 @@ public class demo {
         static void test2(){
             deleteDir("store");
 
-            GlobalRequestStatistics grs = new GlobalRequestStatistics();
+            GlobalRequestStatistics grs = new GlobalRequestStatistics(5);
 
             ExecutorService service = Executors.newCachedThreadPool();
             GlobalBipolarController controller = new GlobalBipolarController(5, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE, netConfig.initLeaderId, grs);
@@ -383,7 +383,7 @@ public class demo {
                         );
                         rsm.link(netConfig);
                         rsm.agent(controller);
-                        rsm.routine(grs.getMessageGetter(serverId), grs.getMessageReporter(serverId), controller.getReminder(serverId), controller.getDecider(serverId));
+                        grs.setAnalytic(serverId, rsm.routine(grs.getMessageGetter(serverId), grs.getMessageReporter(serverId), controller.getReminder(serverId), controller.getDecider(serverId)));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

@@ -72,14 +72,17 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
         AdaPaxosInstance chosenInstance = null;
 
         if (ackRead.status == DiskPaxosMessage.DiskStatus.READ_NO_SUCH_FILE) {
-            AdaRecoveryMaintenance armu = recoveryList.updateAndGet(ackRead.inst_no, unit -> {
+            AdaRecoveryMaintenance armu = recoveryList.getAndUpdate(ackRead.inst_no, unit -> {
                 if (unit != null && unit.token == ackRead.dialog_no && !unit.recovered) {
                     unit.readCount[ackRead.disk_no]++;
 
                     if (unit.readCount[ackRead.disk_no] == peerSize)
                         ++unit.diskCount;
 
-                    unit.recovered = unit.diskCount == diskSize;    // TODO: 2019/4/28 half of disk is sufficient
+                    unit.recovered = unit.diskCount >= (diskSize+1)/2;    // TODO: 2019/4/28 half of disk is sufficient
+
+                    if (unit.recovered)
+                        return null;
                 }
 
                 return unit;
@@ -91,7 +94,7 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
             }
         }
         else if (ackRead.status == DiskPaxosMessage.DiskStatus.READ_SUCCESS){
-            AdaRecoveryMaintenance armu = recoveryList.updateAndGet(ackRead.inst_no, unit -> {
+            AdaRecoveryMaintenance armu = recoveryList.getAndUpdate(ackRead.inst_no, unit -> {
                 if (unit != null && unit.token == ackRead.dialog_no && !unit.recovered) {
                     if (unit.potential == null
                             || unit.potential.crtInstBallot < ackRead.load.crtInstBallot
@@ -105,7 +108,10 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
                     if (unit.readCount[ackRead.disk_no] == peerSize)
                         ++unit.diskCount;
 
-                    unit.recovered = unit.diskCount == diskSize;    // TODO: 2019/4/28 half of disk is sufficient
+                    unit.recovered = unit.diskCount >= (diskSize+1)/2;    // TODO: 2019/4/28 half of disk is sufficient
+
+                    if (unit.recovered)
+                        return null;
                 }
 
                 return unit;

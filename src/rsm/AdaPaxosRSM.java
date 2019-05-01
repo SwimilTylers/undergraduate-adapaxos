@@ -6,6 +6,7 @@ import agent.learner.AdaLearner;
 import agent.proposer.AdaProposer;
 import agent.recovery.AdaRecovery;
 import client.ClientRequest;
+import client.grs.GRSInstanceAnalytical;
 import client.grs.GRSMessageGetter;
 import client.grs.GRSMessageReporter;
 import instance.AdaPaxosInstance;
@@ -258,7 +259,7 @@ public class AdaPaxosRSM implements Serializable {
         routines.shutdown();
     }
 
-    public void routine(GRSMessageGetter mGetter, GRSMessageReporter mReporter, BipolarStateReminder reminder, BipolarStateDecider decider, Runnable... supplement){
+    public GRSInstanceAnalytical routine(GRSMessageGetter mGetter, GRSMessageReporter mReporter, BipolarStateReminder reminder, BipolarStateDecider decider, Runnable... supplement){
         this.mGetter = mGetter;
         this.mReporter = mReporter;
 
@@ -266,6 +267,20 @@ public class AdaPaxosRSM implements Serializable {
         Thread t = new Thread(() -> thread_bipolar(reminder, decider));
         //t.setPriority(Thread.MAX_PRIORITY);
         t.start();
+
+        return () -> {
+            int max = maxReceivedInstance.get();
+            List<Pair<String, InstanceStatus>> ret = new ArrayList<>();
+            for (int i = 0; i < max; i++) {
+                AdaPaxosInstance instance = instanceSpace.get(i);
+                if (instance != null)
+                    ret.add(new Pair<>(instance.requests[0].exec, instance.status));
+                else
+                    ret.add(null);
+            }
+
+            return ret;
+        };
     }
 
     /* protected-access routine func, including:
