@@ -132,10 +132,12 @@ public class GenericPaxosMessage implements Serializable {
 
     public static class Sync extends GenericPaxosMessage{
         private static final long serialVersionUID = -8757260106040114565L;
+        public final long dialog_no;
         public final PaxosInstance load;
 
-        public Sync(int inst_no, PaxosInstance load) {
+        public Sync(int inst_no, long dialog_no, PaxosInstance load) {
             super(inst_no);
+            this.dialog_no = dialog_no;
             this.load = load;
         }
 
@@ -147,10 +149,12 @@ public class GenericPaxosMessage implements Serializable {
 
     public static class ackSync extends GenericPaxosMessage{
         private static final long serialVersionUID = -8757260106040114565L;
+        public final long dialog_no;
         public final PaxosInstance load;
 
-        public ackSync(int inst_no, PaxosInstance load) {
+        public ackSync(int inst_no, long dialog_no, PaxosInstance load) {
             super(inst_no);
+            this.dialog_no = dialog_no;
             this.load = load;
         }
 

@@ -9,5 +9,5 @@ import network.message.protocols.GenericPaxosMessage;
  */
 public interface CrashRecoveryPerformer {
     void handleSync(GenericPaxosMessage.Sync sync);
-    void handleAckSync(GenericPaxosMessage.ackSync ackSync, CommitUpdater cUpdater, VacantInstanceUpdater vUpdater);
+    void handleAckSync(GenericPaxosMessage.ackSync ackSync, CommitUpdater cUpdater);
 }

@@ -79,6 +79,7 @@ public class AdaPaxosRSM implements Serializable {
     transient protected boolean[] fsyncSignature;
     transient protected BlockingQueue<Integer> fsyncQueue;
     transient protected AtomicReferenceArray<AdaRecoveryMaintenance> recoveryList;
+    transient protected BlockingQueue<Integer> restartList;
 
     /* agents */
     transient protected AdaProposer proposer;
@@ -145,6 +146,7 @@ public class AdaPaxosRSM implements Serializable {
         Arrays.fill(fsyncSignature, false);
         fsyncQueue = new ArrayBlockingQueue<>(waitingQueueLength);
         recoveryList = new AtomicReferenceArray<>(instanceSpace.length());
+        restartList = new ArrayBlockingQueue<>(waitingQueueLength);
 
         return this;
     }
@@ -238,7 +240,7 @@ public class AdaPaxosRSM implements Serializable {
         proposer = new AdaProposer(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
         acceptor = new AdaAcceptor(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
         learner = new AdaLearner(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
-        recovery = new AdaRecovery(serverId, peerSize, nConfig.initLeaderId, net.getPeerMessageSender(), net.getConnectionModule(), maxReceivedInstance, remoteStore, instanceSpace, recoveryList, logger);
+        recovery = new AdaRecovery(serverId, peerSize, nConfig.initLeaderId, net.getPeerMessageSender(), net.getConnectionModule(), remoteStore, instanceSpace, recoveryList, restartList, logger);
     }
 
     public void routine(Runnable... supplement){
@@ -361,16 +363,28 @@ public class AdaPaxosRSM implements Serializable {
         while (routineOnRunning.get()){
             try {
                 if (!recovery.onLeaderElection() && asLeader.get()) {
-                    ClientRequest recv = mGetter.request();
-                    if (recv != null) {
-                        ClientRequest[] cmd = new ClientRequest[]{recv};
-                        int inst_no = maxReceivedInstance.getAndIncrement();
-                        proposer.handleRequests(inst_no, crtInstBallot.get(), cmd);
-                        logger.logFormatted(true, "init a proposal", "cmd=\"" + recv + "\"");
-                        if (forceFsync.get())
-                            fileSynchronize(inst_no);
+                    Integer restart_no = restartList.poll();
+                    if (restart_no != null){
+                        AdaPaxosInstance inst = instanceSpace.get(restart_no);
+                        if (inst == null || inst.status != InstanceStatus.COMMITTED){
+                            proposer.restartRequests(restart_no, crtInstBallot.get());
+                            logger.logFormatted(true, "restart a proposal", "inst_no=\"" + restart_no + "\"");
+                            if (forceFsync.get())
+                                fileSynchronize(restart_no);
+                        }
                     }
-                    Thread.sleep(batchItv);
+                    else{
+                        ClientRequest recv = mGetter.request();
+                        if (recv != null) {
+                            ClientRequest[] cmd = new ClientRequest[]{recv};
+                            int inst_no = maxReceivedInstance.getAndIncrement();
+                            proposer.handleRequests(inst_no, crtInstBallot.get(), cmd);
+                            logger.logFormatted(true, "init a proposal", "cmd=\"" + recv + "\"");
+                            if (forceFsync.get())
+                                fileSynchronize(inst_no);
+                        }
+                        Thread.sleep(batchItv);
+                    }
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -541,7 +555,7 @@ public class AdaPaxosRSM implements Serializable {
                         recovery.handleSync(cast);
                     } else if (msg instanceof GenericPaxosMessage.ackSync){
                         GenericPaxosMessage.ackSync cast = (GenericPaxosMessage.ackSync) msg;
-                        recovery.handleAckSync(cast, i->updateConsecutiveCommit(), this::finishDisk2Mem);
+                        recovery.handleAckSync(cast, i->updateConsecutiveCommit());
                     }
                 }
 

@@ -50,13 +50,11 @@ public class AdaAcceptor implements Acceptor{
     }
 
     private boolean fitRestoreCase(AdaPaxosInstance inst){
-        if (inst.status == InstanceStatus.PREPARING || inst.status == InstanceStatus.PREPARED)
-            return inst.lmu != null;      // former leader
-        else return inst.status == InstanceStatus.ACCEPTED;
+        return false;
     }
 
     private boolean fitRecoveryCase(AdaPaxosInstance inst){
-        return inst.status == InstanceStatus.COMMITTED;
+        return false;
     }
 
     @Override

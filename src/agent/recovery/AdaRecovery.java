@@ -9,9 +9,9 @@ import logger.PaxosLogger;
 import network.message.protocols.DiskPaxosMessage;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.module.connection.ConnectionModule;
-import network.service.module.controller.LeaderElectionProvider;
 import network.service.sender.PeerMessageSender;
 
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.*;
 
 /**
@@ -23,7 +23,9 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
     private RemoteInstanceStore remoteStore;
 
     private final AtomicReferenceArray<AdaPaxosInstance> instanceSpace;
-    private final AtomicReferenceArray<AdaRecoveryMaintenance> recoveryList;;
+    private final AtomicReferenceArray<AdaRecoveryMaintenance> recoveryList;
+
+    private final BlockingQueue<Integer> restartList;
 
     private final PaxosLogger logger;
 
@@ -31,13 +33,13 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
                        int leaderId,
                        PeerMessageSender sender,
                        ConnectionModule conn,
-                       AtomicInteger maxRecvInstance,
                        RemoteInstanceStore remoteStore, AtomicReferenceArray<AdaPaxosInstance> instanceSpace,
                        AtomicReferenceArray<AdaRecoveryMaintenance> recoveryList,
-                       PaxosLogger logger) {
+                       BlockingQueue<Integer> restartList, PaxosLogger logger) {
         super(serverId, peerSize, leaderId, sender, conn, logger);
         this.remoteStore = remoteStore;
         this.diskSize = remoteStore.getDiskSize();
+        this.restartList = restartList;
         this.serverId = serverId;
         this.peerSize = peerSize;
         this.sender = sender;
@@ -54,8 +56,64 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
     }
 
     @Override
-    public void handleAckSync(GenericPaxosMessage.ackSync ackSync, CommitUpdater cUpdater, VacantInstanceUpdater vUpdater){
+    public void handleAckSync(GenericPaxosMessage.ackSync ackSync, CommitUpdater cUpdater){
+        boolean chosen = false;
+        AdaPaxosInstance chosenInstance = null;
 
+        AdaRecoveryMaintenance armu = recoveryList.getAndUpdate(ackSync.inst_no, unit -> {
+            if (unit != null && unit.token == ackSync.dialog_no && !unit.recovered) {
+                if (unit.potential == null
+                        || unit.potential.crtInstBallot < ackSync.load.crtInstBallot
+                        || (unit.potential.crtInstBallot == ackSync.load.crtInstBallot
+                        && !InstanceStatus.earlierThan(unit.potential.status, ackSync.load.status))) {
+                    unit.potential = (AdaPaxosInstance) ackSync.load;
+                }
+
+                ++unit.peerCount;
+
+                unit.recovered = unit.peerCount >= (peerSize+1)/2;
+
+                if (unit.recovered)
+                    return null;
+            }
+
+            return unit;
+        });
+
+        if (armu != null && armu.recovered){
+            chosen = true;
+            chosenInstance = armu.potential;
+        }
+
+        if (chosen && chosenInstance != null) {
+            instanceSync(cUpdater, chosenInstance, ackSync.inst_no);
+        }
+    }
+
+    private void instanceSync(CommitUpdater cUpdater, AdaPaxosInstance chosenInstance, int inst_no) {
+        final AdaPaxosInstance updated = chosenInstance;
+
+        AdaPaxosInstance oldInst = instanceSpace.getAndUpdate(inst_no, instance -> {
+            if (instance == null
+                    || instance.crtInstBallot < updated.crtInstBallot
+                    || (instance.crtInstBallot == updated.crtInstBallot
+                    && !InstanceStatus.earlierThan(instance.status, updated.status))) {
+
+                logger.logFormatted(false, "msync", "confirmed", "inst=" + updated.toString());
+                return updated;
+            } else
+                return instance;
+        });
+
+        if (oldInst == null || oldInst.status != InstanceStatus.COMMITTED) {
+            if (updated.status == InstanceStatus.COMMITTED) {
+                logger.logCommit(inst_no, new GenericPaxosMessage.Commit(inst_no, updated.crtLeaderId, updated.crtInstBallot, updated.requests), "settled");
+                cUpdater.update(inst_no);
+            } else {
+                logger.logFormatted(false, "msync", "restart", "inst=" + updated.toString());
+                restartList.offer(inst_no);
+            }
+        }
     }
 
     @Override
@@ -79,7 +137,7 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
                     if (unit.readCount[ackRead.disk_no] == peerSize)
                         ++unit.diskCount;
 
-                    unit.recovered = unit.diskCount >= (diskSize+1)/2;    // TODO: 2019/4/28 half of disk is sufficient
+                    unit.recovered = unit.diskCount >= (diskSize+1)/2;
 
                     if (unit.recovered)
                         return null;
@@ -108,7 +166,7 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
                     if (unit.readCount[ackRead.disk_no] == peerSize)
                         ++unit.diskCount;
 
-                    unit.recovered = unit.diskCount >= (diskSize+1)/2;    // TODO: 2019/4/28 half of disk is sufficient
+                    unit.recovered = unit.diskCount >= (diskSize+1)/2;
 
                     if (unit.recovered)
                         return null;
@@ -130,32 +188,7 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
             }
             else {
                 logger.logFormatted(false, "msync", "nominal", "inst="+chosenInstance.toString());
-                final AdaPaxosInstance updated = chosenInstance;
-
-                AdaPaxosInstance oldInst = instanceSpace.getAndUpdate(ackRead.inst_no, instance -> {
-                    if (instance == null
-                            || instance.crtInstBallot < updated.crtInstBallot
-                            || (instance.crtInstBallot == updated.crtInstBallot
-                            && !InstanceStatus.earlierThan(instance.status, updated.status))) {
-
-                        /*
-                        if ((instance == null || instance.status != InstanceStatus.COMMITTED)
-                                && updated.status == InstanceStatus.COMMITTED) {
-                            commitUpdate[0] = true;
-                        }
-                        */
-
-                        logger.logFormatted(false, "msync", "confirmed", "inst="+updated.toString());
-                        return updated;
-                    }
-                    else
-                        return instance;
-                });
-
-                if ((oldInst == null || oldInst.status != InstanceStatus.COMMITTED) && updated.status == InstanceStatus.COMMITTED){
-                    logger.logCommit(ackRead.inst_no, new GenericPaxosMessage.Commit(ackRead.inst_no, updated.crtLeaderId, updated.crtInstBallot, updated.requests), "settled");
-                    cUpdater.update(ackRead.inst_no);
-                }
+                instanceSync(cUpdater, chosenInstance, ackRead.inst_no);
 
                 int next_inst = ackRead.inst_no + 1;
                 long token = ackRead.dialog_no;

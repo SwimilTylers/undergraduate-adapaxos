@@ -7,6 +7,7 @@ import instance.maintenance.HistoryMaintenance;
 import instance.store.RemoteInstanceStore;
 import logger.PaxosLogger;
 import network.message.protocols.DiskPaxosMessage;
+import network.message.protocols.GenericClientMessage;
 import network.message.protocols.GenericPaxosMessage;
 import network.service.sender.PeerMessageSender;
 import utils.AdaAgents;
@@ -59,6 +60,22 @@ public class AdaProposer implements Proposer, DiskResponder {
     public void handleRequests(int inst_no, int ballot, ClientRequest[] requests) {
         long token = AdaAgents.newToken();
         AdaPaxosInstance inst = AdaPaxosInstance.leaderInst(token, serverId, peerSize, ballot, InstanceStatus.PREPARING, requests);
+        initializeConsensus(inst_no, token, inst);
+    }
+
+    public void restartRequests(int inst_no, int ballot){
+        long token = AdaAgents.newToken();
+        ClientRequest[] requests;
+        AdaPaxosInstance inst = instanceSpace.get(inst_no);
+        if (inst == null || inst.requests == null)
+            requests = new ClientRequest[]{new ClientRequest(new GenericClientMessage.Propose(""), "nope")};
+        else
+            requests = inst.requests;
+        inst = AdaPaxosInstance.leaderInst(token, serverId, peerSize, ballot, InstanceStatus.PREPARING, requests);
+        initializeConsensus(inst_no, token, inst);
+    }
+
+    private void initializeConsensus(int inst_no, long token, AdaPaxosInstance inst) {
         instanceSpace.set(inst_no, inst);
 
         if (!forceFsync.get()) {

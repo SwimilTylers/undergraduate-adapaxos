@@ -13,6 +13,7 @@ public class AdaRecoveryMaintenance {
     public boolean recovered;
     public AdaPaxosInstance potential = null;
 
+    public int peerCount = 0;
     public int diskCount = 0;
     public int[] readCount;
 
