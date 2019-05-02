@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="Status: fix disk-paxos&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR">
+    <list default="true" id="66cfb44a-2ec7-4df5-9c06-3a775c0564a8" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/control.txt" beforeDir="false" afterPath="$PROJECT_DIR$/control.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/agent/acceptor/AdaAcceptor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/acceptor/AdaAcceptor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/agent/learner/AdaLearner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/learner/AdaLearner.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/client/grs/GlobalRequestStatistics.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/client/grs/GlobalRequestStatistics.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -32,10 +28,37 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/conclusion.txt">
+        <entry file="file://$PROJECT_DIR$/conclusion.05021452.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="196">
-              <caret line="14" column="16" selection-start-line="14" selection-end-line="14" selection-end-column="16" />
+            <state relative-caret-position="56">
+              <caret line="4" column="16" selection-start-line="4" selection-end-line="4" selection-end-column="16" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/control.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret selection-end-line="3" selection-end-column="15" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/conclusion.05021511.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="420">
+              <caret line="30" column="15" selection-start-line="30" selection-start-column="15" selection-end-line="30" selection-end-column="15" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/logs/server-1.log">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="6557">
+              <caret line="714" column="107" selection-start-line="714" selection-start-column="91" selection-end-line="714" selection-end-column="107" />
             </state>
           </provider>
         </entry>
@@ -59,19 +82,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/logs/server-1.log">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-717">
-              <caret line="55" column="69" selection-start-line="55" selection-start-column="56" selection-end-line="55" selection-end-column="69" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/logs/server-2.commit.log">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="238">
-              <caret line="17" column="63" selection-start-line="17" selection-start-column="63" selection-end-line="17" selection-end-column="63" />
+            <state relative-caret-position="42">
+              <caret line="3" column="63" selection-start-line="3" selection-start-column="63" selection-end-line="3" selection-end-column="63" />
             </state>
           </provider>
         </entry>
@@ -79,8 +93,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/logs/server-2.log">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-8926">
-              <caret line="93" column="55" selection-start-line="93" selection-start-column="53" selection-end-line="93" selection-end-column="55" />
+            <state relative-caret-position="131">
+              <caret line="606" column="47" selection-start-line="606" selection-start-column="32" selection-end-line="606" selection-end-column="47" />
             </state>
           </provider>
         </entry>
@@ -88,38 +102,20 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/agent/learner/AdaLearner.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3290">
-              <caret line="251" selection-start-line="251" selection-end-line="251" />
+            <state relative-caret-position="261">
+              <caret line="261" column="21" selection-start-line="261" selection-start-column="21" selection-end-line="261" selection-end-column="21" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="604">
-              <caret line="364" column="50" selection-start-line="364" selection-start-column="50" selection-end-line="364" selection-end-column="50" />
+            <state relative-caret-position="7422">
+              <caret line="765" column="50" selection-start-line="765" selection-start-column="50" selection-end-line="765" selection-end-column="50" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1582">
-              <caret line="125" column="88" lean-forward="true" selection-start-line="125" selection-start-column="88" selection-end-line="125" selection-end-column="88" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/logs/server-2.diagnosis">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="70">
-              <caret line="5" column="12" selection-start-line="5" selection-start-column="12" selection-end-line="5" selection-end-column="12" />
             </state>
           </provider>
         </entry>
@@ -137,21 +133,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>d33c452d8189190e</find>
-      <find>19</find>
-      <find>=19</find>
-      <find>bde0bb061cdce58b</find>
-      <find>reporter</find>
-      <find>53a6cf10ef68715</find>
-      <find>=18</find>
-      <find>grsCommit</find>
-      <find>246288943dd3d7ce</find>
-      <find>14:36:39:71</find>
-      <find>=30</find>
-      <find>=36</find>
-      <find>8b2a94db9f0be94b</find>
-      <find>=25</find>
-      <find>maxReceivedInstance</find>
       <find>=4</find>
       <find>d49bc6159ac31261</find>
       <find>inst_no=4</find>
@@ -166,7 +147,22 @@
       <find>ino=3</find>
       <find>inst_no=3</find>
       <find>=3</find>
+      <find>1556722334922</find>
+      <find>msync</find>
+      <find>tkn=1556722334922</find>
       <find>1556722334341</find>
+      <find>19b279696a454f05</find>
+      <find>45b05645e17b521b</find>
+      <find>=9</find>
+      <find>d61dd9072650f0e9</find>
+      <find>1556779339033</find>
+      <find>reverse</find>
+      <find>545b2a4774d07d83</find>
+      <find>2d1fb9f199808cb2</find>
+      <find>ca5ece732796dbb</find>
+      <find>init a proposal</find>
+      <find>8d14a0a1a712f80a</find>
+      <find>91485bc1de9bf90f</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -189,8 +185,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/network/service/sender/BipolarSenderDecider.java" />
-        <option value="$PROJECT_DIR$/src/network/service/sender/BipolarPeerMessageSender.java" />
         <option value="$PROJECT_DIR$/src/network/service/DelayedNetService.java" />
         <option value="$PROJECT_DIR$/src/network/service/SimulatedNetService.java" />
         <option value="$PROJECT_DIR$/src/network/BipolarNetService.java" />
@@ -237,9 +231,11 @@
         <option value="$PROJECT_DIR$/src/network/service/module/controller/GlobalBipolarController.java" />
         <option value="$PROJECT_DIR$/control.txt" />
         <option value="$PROJECT_DIR$/logs/server-0.log" />
-        <option value="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" />
-        <option value="$PROJECT_DIR$/src/agent/learner/AdaLearner.java" />
         <option value="$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java" />
+        <option value="$PROJECT_DIR$/src/agent/learner/AdaLearner.java" />
+        <option value="$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java" />
+        <option value="$PROJECT_DIR$/conclusion.txt" />
+        <option value="$PROJECT_DIR$/conclusion.05021511.txt" />
       </list>
     </option>
   </component>
@@ -593,14 +589,7 @@
       <workItem from="1556612142069" duration="1920000" />
       <workItem from="1556676776618" duration="17205000" />
       <workItem from="1556700317658" duration="10326000" />
-      <workItem from="1556773765058" duration="1738000" />
-    </task>
-    <task id="LOCAL-00031" summary="Status: HeartBeatModule&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation">
-      <created>1551181493939</created>
-      <option name="number" value="00031" />
-      <option name="presentableId" value="LOCAL-00031" />
-      <option name="project" value="LOCAL" />
-      <updated>1551181493939</updated>
+      <workItem from="1556773765058" duration="6506000" />
     </task>
     <task id="LOCAL-00032" summary="Status: PeerMessageSender &amp; PeerMessageReceiver&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ logger is not working properly&#10;+ further work inspired by epaxos implementation">
       <created>1551184086286</created>
@@ -938,11 +927,18 @@
       <option name="project" value="LOCAL" />
       <updated>1556690029514</updated>
     </task>
-    <option name="localTasksCounter" value="80" />
+    <task id="LOCAL-00080" summary="Status: fix disk-paxos&#10;&#10;Working on:&#10;&#10;* Echo.rsm&#10;* Echo.poly&#10;# Echo.agent&#10;* Echo.scmodel&#10;&#10;REMAINS:&#10;&#10;+ further work inspired by epaxos implementation&#10;+ further work inspired by SAUCR">
+      <created>1556776333455</created>
+      <option name="number" value="00080" />
+      <option name="presentableId" value="LOCAL-00080" />
+      <option name="project" value="LOCAL" />
+      <updated>1556776333456</updated>
+    </task>
+    <option name="localTasksCounter" value="81" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="864865000" />
+    <option name="totallyTimeSpent" value="869633000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -957,7 +953,7 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49858356" visible="true" weight="0.3016086" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49858356" visible="true" weight="0.2774799" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Designer" order="3" />
@@ -1084,7 +1080,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/network/service/module/controller/LeaderAcknowledgement.java" />
     <entry file="file://$PROJECT_DIR$/src/client/grs/GRSRequest.java" />
     <entry file="file://$PROJECT_DIR$/src/client/ClientRequest.java">
       <provider selected="true" editor-type-id="text-editor">
@@ -1349,13 +1344,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/control.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="42">
-          <caret line="3" column="15" selection-start-line="3" selection-start-column="15" selection-end-line="3" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-0.diagnosis">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="42">
@@ -1373,17 +1361,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/agent/learner/AdaLearner.java">
+    <entry file="file://$PROJECT_DIR$/logs/server-2.diagnosis">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3290">
-          <caret line="251" selection-start-line="251" selection-end-line="251" />
+        <state relative-caret-position="238">
+          <caret line="17" column="14" selection-start-line="17" selection-start-column="14" selection-end-line="17" selection-end-column="14" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-2.diagnosis">
+    <entry file="file://$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="70">
-          <caret line="5" column="12" selection-start-line="5" selection-start-column="12" selection-end-line="5" selection-end-column="12" />
+        <state relative-caret-position="415">
+          <caret line="198" column="24" selection-start-line="198" selection-start-column="24" selection-end-line="198" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-2.commit.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="42">
+          <caret line="3" column="63" selection-start-line="3" selection-start-column="63" selection-end-line="3" selection-end-column="63" />
         </state>
       </provider>
     </entry>
@@ -1394,17 +1389,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-2.commit.log">
+    <entry file="file://$PROJECT_DIR$/conclusion.05021452.txt">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="17" column="63" selection-start-line="17" selection-start-column="63" selection-end-line="17" selection-end-column="63" />
+        <state relative-caret-position="56">
+          <caret line="4" column="16" selection-start-line="4" selection-end-line="4" selection-end-column="16" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/logs/server-2.log">
+    <entry file="file://$PROJECT_DIR$/src/agent/learner/AdaLearner.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-8926">
-          <caret line="93" column="55" selection-start-line="93" selection-start-column="53" selection-end-line="93" selection-end-column="55" />
+        <state relative-caret-position="261">
+          <caret line="261" column="21" selection-start-line="261" selection-start-column="21" selection-end-line="261" selection-end-column="21" />
         </state>
       </provider>
     </entry>
@@ -1415,34 +1410,41 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/logs/server-2.log">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="131">
+          <caret line="606" column="47" selection-start-line="606" selection-start-column="32" selection-end-line="606" selection-end-column="47" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/logs/server-1.log">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-717">
-          <caret line="55" column="69" selection-start-line="55" selection-start-column="56" selection-end-line="55" selection-end-column="69" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/conclusion.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="14" column="16" selection-start-line="14" selection-end-line="14" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/agent/recovery/AdaRecovery.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1582">
-          <caret line="125" column="88" lean-forward="true" selection-start-line="125" selection-start-column="88" selection-end-line="125" selection-end-column="88" />
+        <state relative-caret-position="6557">
+          <caret line="714" column="107" selection-start-line="714" selection-start-column="91" selection-end-line="714" selection-end-column="107" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/rsm/AdaPaxosRSM.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="604">
-          <caret line="364" column="50" selection-start-line="364" selection-start-column="50" selection-end-line="364" selection-end-column="50" />
+        <state relative-caret-position="7422">
+          <caret line="765" column="50" selection-start-line="765" selection-start-column="50" selection-end-line="765" selection-end-column="50" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/control.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret selection-end-line="3" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/conclusion.05021511.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="420">
+          <caret line="30" column="15" selection-start-line="30" selection-start-column="15" selection-end-line="30" selection-end-column="15" />
         </state>
       </provider>
     </entry>

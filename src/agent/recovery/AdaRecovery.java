@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.*;
 public class AdaRecovery extends LeaderElectionRecovery implements CrashRecoveryPerformer, DiskCommitVacantResponder {
     private final int diskSize;
     private RemoteInstanceStore remoteStore;
+    private AtomicInteger consecutiveCommit;
 
     private final AtomicReferenceArray<AdaPaxosInstance> instanceSpace;
     private final AtomicReferenceArray<AdaRecoveryMaintenance> recoveryList;
@@ -33,12 +34,13 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
                        int leaderId,
                        PeerMessageSender sender,
                        ConnectionModule conn,
-                       RemoteInstanceStore remoteStore, AtomicReferenceArray<AdaPaxosInstance> instanceSpace,
+                       RemoteInstanceStore remoteStore, AtomicInteger consecutiveCommit, AtomicReferenceArray<AdaPaxosInstance> instanceSpace,
                        AtomicReferenceArray<AdaRecoveryMaintenance> recoveryList,
                        BlockingQueue<Integer> restartList, PaxosLogger logger) {
         super(serverId, peerSize, leaderId, sender, conn, logger);
         this.remoteStore = remoteStore;
         this.diskSize = remoteStore.getDiskSize();
+        this.consecutiveCommit = consecutiveCommit;
         this.restartList = restartList;
         this.serverId = serverId;
         this.peerSize = peerSize;
@@ -187,11 +189,12 @@ public class AdaRecovery extends LeaderElectionRecovery implements CrashRecovery
                 vUpdater.update(ackRead.dialog_no, ackRead.inst_no);
             }
             else {
-                logger.logFormatted(false, "msync", "nominal", "inst="+chosenInstance.toString());
+                logger.logFormatted(false, "msync", "nominal", "inst_no" + ackRead.inst_no, "inst="+chosenInstance.toString());
                 instanceSync(cUpdater, chosenInstance, ackRead.inst_no);
 
-                int next_inst = ackRead.inst_no + 1;
+                int next_inst = Integer.max(consecutiveCommit.get(), ackRead.inst_no + 1);
                 long token = ackRead.dialog_no;
+                logger.logFormatted(false, "msync", "continue", "inst_no=" + next_inst);
 
                 recoveryList.set(next_inst, new AdaRecoveryMaintenance(token, diskSize));
                 for (int disk_no = 0; disk_no < diskSize; disk_no++) {

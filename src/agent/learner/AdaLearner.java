@@ -248,7 +248,8 @@ public class AdaLearner implements Learner, DiskCommitResponder {
                         logger.logCommit(ackRead.inst_no, sendOut, "settled");
 
                         sender.broadcastPeerMessage(sendOut);
-                        broadcastOnDisks(inst.lmu.token, ackRead.inst_no, inst, diskSize, remoteStore);
+                        if (forceFsync.get())
+                            broadcastOnDisks(inst.lmu.token, ackRead.inst_no, inst, diskSize, remoteStore);
 
                         updater.update(ackRead.inst_no);
 

@@ -76,6 +76,7 @@ public class AdaPaxosRSM implements Serializable {
     transient protected int diskSize;
     protected AtomicBoolean forceFsync;
     protected AtomicBoolean metaFsync;
+    transient private int chockCount;
     transient protected boolean[] fsyncSignature;
     transient protected BlockingQueue<Integer> fsyncQueue;
     transient protected AtomicReferenceArray<AdaRecoveryMaintenance> recoveryList;
@@ -142,6 +143,7 @@ public class AdaPaxosRSM implements Serializable {
         ((PseudoRemoteInstanceStore)remoteStore).setLogger(logger);
         forceFsync = new AtomicBoolean(initFsync);
         metaFsync = new AtomicBoolean(true);
+        chockCount = 0;
         fsyncSignature = new boolean[instanceSpace.length()];
         Arrays.fill(fsyncSignature, false);
         fsyncQueue = new ArrayBlockingQueue<>(waitingQueueLength);
@@ -240,7 +242,7 @@ public class AdaPaxosRSM implements Serializable {
         proposer = new AdaProposer(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
         acceptor = new AdaAcceptor(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
         learner = new AdaLearner(serverId, peerSize, forceFsync, net.getPeerMessageSender(), remoteStore, instanceSpace, restoredQueue, logger);
-        recovery = new AdaRecovery(serverId, peerSize, nConfig.initLeaderId, net.getPeerMessageSender(), net.getConnectionModule(), remoteStore, instanceSpace, recoveryList, restartList, logger);
+        recovery = new AdaRecovery(serverId, peerSize, nConfig.initLeaderId, net.getPeerMessageSender(), net.getConnectionModule(), remoteStore, consecutiveCommit, instanceSpace, recoveryList, restartList, logger);
     }
 
     public void routine(Runnable... supplement){
@@ -529,7 +531,7 @@ public class AdaPaxosRSM implements Serializable {
                 if (msg != null) {
                     logger.logFormatted(true, "receive", msg.toString());
 
-                    maxReceivedInstance.updateAndGet(i -> Integer.max(i, msg.inst_no));
+                    maxReceivedInstance.updateAndGet(i -> Integer.max(i, msg.inst_no + 1));
 
                     if (msg instanceof GenericPaxosMessage.Prepare) {
                         GenericPaxosMessage.Prepare cast = (GenericPaxosMessage.Prepare) msg;
@@ -560,7 +562,7 @@ public class AdaPaxosRSM implements Serializable {
                     logger.logFormatted(true, "receive", dmsg.toString());
                     boolean update = false;
 
-                    maxReceivedInstance.updateAndGet(i -> Integer.max(i, dmsg.inst_no));
+                    maxReceivedInstance.updateAndGet(i -> Integer.max(i, dmsg.inst_no + 1));
 
                     if (proposer.isValidMessage(dmsg.inst_no, dmsg.dialog_no)) {
                         if (dmsg instanceof DiskPaxosMessage.ackWrite)
@@ -680,7 +682,13 @@ public class AdaPaxosRSM implements Serializable {
                     break;
             }
         }
-        fsyncInitInstance.set(inst_no);
+        int lastFsyncInit = fsyncInitInstance.getAndSet(inst_no);
+
+        if (lastFsyncInit == inst_no)
+            ++chockCount;
+        else
+            chockCount = 0;
+
         net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage.SyncInitFsync(inst_no));
         int fsyncInit_end = inst_no;
         for (; inst_no < maxReceivedInstance.get(); inst_no++) {
@@ -696,6 +704,12 @@ public class AdaPaxosRSM implements Serializable {
             }
         }
         logger.logFormatted(false, "fsync", "backup", "fsyncInit="+fsyncInit_sta+"->"+fsyncInit_end, "upto="+inst_no);
+
+        if (chockCount == 5 && chockCount < maxReceivedInstance.get()){
+            memorySynchronize(AdaAgents.newToken());
+            logger.logFormatted(false, "fsync", "backup", "reverse", "init_no="+consecutiveCommit.get());
+        }
+
         return inst_no;
     }
 
@@ -756,6 +770,13 @@ public class AdaPaxosRSM implements Serializable {
     }
 
     protected void finishDisk2Mem(long dialog_no, int vacant_no){
+        AdaPaxosInstance inst = instanceSpace.get(vacant_no);
+        maxReceivedInstance.updateAndGet(i -> {
+            if (i == vacant_no + 1 && inst == null)
+                return vacant_no;
+            else
+                return i;
+        });
         int to = fsyncInitInstance.updateAndGet(i -> Integer.max(consecutiveCommit.get(), i));
         logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[INIT_FSYNC][to="+to+"]\n");
         recovery.markFileSyncComplete((token, leaderId) -> asLeader.set(leaderId == serverId));
