@@ -65,6 +65,7 @@ public class GlobalBipolarController extends GlobalLeaderElectionController{
                 writer.write("\n\n============================================\n\n\n");
                 writer.flush();
                 writer.close();
+                System.out.println("concluded");
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();

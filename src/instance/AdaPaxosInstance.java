@@ -56,6 +56,9 @@ public class AdaPaxosInstance extends PaxosInstance {
 
     @Override
     public String toString() {
-        return "[lid="+crtLeaderId+",blt="+crtInstBallot+",cmd_len="+requests.length+"]["+status+"]";
+        if (requests != null)
+            return "[lid="+crtLeaderId+",blt="+crtInstBallot+",cmd_len="+requests.length+"]["+status+"]";
+        else
+            return "[lid="+crtLeaderId+",blt="+crtInstBallot+",cmd_len=null]["+status+"]";
     }
 }

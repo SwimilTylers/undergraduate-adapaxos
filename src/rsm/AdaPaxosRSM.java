@@ -424,8 +424,13 @@ public class AdaPaxosRSM implements Serializable {
 
                             /* at the first sight out timeout, follower should flush all on-memory instances to disk */
                             logger.record(false, "diag", "[" + System.currentTimeMillis() + "][leader failure][test=1]\n");
-                            if (!forceFsync.get())
-                                fileSynchronize();
+                            if (!forceFsync.get()) {
+                                logger.logFormatted(false, "fsync", "emergency", "start");
+                                fileSynchronize_immediate();
+                            }
+                            else {
+                                logger.logFormatted(false, "fsync", "emergency", "suppressed");
+                            }
 
                             Thread.sleep(decisionDelay);
 
@@ -688,7 +693,7 @@ public class AdaPaxosRSM implements Serializable {
             ++chockCount;
         else
             chockCount = 0;
-
+        logger.logFormatted(false, "fsync", "reset initFsync", "upto="+inst_no);
         net.getPeerMessageSender().broadcastPeerMessage(new AdaPaxosMessage.SyncInitFsync(inst_no));
         int fsyncInit_end = inst_no;
         for (; inst_no < maxReceivedInstance.get(); inst_no++) {
