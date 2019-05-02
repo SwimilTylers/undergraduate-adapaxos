@@ -7,7 +7,7 @@ import network.message.protocols.GenericClientMessage;
 
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -44,6 +44,7 @@ public class GlobalRequestStatistics {
     private Random rnd;
     private GRSInstanceAnalytical[] analytics;
     private AtomicInteger lastMGetter;
+    private BlockingQueue<String> requests;
 
     public GlobalRequestStatistics(int peerSize) {
         this.statistics = new ConcurrentHashMap<>();
@@ -51,13 +52,16 @@ public class GlobalRequestStatistics {
         this.conclude = new AtomicBoolean(false);
         analytics = new GRSInstanceAnalytical[peerSize];
         lastMGetter = new AtomicInteger();
+
+        requests = new ArrayBlockingQueue<>(32);
     }
 
     public GRSMessageGetter getMessageGetter(int serverId){
         return () -> {
             if (!conclude.get()) {
-                lastMGetter.set(serverId);
                 String request = String.format("%x", rnd.nextLong());
+                lastMGetter.set(serverId);
+
                 statistics.put(request, new GRSEntry(serverId));
                 return new ClientRequest(new GenericClientMessage.Propose(request), "global request statistics");
             }
@@ -93,6 +97,10 @@ public class GlobalRequestStatistics {
         builder.append(String.format("%-16s\t%-9s", "REQUEST", "STATUS")).append("\tRL\tCL\tVD\t").append(String.format("%-13s\t%-13s\t%s", "START_TS", "COMMIT_TS", "ITV")).append("\n\n");
         statistics.forEach((request, grsEntry) -> builder.append(String.format("%-16s\t", request)).append(grsEntry).append("\n"));
         return builder.toString();
+    }
+
+    public void releaseRequests(){
+        String request = String.format("%x", rnd.nextLong());
     }
 
     public void setAnalytic(int serverId, GRSInstanceAnalytical analytic){

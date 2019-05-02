@@ -356,11 +356,13 @@ public class AdaPaxosRSM implements Serializable {
     }
 
     protected void routine_grsBatch(final int batchItv){
+        Set<Integer> restarted = new HashSet<>();
         while (routineOnRunning.get()){
             try {
                 if (!recovery.onLeaderElection() && asLeader.get()) {
                     Integer restart_no = restartList.poll();
-                    if (restart_no != null){
+                    if (restart_no != null && !restarted.contains(restart_no)){
+                        restarted.add(restart_no);
                         AdaPaxosInstance inst = instanceSpace.get(restart_no);
                         if (inst == null || inst.status != InstanceStatus.COMMITTED){
                             proposer.restartRequests(restart_no, crtInstBallot.get());
@@ -429,18 +431,20 @@ public class AdaPaxosRSM implements Serializable {
                                 if (!routineOnRunning.get())
                                     break;
 
-                                if (!forceFsync.get()){   // FAST_MODE before leader crashed
+                                if (!forceFsync.getAndSet(true)){   // FAST_MODE before leader crashed
                                     metaFsync.set(true);
                                     long leToken = AdaAgents.newToken();
                                     recovery.markLeaderElection(false, leToken);
-                                    leProvider.provide(new LeaderElectionMessage.LEOffer(serverId, leToken, maxReceivedInstance.get()));
-                                    logger.record(true, "diag", "[" + System.currentTimeMillis() + "][leader failure][test=2][confirmed][RECOVERED, token="+leToken+"]\n");
+                                    int ticket = maxReceivedInstance.get();
+                                    leProvider.provide(new LeaderElectionMessage.LEOffer(serverId, leToken, ticket));
+                                    logger.record(true, "diag", "[" + System.currentTimeMillis() + "][leader failure][test=2][confirmed][RECOVERED, token="+leToken+", ticket="+ ticket +"]\n");
                                 }
                                 else {  // SLOW_MODE before leader crashed
                                     long leToken = AdaAgents.newToken();
                                     recovery.markLeaderElection(true, leToken);
-                                    leProvider.provide(new LeaderElectionMessage.LEOffer(serverId, leToken, fsyncInitInstance.get()));
-                                    logger.record(true, "diag", "[" + System.currentTimeMillis() + "][leader failure][test=2][confirmed][RECOVERING, token="+leToken+"]\n");
+                                    int ticket = fsyncInitInstance.get();
+                                    leProvider.provide(new LeaderElectionMessage.LEOffer(serverId, leToken, ticket));
+                                    logger.record(true, "diag", "[" + System.currentTimeMillis() + "][leader failure][test=2][confirmed][RECOVERING, token="+leToken+", ticket="+ ticket +"]\n");
                                     memorySynchronize(leToken); // fetch up-to-date information from disk
                                 }
                             }
@@ -759,30 +763,36 @@ public class AdaPaxosRSM implements Serializable {
 
     protected void thread_bipolar(final BipolarStateReminder reminder, final BipolarStateDecider decider){
         int lastState = decider.decide();
-        while (reminder.remind() >= 0){
-            int crtState = decider.decide();
-            if (lastState != crtState){
-                lastState = crtState;
-                if (crtState == 0){
-                    logger.record(false, "diag", "[" + System.currentTimeMillis() + "][state change][1->0]\n");
-                    routineOnRunning.set(false);
-                    asLeader.set(false);
+        int lastEpoch = reminder.remind(), crtEpoch;
+        while ((crtEpoch = reminder.remind()) >= 0){
+            if (crtEpoch != lastEpoch) {
+                crtEpoch = lastEpoch;
+                int crtState = decider.decide();
+                if (lastState != crtState) {
+                    lastState = crtState;
+                    if (crtState == 0) {
+                        logger.record(false, "diag", "[" + System.currentTimeMillis() + "][state change][1->0]\n");
+                        routineOnRunning.set(false);
+                        asLeader.set(false);
+                    } else {
+                        logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[state change][0->1][tkt=" + fsyncInitInstance.get() + ",init_lid=" + nConfig.initLeaderId + "]\n");
+                        instanceSpaceBuild(instanceSpace.length(), reminder.remind() << 16, 0);
+                        agent(leProvider);
+
+                        forceFsync.set(true);
+
+                        long leToken = AdaAgents.newToken();
+                        recovery.markLeaderElection(forceFsync.get(), leToken);
+                        leProvider.provide(new LeaderElectionMessage.LEOffer(serverId, leToken, 0));
+
+                        logger.record(true, "diag", "[" + System.currentTimeMillis() + "][recovery][confirmed][RECOVERING, token=" + leToken + "]\n");
+                        memorySynchronize(leToken); // fetch up-to-date information from disk
+
+                        routine(supplementRoutines);
+                    }
                 }
-                else {
-                    logger.record(false, "diag", "[" + System.currentTimeMillis() + "]" + "[state change][0->1][tkt="+fsyncInitInstance.get()+",init_lid="+nConfig.initLeaderId+"]\n");
-                    instanceSpaceBuild(instanceSpace.length(), reminder.remind() << 16, 0);
-                    agent(leProvider);
-
-                    forceFsync.set(true);
-
-                    long leToken = AdaAgents.newToken();
-                    recovery.markLeaderElection(forceFsync.get(), leToken);
-                    leProvider.provide(new LeaderElectionMessage.LEOffer(serverId, leToken, 0));
-
-                    logger.record(true, "diag", "[" + System.currentTimeMillis() + "][recovery][confirmed][RECOVERING, token="+leToken+"]\n");
-                    memorySynchronize(leToken); // fetch up-to-date information from disk
-
-                    routine(supplementRoutines);
+                else if (crtState == 1){
+                    crtInstBallot.set(reminder.remind() << 16);
                 }
             }
         }

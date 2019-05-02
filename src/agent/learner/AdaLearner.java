@@ -236,7 +236,22 @@ public class AdaLearner implements Learner, DiskCommitResponder {
                     /* accumulating until reach Paxos threshold
                      * BROADCASTING_ACCEPT activated only once in each Paxos period (only in PREPARING status) */
                     if (inst.lmu.response > diskSize/2) {
-                        furtherStep(ackRead.inst_no, updater);
+                        inst = instanceSpace.updateAndGet(ackRead.inst_no, instance -> {
+                            instance = AdaPaxosInstance.copy(instance);
+                            instance.status = InstanceStatus.COMMITTED;
+                            instance.lmu.refresh(AdaAgents.newToken(), serverId);
+
+                            return instance;
+                        });
+
+                        GenericPaxosMessage.Commit sendOut = new GenericPaxosMessage.Commit(ackRead.inst_no, serverId, inst.crtInstBallot, inst.requests);
+                        logger.logCommit(ackRead.inst_no, sendOut, "settled");
+
+                        sender.broadcastPeerMessage(sendOut);
+                        broadcastOnDisks(inst.lmu.token, ackRead.inst_no, inst, diskSize, remoteStore);
+
+                        updater.update(ackRead.inst_no);
+
                         return true;
                     }
                 }

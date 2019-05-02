@@ -49,9 +49,7 @@ public class AdaAcceptor implements Acceptor{
         this.logger = logger;
     }
 
-    private boolean fitRestoreCase(AdaPaxosInstance inst){
-        return false;
-    }
+    private boolean fitRestoreCase(AdaPaxosInstance inst){ return false; }
 
     private boolean fitRecoveryCase(AdaPaxosInstance inst){
         return false;
@@ -65,6 +63,7 @@ public class AdaAcceptor implements Acceptor{
 
         if (inst == null){    // normal case
             inst = AdaPaxosInstance.subInst(prepare.leaderId, prepare.inst_ballot, InstanceStatus.PREPARING, null);
+            //logger.logFormatted(false, "handle", "normal", "prepare=\""+prepare+"\"");
             instanceSpace.set(prepare.inst_no, inst);
 
             sender.sendPeerMessage(
@@ -102,6 +101,7 @@ public class AdaAcceptor implements Acceptor{
                     ));
                 }
                 else{   // overwrite case
+                    //logger.logFormatted(false, "handle", "overwrite", "prepare=\""+prepare+"\"");
                     instanceSpace.updateAndGet(prepare.inst_no, updating);
 
 
@@ -117,6 +117,7 @@ public class AdaAcceptor implements Acceptor{
                 }
             }
             else {      // overwrite case
+                //logger.logFormatted(false, "handle", "overwrite", "prepare=\""+prepare+"\"");
                 instanceSpace.updateAndGet(prepare.inst_no, updating);
 
                 sender.sendPeerMessage(
@@ -130,6 +131,7 @@ public class AdaAcceptor implements Acceptor{
                 );
             }
         } else {
+            //logger.logFormatted(false, "handle", "abort", "prepare=\""+prepare+"\"");
             inst = instanceSpace.getAndUpdate(prepare.inst_no, updating);
             sender.sendPeerMessage(prepare.leaderId, new GenericPaxosMessage.ackPrepare(
                     prepare.inst_no,

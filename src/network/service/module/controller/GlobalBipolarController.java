@@ -58,8 +58,8 @@ public class GlobalBipolarController extends GlobalLeaderElectionController{
                 Thread.sleep(Integer.valueOf(pair[3]));
             }
             if (grs != null) {
-                FileWriter writer = new FileWriter("conclusion.txt");
-                String conclusion = grs.makeConclusion(2000);
+                FileWriter writer = new FileWriter("conclusion.txt", false);
+                String conclusion = grs.makeConclusion(10000);
                 writer.write("conclusion = " + System.currentTimeMillis() + "\n\n");
                 writer.write(conclusion);
                 writer.write("\n\n============================================\n\n\n");
