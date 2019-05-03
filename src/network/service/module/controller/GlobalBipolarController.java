@@ -4,6 +4,7 @@ import client.grs.GlobalRequestStatistics;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -58,13 +59,18 @@ public class GlobalBipolarController extends GlobalLeaderElectionController{
                 Thread.sleep(Integer.valueOf(pair[3]));
             }
             if (grs != null) {
-                FileWriter writer = new FileWriter("conclusion.txt", false);
-                String conclusion = grs.makeConclusion(10000);
+                String timePrefix  = String.format("%tm%<td%<tH%<tM", new Date());
+                FileWriter writer = new FileWriter("conclusion."+timePrefix+".txt", false);
+                String conclusion = grs.makeConclusion(15000);
                 writer.write("conclusion = " + System.currentTimeMillis() + "\n\n");
                 writer.write(conclusion);
                 writer.write("\n\n============================================\n\n\n");
                 writer.flush();
                 writer.close();
+                for (int i = 0; i < 20; i++) {
+                    System.out.println("concluded");
+                    Thread.sleep(5000);
+                }
                 System.out.println("concluded");
             }
         } catch (IOException | InterruptedException e) {
