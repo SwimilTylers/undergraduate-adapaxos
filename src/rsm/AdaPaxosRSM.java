@@ -558,7 +558,7 @@ public class AdaPaxosRSM implements Serializable {
                         recovery.handleSync(cast);
                     } else if (msg instanceof GenericPaxosMessage.ackSync){
                         GenericPaxosMessage.ackSync cast = (GenericPaxosMessage.ackSync) msg;
-                        recovery.handleAckSync(cast, i->updateConsecutiveCommit());
+                        recovery.handleAckSync(cast, i->updateConsecutiveCommit(), this::finishPeer2Local);
                     }
                 }
 
@@ -734,6 +734,21 @@ public class AdaPaxosRSM implements Serializable {
         }
     }
 
+    protected void peerSynchronize(final long token){
+        int inst_no = consecutiveCommit.get();
+        AdaPaxosInstance instance = instanceSpace.get(inst_no);
+
+        while (instance != null && instance.status == InstanceStatus.COMMITTED){
+            ++inst_no;
+            instance = instanceSpace.get(inst_no);
+        }
+
+        recoveryList.set(inst_no, new AdaRecoveryMaintenance(token, diskSize));
+        for (int peerId = 0; peerId < peerSize; peerId++) {
+            net.getPeerMessageSender().broadcastPeerMessage(new GenericPaxosMessage.Sync(inst_no, token, serverId, instance));
+        }
+    }
+
     /* protected-access misc func */
 
     /*
@@ -787,12 +802,22 @@ public class AdaPaxosRSM implements Serializable {
         recovery.markFileSyncComplete((token, leaderId) -> asLeader.set(leaderId == serverId));
     }
 
+    protected void finishPeer2Local(long dialog_no, int vacant_no){
+        AdaPaxosInstance inst = instanceSpace.get(vacant_no);
+        maxReceivedInstance.updateAndGet(i -> {
+            if (i == vacant_no + 1 && inst == null)
+                return vacant_no;
+            else
+                return i;
+        });
+    }
+
     protected void thread_bipolar(final BipolarStateReminder reminder, final BipolarStateDecider decider){
         int lastState = decider.decide();
         int lastEpoch = reminder.remind(), crtEpoch;
         while ((crtEpoch = reminder.remind()) >= 0){
             if (crtEpoch != lastEpoch) {
-                crtEpoch = lastEpoch;
+                lastEpoch = crtEpoch;
                 int crtState = decider.decide();
                 if (lastState != crtState) {
                     lastState = crtState;

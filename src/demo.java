@@ -11,10 +11,7 @@ import network.service.GenericNetService;
 import network.service.module.controller.GlobalBipolarController;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
-import rsm.AdaPaxosRSM;
-import rsm.BasicPaxosRSM;
-import rsm.DiskPaxosRSM;
-import rsm.GenericPaxosSMR;
+import rsm.*;
 import utils.AdaPaxosParameters;
 import utils.NetworkConfiguration;
 
@@ -377,9 +374,14 @@ public class demo {
                 int serverId = i;
                 service.execute(() -> {
                     try {
+                        /*
                         AdaPaxosRSM rsm = AdaPaxosRSM.makeInstance(serverId, 0, 5,
                                 new PseudoRemoteInstanceStore(serverId, stores, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE),
                                 new BipolarNetService(serverId, controller)
+                        );*/
+                        StaticPaxosRSM rsm = StaticPaxosRSM.makeInstance(serverId, 0, 5,
+                                new PseudoRemoteInstanceStore(serverId, stores, AdaPaxosParameters.RSM.DEFAULT_INSTANCE_SIZE),
+                                new BipolarNetService(serverId, controller), true
                         );
                         rsm.link(netConfig);
                         rsm.agent(controller);
